@@ -125,11 +125,12 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
-    "DEFAULT_THROTTLE_CLASSES": [
-        "rest_framework.throttling.AnonRateThrottle",
-        "rest_framework.throttling.UserRateThrottle",
-    ],
-    "DEFAULT_THROTTLE_RATES": {"anon": "100/hour", "user": "1000/hour"},
+    # Temporarily disable throttling due to Redis cache corruption
+    # "DEFAULT_THROTTLE_CLASSES": [
+    #     "rest_framework.throttling.AnonRateThrottle",
+    #     "rest_framework.throttling.UserRateThrottle",
+    # ],
+    # "DEFAULT_THROTTLE_RATES": {"anon": "100/hour", "user": "1000/hour"},
 }
 
 # JWT Settings
@@ -236,21 +237,21 @@ CACHES = {
                 "max_connections": 20,
                 "decode_responses": True,
             },
-            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            # Temporarily disable compression to avoid corruption issues
+            # "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
         },
         "KEY_PREFIX": "pms",
         "TIMEOUT": 300,  # 5 minutes default
     }
 }
 
-# Cache settings for different data types
-CACHE_MIDDLEWARE_ALIAS = "default"
-CACHE_MIDDLEWARE_SECONDS = 300  # 5 minutes
-CACHE_MIDDLEWARE_KEY_PREFIX = "pms_cache"
+# Temporarily disable cache middleware due to Redis corruption
+# CACHE_MIDDLEWARE_ALIAS = "default"
+# CACHE_MIDDLEWARE_SECONDS = 300  # 5 minutes
+# CACHE_MIDDLEWARE_KEY_PREFIX = "pms_cache"
 
-# Session caching
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
+# Temporarily use database-backed sessions instead of Redis
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 # Celery Configuration
 CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")

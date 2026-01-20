@@ -2,13 +2,74 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
+// Plugin to handle React 19 compatibility for use-sync-external-store
+function react19CompatPlugin() {
+  return {
+    name: 'react19-compat',
+    enforce: 'pre' as const,
+    resolveId(id: string) {
+      // Handle direct imports of the shim paths
+      if (id === 'use-sync-external-store/shim/with-selector' || id === 'use-sync-external-store/with-selector.js') {
+        return path.resolve(__dirname, './src/shims/use-sync-external-store-with-selector.js')
+      }
+      if (id === 'use-sync-external-store/shim') {
+        return path.resolve(__dirname, './src/shims/use-sync-external-store.js')
+      }
+      if (id === 'use-sync-external-store') {
+        return path.resolve(__dirname, './src/shims/use-sync-external-store.js')
+      }
+      return null
+    },
+    load(id: string) {
+      if (id === path.resolve(__dirname, './src/shims/use-sync-external-store-with-selector.js')) {
+        return `export { useSyncExternalStoreWithSelector } from 'react'`
+      }
+      if (id === path.resolve(__dirname, './src/shims/use-sync-external-store.js')) {
+        return `export { useSyncExternalStore } from 'react'`
+      }
+      return null
+    }
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), react19CompatPlugin()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "es-toolkit/compat": "lodash-es", // Redirect es-toolkit to lodash-es for better compatibility
     },
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'axios',
+      'lucide-react',
+      'date-fns',
+      'clsx',
+      'tailwind-merge',
+      'zod',
+      'sonner',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@radix-ui/react-toast',
+      '@tanstack/react-table',
+      'class-variance-authority',
+      'eventemitter3', // Include eventemitter3 for proper module resolution
+      'react-is', // Include react-is for proper module resolution
+      'recharts', // Temporarily include recharts to test module resolution
+    ],
+    exclude: [
+      'zustand', // Exclude zustand to avoid use-sync-external-store conflicts
+      '@dnd-kit/core',
+      '@dnd-kit/modifiers',
+      '@dnd-kit/sortable',
+      '@dnd-kit/utilities'
+    ]
   },
   server: {
     host: '0.0.0.0',
@@ -66,38 +127,6 @@ export default defineConfig({
     target: 'esnext',
     // Optimize assets
     assetsInlineLimit: 4096
-  },
-  // Optimize dependencies for faster development
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      'axios',
-      'lucide-react',
-      'date-fns',
-      'clsx',
-      'tailwind-merge',
-      'zod',
-      'sonner',
-      // Core UI libraries
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-dropdown-menu',
-      '@radix-ui/react-select',
-      '@radix-ui/react-toast',
-      // Table and data libraries
-      '@tanstack/react-table',
-      // Utility libraries
-      'class-variance-authority'
-    ],
-    exclude: [
-      // Exclude large libraries that should be lazy loaded
-      'recharts',
-      '@dnd-kit/core',
-      '@dnd-kit/modifiers',
-      '@dnd-kit/sortable',
-      '@dnd-kit/utilities'
-    ]
   },
   // CSS configuration
   css: {

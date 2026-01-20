@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action
@@ -45,6 +47,7 @@ class PropertyViewSet(BaseViewSet):
         - Comprehensive filtering and search capabilities
     """
 
+    queryset = Property.objects.all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["property_type", "is_active", "city", "state"]
     search_fields = ["property_name", "address", "city"]
@@ -154,7 +157,8 @@ class PropertyViewSet(BaseViewSet):
             }
         )
 
-    @method_decorator(cache_page(600))  # Cache for 10 minutes
+    # Temporarily disable caching due to Redis corruption
+    # @method_decorator(cache_page(600))  # Cache for 10 minutes
     @action(detail=False, methods=["get"])
     def dashboard_analytics(self, request):
         """Get comprehensive dashboard analytics"""
