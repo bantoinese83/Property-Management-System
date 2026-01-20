@@ -92,6 +92,7 @@ interface ModalProps {
   isOpen: boolean
   onClose: () => void
   title: string
+  description?: string
   children: React.ReactNode
   footer?: React.ReactNode
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl'
@@ -101,6 +102,7 @@ export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   title,
+  description,
   children,
   footer,
   size = 'md',
@@ -118,6 +120,7 @@ export const Modal: React.FC<ModalProps> = ({
       >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         <div className='modal-body max-h-[calc(90vh-8rem)] overflow-y-auto'>{children}</div>
         {footer && <DialogFooter>{footer}</DialogFooter>}

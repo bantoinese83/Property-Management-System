@@ -7,6 +7,14 @@ export const API_ENDPOINTS = {
     REGISTER: '/users/',
   },
 
+  // Users
+  USERS: {
+    ME: '/users/me/',
+    PROFILE: (id: number) => `/users/${id}/profile/`,
+    LIST: '/users/',
+    DETAIL: (id: number) => `/users/${id}/`,
+  },
+
   // Properties
   PROPERTIES: {
     LIST: '/properties/',
@@ -70,11 +78,58 @@ export const API_ENDPOINTS = {
     },
   },
 
-  // Documents
+  // Billing
+  BILLING: {
+    PLANS: '/billing/plans/',
+    SUBSCRIPTIONS: '/billing/subscriptions/',
+    SUBSCRIPTION_DETAIL: (id: string) => `/billing/subscriptions/${id}/`,
+    PAYMENT_METHODS: '/billing/payment-methods/',
+    PAYMENT_METHOD_DETAIL: (id: number) => `/billing/payment-methods/${id}/`,
+    INVOICES: '/billing/invoices/',
+  },
+
+  // Notifications
+  NOTIFICATIONS: {
+    LIST: '/notifications/',
+    DETAIL: (id: number) => `/notifications/${id}/`,
+    MARK_READ: (id: number) => `/notifications/${id}/mark_read/`,
+    ARCHIVE: (id: number) => `/notifications/${id}/archive/`,
+    MARK_ALL_READ: '/notifications/mark_all_read/',
+    UNREAD_COUNT: '/notifications/unread_count/',
+  },
+
+  NOTIFICATION_PREFERENCES: '/notification-preferences/',
+
+  // Reports
+  REPORTS: {
+    TEMPLATES: '/reports/templates/',
+    GENERATE: '/reports/generate/',
+    LIST: '/reports/list/',
+  },
+
+  // Audit
+  AUDIT: '/audit/',
+
+  // Documents (file uploads)
   DOCUMENTS: {
     LIST: '/documents/',
     DETAIL: (id: number) => `/documents/${id}/`,
     CREATE: '/documents/',
     DELETE: (id: number) => `/documents/${id}/`,
+  },
+
+  // Templates (document templates)
+  TEMPLATES: {
+    LIST: '/templates/',
+    DETAIL: (id: number) => `/templates/${id}/`,
+    VARIABLES: (id: number) => `/templates/${id}/variables/`,
+  },
+
+  // Generated Documents
+  GENERATED_DOCUMENTS: {
+    LIST: '/templates/generated/',
+    DETAIL: (id: number) => `/templates/generated/${id}/`,
+    DOWNLOAD: (id: number) => `/templates/generated/${id}/download/`,
+    GENERATE: '/templates/generate/',
   },
 }

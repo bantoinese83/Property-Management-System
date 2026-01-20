@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import URLValidator
 from django.db import models
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -58,3 +59,107 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"Profile of {self.user.username}"
+
+
+class Notification(models.Model):
+    """User notifications"""
+
+    NOTIFICATION_TYPES = (
+        ('system', 'System Notification'),
+        ('payment', 'Payment Notification'),
+        ('maintenance', 'Maintenance Notification'),
+        ('lease', 'Lease Notification'),
+        ('property', 'Property Notification'),
+        ('tenant', 'Tenant Notification'),
+    )
+
+    PRIORITY_CHOICES = (
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('urgent', 'Urgent'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+
+    # Related objects (optional)
+    related_model = models.CharField(max_length=100, blank=True)  # e.g., 'property', 'lease', 'maintenance'
+    related_id = models.PositiveIntegerField(null=True, blank=True)
+
+    # Status
+    is_read = models.BooleanField(default=False)
+    is_archived = models.BooleanField(default=False)
+
+    # Metadata
+    action_url = models.URLField(blank=True)  # URL to redirect user to
+    metadata = models.JSONField(default=dict)  # Additional data
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_read']),
+            models.Index(fields=['user', 'notification_type']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.title}"
+
+    def mark_as_read(self):
+        """Mark notification as read"""
+        self.is_read = True
+        self.save(update_fields=['is_read', 'updated_at'])
+
+    def archive(self):
+        """Archive notification"""
+        self.is_archived = True
+        self.save(update_fields=['is_archived', 'updated_at'])
+
+
+class NotificationPreference(models.Model):
+    """User notification preferences"""
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='notification_preferences')
+
+    # Email preferences
+    email_enabled = models.BooleanField(default=True)
+    email_payment_reminders = models.BooleanField(default=True)
+    email_maintenance_updates = models.BooleanField(default=True)
+    email_lease_updates = models.BooleanField(default=True)
+    email_system_updates = models.BooleanField(default=True)
+
+    # In-app preferences
+    in_app_enabled = models.BooleanField(default=True)
+    in_app_payment_reminders = models.BooleanField(default=True)
+    in_app_maintenance_updates = models.BooleanField(default=True)
+    in_app_lease_updates = models.BooleanField(default=True)
+    in_app_system_updates = models.BooleanField(default=True)
+
+    # Push notification preferences (for future mobile app)
+    push_enabled = models.BooleanField(default=False)
+    push_payment_reminders = models.BooleanField(default=False)
+    push_maintenance_updates = models.BooleanField(default=False)
+    push_lease_updates = models.BooleanField(default=False)
+    push_system_updates = models.BooleanField(default=False)
+
+    # Frequency settings
+    digest_frequency = models.CharField(max_length=20, choices=[
+        ('immediate', 'Immediate'),
+        ('daily', 'Daily'),
+        ('weekly', 'Weekly'),
+        ('never', 'Never'),
+    ], default='immediate')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Notification preferences for {self.user.username}"

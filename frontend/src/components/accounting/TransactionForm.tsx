@@ -12,17 +12,40 @@ interface TransactionFormProps {
   onClose: () => void
 }
 
-type TransactionFormValues = Omit<
-  FinancialTransaction,
-  'id' | 'recorded_by' | 'recorded_by_name' | 'created_at' | 'updated_at'
->
+type TransactionFormValues = {
+  property_obj?: number
+  transaction_type: string
+  category: string
+  amount?: number
+  description: string
+  transaction_date: string
+  lease?: number
+  maintenance_request?: number
+  vendor_name: string
+  vendor_invoice_number: string
+  is_recurring: boolean
+  recurring_frequency: string
+}
 
 const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onClose }) => {
   const isEditing = !!transaction
 
   const { values, errors, loading, handleChange, handleSubmit, setValue } =
     useForm<TransactionFormValues>({
-      initialValues: (transaction as TransactionFormValues) || {
+      initialValues: transaction ? {
+        property_obj: transaction.property,
+        transaction_type: transaction.transaction_type,
+        category: transaction.category,
+        amount: typeof transaction.amount === 'string' ? parseFloat(transaction.amount) : transaction.amount,
+        description: transaction.description,
+        transaction_date: transaction.transaction_date,
+        lease: transaction.lease,
+        maintenance_request: transaction.maintenance_request,
+        vendor_name: transaction.vendor_name || '',
+        vendor_invoice_number: transaction.vendor_invoice_number || '',
+        is_recurring: false,
+        recurring_frequency: '',
+      } : {
         property_obj: undefined,
         transaction_type: 'expense',
         category: '',
@@ -79,58 +102,57 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onClose 
     { value: 'other_expenses', label: 'Other Expenses' },
   ]
 
-  const currentCategories = values.transaction_type === 'income' ? incomeCategories : expenseCategories
+  const currentCategories =
+    values.transaction_type === 'income' ? incomeCategories : expenseCategories
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className='space-y-5'>
       {/* Transaction Details */}
-      <div className="space-y-3">
+      <div className='space-y-3'>
         <div>
-          <h3 className="text-base font-medium text-foreground">Transaction Details</h3>
-          <p className="text-xs text-muted-foreground">Basic transaction information</p>
+          <h3 className='text-base font-medium text-foreground'>Transaction Details</h3>
+          <p className='text-xs text-muted-foreground'>Basic transaction information</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
           <Input
-            label="Property ID"
-            name="property_obj"
-            type="number"
+            label='Property ID'
+            name='property_obj'
+            type='number'
             value={values.property_obj || ''}
             onChange={handleChange}
             required
           />
 
           <div>
-            <label className="text-sm font-medium text-muted-foreground mb-2 block">
+            <label className='text-sm font-medium text-muted-foreground mb-2 block'>
               Transaction Type
             </label>
             <select
-              name="transaction_type"
+              name='transaction_type'
               value={values.transaction_type}
               onChange={handleChange}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
               required
             >
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
+              <option value='income'>Income</option>
+              <option value='expense'>Expense</option>
             </select>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
           <div>
-            <label className="text-sm font-medium text-muted-foreground mb-2 block">
-              Category
-            </label>
+            <label className='text-sm font-medium text-muted-foreground mb-2 block'>Category</label>
             <select
-              name="category"
+              name='category'
               value={values.category}
               onChange={handleChange}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
               required
             >
-              <option value="">Select Category</option>
-              {currentCategories.map((cat) => (
+              <option value=''>Select Category</option>
+              {currentCategories.map(cat => (
                 <option key={cat.value} value={cat.value}>
                   {cat.label}
                 </option>
@@ -139,31 +161,31 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onClose 
           </div>
 
           <Input
-            label="Amount"
-            name="amount"
-            type="number"
+            label='Amount'
+            name='amount'
+            type='number'
             value={values.amount || ''}
             onChange={handleChange}
-            min="0"
-            step="0.01"
+            min='0'
+            step='0.01'
             required
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
           <Input
-            label="Transaction Date"
-            name="transaction_date"
-            type="date"
+            label='Transaction Date'
+            name='transaction_date'
+            type='date'
             value={values.transaction_date}
             onChange={handleChange}
             required
           />
 
           <Input
-            label="Lease ID (Optional)"
-            name="lease"
-            type="number"
+            label='Lease ID (Optional)'
+            name='lease'
+            type='number'
             value={values.lease || ''}
             onChange={handleChange}
           />
@@ -171,31 +193,33 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onClose 
       </div>
 
       {/* Description & Vendor */}
-      <div className="space-y-3">
+      <div className='space-y-3'>
         <div>
-          <h3 className="text-base font-medium text-foreground">Description & Vendor</h3>
-          <p className="text-xs text-muted-foreground">Transaction details and vendor information</p>
+          <h3 className='text-base font-medium text-foreground'>Description & Vendor</h3>
+          <p className='text-xs text-muted-foreground'>
+            Transaction details and vendor information
+          </p>
         </div>
 
         <Input
-          label="Description"
-          name="description"
+          label='Description'
+          name='description'
           value={values.description}
           onChange={handleChange}
           required
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
           <Input
-            label="Vendor Name"
-            name="vendor_name"
+            label='Vendor Name'
+            name='vendor_name'
             value={values.vendor_name}
             onChange={handleChange}
           />
 
           <Input
-            label="Vendor Invoice Number"
-            name="vendor_invoice_number"
+            label='Vendor Invoice Number'
+            name='vendor_invoice_number'
             value={values.vendor_invoice_number}
             onChange={handleChange}
           />
@@ -203,42 +227,42 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onClose 
       </div>
 
       {/* Recurring Settings */}
-      <div className="space-y-3">
+      <div className='space-y-3'>
         <div>
-          <h3 className="text-base font-medium text-foreground">Recurring Settings</h3>
-          <p className="text-xs text-muted-foreground">Configure recurring transactions</p>
+          <h3 className='text-base font-medium text-foreground'>Recurring Settings</h3>
+          <p className='text-xs text-muted-foreground'>Configure recurring transactions</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="flex items-center space-x-2 pt-6">
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+          <div className='flex items-center space-x-2 pt-6'>
             <input
-              type="checkbox"
-              id="is_recurring"
-              name="is_recurring"
+              type='checkbox'
+              id='is_recurring'
+              name='is_recurring'
               checked={values.is_recurring}
               onChange={e => setValue('is_recurring', e.target.checked)}
-              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+              className='h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded'
             />
-            <label htmlFor="is_recurring" className="text-sm font-medium text-foreground">
+            <label htmlFor='is_recurring' className='text-sm font-medium text-foreground'>
               This is a recurring transaction
             </label>
           </div>
 
           {values.is_recurring && (
             <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">
+              <label className='text-sm font-medium text-muted-foreground mb-2 block'>
                 Frequency
               </label>
               <select
-                name="recurring_frequency"
+                name='recurring_frequency'
                 value={values.recurring_frequency}
                 onChange={handleChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
               >
-                <option value="">Select Frequency</option>
-                <option value="monthly">Monthly</option>
-                <option value="quarterly">Quarterly</option>
-                <option value="yearly">Yearly</option>
+                <option value=''>Select Frequency</option>
+                <option value='monthly'>Monthly</option>
+                <option value='quarterly'>Quarterly</option>
+                <option value='yearly'>Yearly</option>
               </select>
             </div>
           )}
@@ -247,17 +271,17 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onClose 
 
       {/* Error Display */}
       {errors.submit && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
+        <div className='rounded-lg border border-red-200 bg-red-50 p-4 text-red-800'>
           {errors.submit}
         </div>
       )}
 
       {/* Form Actions */}
-      <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-        <Button type="button" variant="ghost" onClick={onClose} className="mt-2 sm:mt-0">
+      <div className='flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4'>
+        <Button type='button' variant='ghost' onClick={onClose} className='mt-2 sm:mt-0'>
           Cancel
         </Button>
-        <Button type="submit" variant="primary" loading={loading}>
+        <Button type='submit' variant='primary' loading={loading}>
           {isEditing ? 'Update Transaction' : 'Create Transaction'}
         </Button>
       </div>

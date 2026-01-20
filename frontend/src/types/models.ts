@@ -203,6 +203,8 @@ export interface FinancialTransaction {
   lease_tenant_name?: string
   maintenance_request?: number
   maintenance_title?: string
+  vendor_name?: string
+  vendor_invoice_number?: string
   created_at: string
   updated_at: string
 }

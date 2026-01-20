@@ -34,7 +34,10 @@ export function useApi<T = unknown>(
   const retryCount = useRef(0)
 
   // Memoize options to prevent unnecessary re-renders
-  const memoizedOptions = useMemo(() => options, [options.skip, options.refetchInterval, options.retryOnError])
+  const memoizedOptions = useMemo(
+    () => options,
+    [options.skip, options.refetchInterval, options.retryOnError]
+  )
 
   const fetchData = useCallback(
     async (isRetry = false) => {
@@ -71,7 +74,7 @@ export function useApi<T = unknown>(
           axiosError.response &&
           typeof axiosError.response.status === 'number' &&
           axiosError.response.status >= 500 &&
-          axiosError.response.status !== 429  // Don't retry rate limits
+          axiosError.response.status !== 429 // Don't retry rate limits
         ) {
           retryCount.current++
           setTimeout(() => fetchData(true), 1000 * Math.pow(2, retryCount.current))

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Lease Expiration Notice</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; border-bottom: 2px solid #dc3545; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { color: #dc3545; margin: 0; }
+        .content { line-height: 1.6; color: #333; }
+        .urgent { background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .lease-details { background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .button { display: inline-block; background-color: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 10px 20px 0; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Lease Expiration Notice</h1>
+        </div>
+
+        <div class="content">
+            <p>Dear {{ tenant_name }},</p>
+
+            <p>This is an important notice regarding your lease agreement.</p>
+
+            <div class="urgent">
+                <strong>⚠️ Your lease is expiring soon!</strong>
+            </div>
+
+            <div class="lease-details">
+                <strong>Property:</strong> {{ property_name }}<br>
+                <strong>Lease Period:</strong> {{ lease_start_date }} to {{ lease_end_date }}<br>
+                <strong>Monthly Rent:</strong> ${{ monthly_rent }}<br>
+                <strong>Days Remaining:</strong> {{ days_remaining }}<br>
+                {% if auto_renew %}
+                <strong>Auto-Renewal:</strong> Enabled<br>
+                {% endif %}
+            </div>
+
+            {% if days_remaining <= 30 %}
+            <p><strong>Your lease will expire in {{ days_remaining }} day{{ days_remaining|pluralize }}.</strong></p>
+
+            <p>Please contact us as soon as possible to discuss your lease renewal options:</p>
+            <ul>
+                <li>Renew your current lease terms</li>
+                <li>Negotiate new lease terms</li>
+                <li>Make arrangements for move-out</li>
+            </ul>
+            {% else %}
+            <p>Your lease will expire in {{ days_remaining }} days. We recommend planning ahead for this important date.</p>
+            {% endif %}
+
+            <a href="{{ contact_link }}" class="button">Contact Us</a>
+            <a href="{{ renewal_link }}" class="button">Start Renewal Process</a>
+
+            <p>Failure to renew or provide notice may result in month-to-month tenancy terms or other arrangements as per your lease agreement.</p>
+
+            <p>Please don't hesitate to contact us with any questions about your lease or renewal options.</p>
+
+            <p>Best regards,<br>
+            {{ company_name }} Leasing Team</p>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated message from {{ company_name }} Property Management System.<br>
+            Please do not reply to this email.</p>
+            <p>Contact us: {{ contact_email }} | {{ contact_phone }}</p>
+        </div>
+    </div>
+</body>
+</html>

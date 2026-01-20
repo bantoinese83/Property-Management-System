@@ -76,11 +76,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
     })
 
   return (
-    <form onSubmit={handleSubmit} className='property-form'>
-      <div className='form-grid'>
+    <form onSubmit={handleSubmit} className='space-y-6'>
+      <div className='grid gap-6 lg:grid-cols-2'>
         {/* Basic Information */}
-        <div className='form-section'>
-          <h3>Basic Information</h3>
+        <div className='space-y-4 lg:col-span-2'>
+          <h3 className='text-lg font-semibold border-b pb-2'>Basic Information</h3>
 
           <Input
             label='Property Name'
@@ -92,8 +92,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
             fullWidth
           />
 
-          <div className='form-row'>
-            <div className='form-group'>
+          <div className='grid gap-4 sm:grid-cols-2'>
+            <div className='space-y-2'>
               <Label htmlFor='property_type'>Property Type</Label>
               <Select
                 value={values.property_type}
@@ -127,7 +127,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
             />
           </div>
 
-          <div className='form-group'>
+            <div className='space-y-2'>
             <label htmlFor='description'>Description</label>
             <textarea
               id='description'
@@ -142,8 +142,8 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
         </div>
 
         {/* Address Information */}
-        <div className='form-section'>
-          <h3>Address</h3>
+        <div className='space-y-4 lg:col-span-2'>
+          <h3 className='text-lg font-semibold border-b pb-2'>Address</h3>
 
           <Input
             label='Street Address'
@@ -154,7 +154,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
             fullWidth
           />
 
-          <div className='form-row'>
+          <div className='grid gap-4 sm:grid-cols-2'>
             <Input
               label='City'
               name='city'
@@ -174,7 +174,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
             />
           </div>
 
-          <div className='form-row'>
+          <div className='grid gap-4 sm:grid-cols-2'>
             <Input
               label='ZIP Code'
               name='zip_code'
@@ -195,10 +195,10 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
         </div>
 
         {/* Property Details */}
-        <div className='form-section'>
-          <h3>Property Details</h3>
+        <div className='space-y-4 lg:col-span-2'>
+          <h3 className='text-lg font-semibold border-b pb-2'>Property Details</h3>
 
-          <div className='form-row'>
+          <div className='grid gap-4 sm:grid-cols-2'>
             <Input
               label='Year Built'
               name='year_built'
@@ -221,7 +221,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
             />
           </div>
 
-          <div className='form-row'>
+          <div className='grid gap-4 sm:grid-cols-2'>
             <Input
               label='Bedrooms'
               name='bedrooms'
@@ -246,10 +246,10 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
         </div>
 
         {/* Financial Information */}
-        <div className='form-section'>
-          <h3>Financial Information</h3>
+        <div className='space-y-4 lg:col-span-2'>
+          <h3 className='text-lg font-semibold border-b pb-2'>Financial Information</h3>
 
-          <div className='form-row'>
+          <div className='grid gap-4 sm:grid-cols-2'>
             <Input
               label='Purchase Price'
               name='purchase_price'
@@ -271,7 +271,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
             />
           </div>
 
-          <div className='form-row'>
+          <div className='grid gap-4 sm:grid-cols-2'>
             <Input
               label='Annual Property Tax'
               name='annual_property_tax'
@@ -297,11 +297,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
         </div>
 
         {/* Status */}
-        <div className='form-section'>
-          <h3>Status</h3>
+        <div className='space-y-4 lg:col-span-2'>
+          <h3 className='text-lg font-semibold border-b pb-2'>Status</h3>
 
-          <div className='form-checkboxes'>
-            <label className='checkbox-label'>
+          <div className='space-y-3'>
+            <label className='flex items-center space-x-2 cursor-pointer'>
               <input
                 type='checkbox'
                 name='is_active'
@@ -326,11 +326,11 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
 
       {errors.submit && <div className='form-error'>{errors.submit}</div>}
 
-      <div className='form-actions'>
-        <Button type='button' variant='ghost' onClick={onClose}>
+      <div className='flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-6 border-t'>
+        <Button type='button' variant='ghost' onClick={onClose} className='w-full sm:w-auto'>
           Cancel
         </Button>
-        <Button type='submit' variant='primary' loading={loading}>
+        <Button type='submit' variant='primary' loading={loading} className='w-full sm:w-auto'>
           {isEditing ? 'Update Property' : 'Add Property'}
         </Button>
       </div>

@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from .models import User, UserProfile
+from .models import User, UserProfile, Notification, NotificationPreference
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -111,3 +111,43 @@ class UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(_("Must include username and password"))
 
         return data
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    time_ago = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Notification
+        fields = [
+            'id', 'notification_type', 'title', 'message', 'priority',
+            'is_read', 'is_archived', 'action_url', 'created_at', 'time_ago'
+        ]
+        read_only_fields = ['id', 'created_at', 'time_ago']
+
+    def get_time_ago(self, obj):
+        from django.utils import timezone
+        delta = timezone.now() - obj.created_at
+
+        if delta.days > 0:
+            return f"{delta.days} day{'s' if delta.days > 1 else ''} ago"
+        elif delta.seconds // 3600 > 0:
+            hours = delta.seconds // 3600
+            return f"{hours} hour{'s' if hours > 1 else ''} ago"
+        elif delta.seconds // 60 > 0:
+            minutes = delta.seconds // 60
+            return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+        else:
+            return "Just now"
+
+
+class NotificationPreferenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotificationPreference
+        fields = [
+            'email_enabled', 'email_payment_reminders', 'email_maintenance_updates',
+            'email_lease_updates', 'email_system_updates', 'in_app_enabled',
+            'in_app_payment_reminders', 'in_app_maintenance_updates', 'in_app_lease_updates',
+            'in_app_system_updates', 'push_enabled', 'push_payment_reminders',
+            'push_maintenance_updates', 'push_lease_updates', 'push_system_updates',
+            'digest_frequency'
+        ]

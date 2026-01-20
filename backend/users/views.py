@@ -5,12 +5,14 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User, UserProfile
+from .models import User, UserProfile, Notification, NotificationPreference
 from .serializers import (
     UserLoginSerializer,
     UserProfileSerializer,
     UserRegistrationSerializer,
     UserSerializer,
+    NotificationSerializer,
+    NotificationPreferenceSerializer,
 )
 
 
@@ -128,3 +130,72 @@ class UserViewSet(viewsets.ModelViewSet):
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    """ViewSet for user notifications"""
+    serializer_class = NotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['notification_type', 'is_read', 'is_archived']
+    ordering_fields = ['created_at', 'priority']
+    ordering = ['-created_at']
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)
+
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        """Mark notification as read"""
+        notification = self.get_object()
+        notification.mark_as_read()
+        serializer = self.get_serializer(notification)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def archive(self, request, pk=None):
+        """Archive notification"""
+        notification = self.get_object()
+        notification.archive()
+        serializer = self.get_serializer(notification)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def mark_all_read(self, request):
+        """Mark all unread notifications as read"""
+        updated_count = self.get_queryset().filter(is_read=False).update(is_read=True)
+        return Response({'message': f'Marked {updated_count} notifications as read'})
+
+    @action(detail=False, methods=['get'])
+    def unread_count(self, request):
+        """Get count of unread notifications"""
+        count = self.get_queryset().filter(is_read=False).count()
+        return Response({'unread_count': count})
+
+
+class NotificationPreferenceViewSet(viewsets.ModelViewSet):
+    """ViewSet for notification preferences"""
+    serializer_class = NotificationPreferenceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return NotificationPreference.objects.filter(user=self.request.user)
+
+    def get_object(self):
+        """Get or create notification preferences for current user"""
+        obj, created = NotificationPreference.objects.get_or_create(user=self.request.user)
+        return obj
+
+    def list(self, request, *args, **kwargs):
+        """Get current user's notification preferences"""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        """Update current user's notification preferences"""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)

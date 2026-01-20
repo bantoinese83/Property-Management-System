@@ -1,21 +1,30 @@
-import { useState } from "react"
-import { MailIcon, PlusCircleIcon, type LucideIcon, Home, Users, FileText, Wrench, DollarSign } from "lucide-react"
-import { Link } from "react-router-dom"
+import { useState } from 'react'
+import {
+  MailIcon,
+  PlusCircleIcon,
+  type LucideIcon,
+  Home,
+  Users,
+  FileText,
+  Wrench,
+  DollarSign,
+} from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 
 export function NavMain({
   items,
@@ -27,67 +36,68 @@ export function NavMain({
   }[]
 }) {
   const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false)
+  const navigate = useNavigate()
 
   const quickCreateItems = [
     {
-      title: "Property",
-      url: "/properties",
+      title: 'Property',
+      url: '/properties',
       icon: Home,
-      description: "Add new property",
+      description: 'Add new property',
     },
     {
-      title: "Tenant",
-      url: "/tenants",
+      title: 'Tenant',
+      url: '/tenants',
       icon: Users,
-      description: "Add new tenant",
+      description: 'Add new tenant',
     },
     {
-      title: "Lease",
-      url: "/leases",
+      title: 'Lease',
+      url: '/leases',
       icon: FileText,
-      description: "Create new lease",
+      description: 'Create new lease',
     },
     {
-      title: "Maintenance",
-      url: "/maintenance",
+      title: 'Maintenance',
+      url: '/maintenance',
       icon: Wrench,
-      description: "Log maintenance request",
+      description: 'Log maintenance request',
     },
     {
-      title: "Payment",
-      url: "/payments",
+      title: 'Payment',
+      url: '/payments',
       icon: DollarSign,
-      description: "Record payment",
+      description: 'Record payment',
     },
   ]
 
   return (
     <SidebarGroup>
-      <SidebarGroupContent className="flex flex-col gap-2">
+      <SidebarGroupContent className='flex flex-col gap-2'>
         <SidebarMenu>
-          <SidebarMenuItem className="flex items-center gap-2">
+          <SidebarMenuItem className='flex items-center gap-2'>
             <DropdownMenu open={isQuickCreateOpen} onOpenChange={setIsQuickCreateOpen}>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
-                  tooltip="Quick Create"
-                  className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+                  tooltip='Quick Create'
+                  className='min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground'
                 >
                   <PlusCircleIcon />
                   <span>Quick Create</span>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56">
-                {quickCreateItems.map((item) => (
+              <DropdownMenuContent align='start' className='w-56'>
+                {quickCreateItems.map(item => (
                   <DropdownMenuItem key={item.title} asChild>
                     <Link
                       to={item.url}
-                      className="flex items-center gap-3 cursor-pointer"
+                      className='flex items-center gap-3 cursor-pointer'
                       onClick={() => setIsQuickCreateOpen(false)}
                     >
-                      {item.icon && <item.icon className="h-4 w-4" />}
-                      <div className="flex flex-col">
-                        <span className="font-medium">{item.title}</span>
-                        <span className="text-xs text-muted-foreground">{item.description}</span>
+                      {item.icon && <item.icon className='h-4 w-4' />}
+                      <div className='flex flex-col'>
+                        <span className='font-medium'>{item.title}</span>
+                        <span className='text-xs text-muted-foreground'>{item.description}</span>
                       </div>
                     </Link>
                   </DropdownMenuItem>
@@ -95,17 +105,19 @@ export function NavMain({
               </DropdownMenuContent>
             </DropdownMenu>
             <Button
-              size="icon"
-              className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
+              size='icon'
+              className='h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0'
+              variant='outline'
+              onClick={() => navigate('/notifications')}
+              title='View Notifications'
             >
               <MailIcon />
-              <span className="sr-only">Inbox</span>
+              <span className='sr-only'>Inbox</span>
             </Button>
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {items.map((item) => (
+          {items.map(item => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title} asChild>
                 <Link to={item.url}>

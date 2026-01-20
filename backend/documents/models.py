@@ -1,51 +1,64 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.conf import settings
-import os
+
+User = get_user_model()
+
 
 class Document(models.Model):
-    """
-    General purpose document storage model.
-    Can be attached to any other model (Property, Tenant, Lease, etc.)
-    """
+    """File documents uploaded for various models"""
+
+    FILE_TYPES = (
+        ('pdf', 'PDF'),
+        ('doc', 'Word Document'),
+        ('docx', 'Word Document'),
+        ('xls', 'Excel Spreadsheet'),
+        ('xlsx', 'Excel Spreadsheet'),
+        ('txt', 'Text File'),
+        ('jpg', 'JPEG Image'),
+        ('png', 'PNG Image'),
+        ('gif', 'GIF Image'),
+        ('other', 'Other'),
+    )
+
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    file = models.FileField(upload_to="documents/%Y/%m/%d/")
-    file_type = models.CharField(max_length=100, blank=True)
-    file_size = models.PositiveIntegerField(help_text="File size in bytes", null=True, blank=True)
-    
-    # Generic relation to attach to any model
+
+    # File storage
+    file = models.FileField(upload_to='documents/')
+    file_type = models.CharField(max_length=10, choices=FILE_TYPES)
+    file_size = models.PositiveIntegerField(null=True, blank=True)
+
+    # Generic relation to any model
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey("content_type", "object_id")
-    
-    uploaded_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="uploaded_documents"
-    )
-    
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    # Audit
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='uploaded_documents')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
+        ordering = ['-created_at']
         indexes = [
-            models.Index(fields=["content_type", "object_id"]),
-            models.Index(fields=["title"]),
+            models.Index(fields=['content_type', 'object_id']),
+            models.Index(fields=['uploaded_by']),
         ]
-        ordering = ["-created_at"]
 
     def __str__(self):
-        return self.title
+        return f"{self.title} ({self.file_type})"
 
-    def save(self, *args, **kwargs):
-        if self.file and not self.file_size:
-            self.file_size = self.file.size
-        
-        if self.file and not self.file_type:
-            _, extension = os.path.splitext(self.file.name)
-            self.file_type = extension.lower().replace(".", "")
-            
-        super().save(*args, **kwargs)
+    def get_file_type_display(self):
+        return dict(self.FILE_TYPES).get(self.file_type, self.file_type)
+
+    @property
+    def file_url(self):
+        """Get the file URL"""
+        return self.file.url if self.file else None
+
+    @property
+    def file_name(self):
+        """Get the file name from the path"""
+        return self.file.name.split('/')[-1] if self.file else None

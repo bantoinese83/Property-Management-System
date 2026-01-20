@@ -24,7 +24,7 @@ export const devUtils = {
         console.log('Response:', {
           status: response.status,
           data: response.data,
-          headers: response.headers
+          headers: response.headers,
         })
       }
       console.groupEnd()
@@ -49,7 +49,7 @@ export const devUtils = {
       console.log('🧠 Memory Usage:', {
         used: `${Math.round(memInfo.usedJSHeapSize / 1048576)} MB`,
         total: `${Math.round(memInfo.totalJSHeapSize / 1048576)} MB`,
-        limit: `${Math.round(memInfo.jsHeapSizeLimit / 1048576)} MB`
+        limit: `${Math.round(memInfo.jsHeapSizeLimit / 1048576)} MB`,
       })
     }
   },
@@ -69,18 +69,19 @@ export const devUtils = {
         dev: import.meta.env.DEV,
         prod: import.meta.env.PROD,
         baseUrl: import.meta.env.BASE_URL,
-        apiUrl: import.meta.env.VITE_API_URL
+        apiUrl: import.meta.env.VITE_API_URL,
       })
     }
-  }
+  },
 }
 
 // Performance observer for long tasks
 export const initPerformanceObserver = () => {
   if (import.meta.env.DEV && 'PerformanceObserver' in window) {
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
-        if (entry.duration > 50) { // Log tasks longer than 50ms
+        if (entry.duration > 50) {
+          // Log tasks longer than 50ms
           console.warn(`🐌 Long task detected: ${entry.name} took ${entry.duration.toFixed(2)}ms`)
         }
       }

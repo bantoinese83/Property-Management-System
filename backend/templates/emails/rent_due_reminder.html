@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Rent Payment Due Reminder</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; border-bottom: 2px solid #007bff; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { color: #007bff; margin: 0; }
+        .content { line-height: 1.6; color: #333; }
+        .highlight { background-color: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107; margin: 20px 0; }
+        .amount { font-size: 24px; font-weight: bold; color: #28a745; }
+        .button { display: inline-block; background-color: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Rent Payment Reminder</h1>
+        </div>
+
+        <div class="content">
+            <p>Dear {{ tenant_name }},</p>
+
+            <p>This is a friendly reminder that your rent payment is due soon.</p>
+
+            <div class="highlight">
+                <strong>Property:</strong> {{ property_name }}<br>
+                <strong>Amount Due:</strong> <span class="amount">{{ amount }}</span><br>
+                <strong>Due Date:</strong> {{ due_date }}<br>
+                <strong>Lease:</strong> {{ lease_period }}
+            </div>
+
+            <p>Please ensure your payment is made by the due date to avoid any late fees.</p>
+
+            <p>You can make your payment securely through our online portal or by contacting our office.</p>
+
+            <a href="{{ payment_link }}" class="button">Make Payment Online</a>
+
+            <p>If you have already made this payment, please disregard this notice.</p>
+
+            <p>Thank you for your prompt attention to this matter.</p>
+
+            <p>Best regards,<br>
+            {{ company_name }} Property Management Team</p>
+        </div>
+
+        <div class="footer">
+            <p>This is an automated message from {{ company_name }} Property Management System.<br>
+            Please do not reply to this email.</p>
+            <p>Contact us: {{ contact_email }} | {{ contact_phone }}</p>
+        </div>
+    </div>
+</body>
+</html>

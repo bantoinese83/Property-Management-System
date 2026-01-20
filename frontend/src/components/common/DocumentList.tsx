@@ -24,16 +24,25 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     setIsLoading(true)
     setError(null)
     try {
-      const response = await apiClient.get<Document[]>(API_ENDPOINTS.DOCUMENTS.LIST, {
+      const response = await apiClient.get<{
+        results: Document[]
+        count: number
+        next?: string
+        previous?: string
+      }>(API_ENDPOINTS.DOCUMENTS.LIST, {
         params: {
           model_name: modelName,
           object_id: objectId,
         },
       })
-      setDocuments(response.data)
+
+      // Handle paginated response - extract results array
+      const documentsData = response.data?.results || []
+      setDocuments(documentsData)
     } catch (err) {
       console.error('Error fetching documents:', err)
       setError('Failed to load documents.')
+      setDocuments([]) // Set to empty array on error
     } finally {
       setIsLoading(false)
     }
@@ -57,11 +66,14 @@ export const DocumentList: React.FC<DocumentListProps> = ({
 
   if (isLoading) return <LoadingSpinner size='md' />
   if (error) return <div className='text-red-500'>{error}</div>
-  if (documents.length === 0) return <div className='text-gray-500'>No documents found.</div>
+
+  // Ensure documents is an array before checking length or mapping
+  const documentsArray = Array.isArray(documents) ? documents : []
+  if (documentsArray.length === 0) return <div className='text-gray-500'>No documents found.</div>
 
   return (
     <div className='document-list space-y-2'>
-      {documents.map(doc => (
+      {documentsArray.map(doc => (
         <div
           key={doc.id}
           className='document-item flex items-center justify-between p-3 border rounded bg-white hover:bg-gray-50 transition-colors'

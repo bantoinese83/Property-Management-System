@@ -1,5 +1,5 @@
-import * as React from "react"
-import { Link } from "react-router-dom"
+import * as React from 'react'
+import { Link } from 'react-router-dom'
 import {
   BarChartIcon,
   ClipboardListIcon,
@@ -8,10 +8,11 @@ import {
   LayoutDashboardIcon,
   SettingsIcon,
   UsersIcon,
-} from "lucide-react"
+  FileIcon,
+} from 'lucide-react'
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from '@/components/nav-main'
+import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
   SidebarContent,
@@ -20,67 +21,79 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar'
 
 // Property Management Navigation Data
 const data = {
   user: {
-    name: "Property Manager",
-    email: "manager@propertyco.com",
-    avatar: "/avatars/manager.jpg",
+    name: 'Property Manager',
+    email: 'manager@propertyco.com',
+    avatar: '/avatars/manager.jpg',
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "/dashboard",
+      title: 'Dashboard',
+      url: '/dashboard',
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Properties",
-      url: "/properties",
+      title: 'Properties',
+      url: '/properties',
       icon: FolderIcon,
     },
     {
-      title: "Tenants",
-      url: "/tenants",
+      title: 'Tenants',
+      url: '/tenants',
       icon: UsersIcon,
     },
     {
-      title: "Leases",
-      url: "/leases",
+      title: 'Leases',
+      url: '/leases',
       icon: FileTextIcon,
     },
     {
-      title: "Payments",
-      url: "/payments",
+      title: 'Payments',
+      url: '/payments',
       icon: BarChartIcon,
     },
     {
-      title: "Maintenance",
-      url: "/maintenance",
+      title: 'Maintenance',
+      url: '/maintenance',
       icon: SettingsIcon,
     },
     {
-      title: "Accounting",
-      url: "/accounting",
+      title: 'Accounting',
+      url: '/accounting',
       icon: ClipboardListIcon,
+    },
+    {
+      title: 'Reports',
+      url: '/reports',
+      icon: BarChartIcon,
+    },
+    {
+      title: 'Audit Trail',
+      url: '/audit',
+      icon: ClipboardListIcon,
+    },
+    {
+      title: 'Documents',
+      url: '/documents',
+      icon: FileIcon,
     },
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible='offcanvas' {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <Link to="/dashboard" onClick={() => console.log('Header logo clicked')}>
-                <LayoutDashboardIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Property Management</span>
+            <SidebarMenuButton asChild className='data-[slot=sidebar-menu-button]:!p-1.5'>
+              <Link to='/dashboard'>
+                <LayoutDashboardIcon className='h-5 w-5' />
+                <span className='text-base font-semibold'>Property Management</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

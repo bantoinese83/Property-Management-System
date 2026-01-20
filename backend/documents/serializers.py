@@ -1,63 +1,41 @@
 from rest_framework import serializers
-from django.contrib.contenttypes.models import ContentType
+
 from .models import Document
 
+
 class DocumentSerializer(serializers.ModelSerializer):
-    uploaded_by_name = serializers.ReadOnlyField(source="uploaded_by.get_full_name")
-    model_name = serializers.CharField(write_only=True, required=False)
+    """Serializer for file documents"""
+
+    uploaded_by_name = serializers.CharField(source='uploaded_by.get_full_name', read_only=True)
+    content_type_name = serializers.CharField(source='content_type.name', read_only=True)
 
     class Meta:
         model = Document
         fields = [
-            "id",
-            "title",
-            "description",
-            "file",
-            "file_type",
-            "file_size",
-            "content_type",
-            "object_id",
-            "model_name",
-            "uploaded_by",
-            "uploaded_by_name",
-            "created_at",
-            "updated_at",
+            'id', 'title', 'description', 'file', 'file_name', 'file_type',
+            'file_size', 'content_type', 'content_type_name', 'object_id',
+            'uploaded_by', 'uploaded_by_name', 'created_at', 'updated_at'
         ]
-        read_only_fields = ["uploaded_by", "file_type", "file_size", "created_at", "updated_at"]
-        extra_kwargs = {
-            "content_type": {"required": False},
-        }
-
-    def validate(self, data):
-        model_name = data.get("model_name")
-        content_type = data.get("content_type")
-
-        if not content_type and not model_name:
-            raise serializers.ValidationError("Either content_type or model_name is required.")
-
-        if model_name:
-            try:
-                # Map common names to actual app_label.model
-                mapping = {
-                    "property": ("properties", "property"),
-                    "tenant": ("tenants", "tenant"),
-                    "lease": ("leases", "lease"),
-                    "maintenance": ("maintenance", "maintenancerequest"),
-                    "payment": ("payments", "rentpayment"),
-                }
-                
-                if model_name.lower() in mapping:
-                    app_label, model = mapping[model_name.lower()]
-                    data["content_type"] = ContentType.objects.get(app_label=app_label, model=model)
-                else:
-                    # Try direct lookup
-                    data["content_type"] = ContentType.objects.get(model=model_name.lower())
-            except ContentType.DoesNotExist:
-                raise serializers.ValidationError({"model_name": f"Invalid model_name: {model_name}"})
-
-        return data
+        read_only_fields = ['id', 'file_name', 'file_size', 'uploaded_by', 'created_at', 'updated_at']
 
     def create(self, validated_data):
-        validated_data.pop("model_name", None)
-        validated_data["uploaded_by"] = self.context["request"].user
+        # Handle file upload
+        file = validated_data.get('file')
+        if file:
+            validated_data['file_size'] = file.size
+            # Extract file type from uploaded file
+            file_name = file.name.lower()
+            if file_name.endswith(('.pdf',)):
+                validated_data['file_type'] = 'pdf'
+            elif file_name.endswith(('.doc', '.docx')):
+                validated_data['file_type'] = 'doc' if file_name.endswith('.doc') else 'docx'
+            elif file_name.endswith(('.xls', '.xlsx')):
+                validated_data['file_type'] = 'xls' if file_name.endswith('.xls') else 'xlsx'
+            elif file_name.endswith(('.txt',)):
+                validated_data['file_type'] = 'txt'
+            elif file_name.endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                validated_data['file_type'] = file_name.split('.')[-1]
+            else:
+                validated_data['file_type'] = 'other'
+
         return super().create(validated_data)
