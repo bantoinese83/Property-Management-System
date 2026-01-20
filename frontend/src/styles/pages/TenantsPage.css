@@ -88,7 +88,9 @@
 }
 
 .tenant-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .tenant-card:hover {
@@ -231,7 +233,7 @@
   font-weight: 500;
 }
 
-.checkbox-label input[type="checkbox"] {
+.checkbox-label input[type='checkbox'] {
   width: 1rem;
   height: 1rem;
   accent-color: var(--color-primary);
@@ -255,7 +257,8 @@
   border: 1px solid #fca5a5;
 }
 
-.loading, .error {
+.loading,
+.error {
   text-align: center;
   padding: var(--spacing-2xl);
   font-size: 1.125rem;

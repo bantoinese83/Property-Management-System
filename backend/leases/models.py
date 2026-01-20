@@ -1,26 +1,21 @@
 from django.db import models
 from django.utils import timezone
-from datetime import timedelta
+
 
 class Lease(models.Model):
     STATUS_CHOICES = (
-        ('draft', 'Draft'),
-        ('pending', 'Pending Signature'),
-        ('active', 'Active'),
-        ('expired', 'Expired'),
-        ('terminated', 'Terminated'),
+        ("draft", "Draft"),
+        ("pending", "Pending Signature"),
+        ("active", "Active"),
+        ("expired", "Expired"),
+        ("terminated", "Terminated"),
     )
 
     property_obj = models.ForeignKey(
-        'properties.Property',
-        on_delete=models.CASCADE,
-        related_name='leases'
+        "properties.Property", on_delete=models.CASCADE, related_name="leases"
     )
     tenant = models.ForeignKey(
-        'tenants.Tenant',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='leases'
+        "tenants.Tenant", on_delete=models.SET_NULL, null=True, related_name="leases"
     )
 
     # Dates
@@ -38,7 +33,7 @@ class Lease(models.Model):
     lease_document_url = models.CharField(max_length=500, blank=True)
 
     # Status & Notes
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='draft')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="draft")
     auto_renew = models.BooleanField(default=True)
     renewal_notice_days = models.IntegerField(default=30)
 
@@ -48,12 +43,12 @@ class Lease(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('property_obj', 'tenant', 'lease_start_date')
-        ordering = ['-lease_start_date']
+        unique_together = ("property_obj", "tenant", "lease_start_date")
+        ordering = ["-lease_start_date"]
         indexes = [
-            models.Index(fields=['status']),
-            models.Index(fields=['property_obj']),
-            models.Index(fields=['lease_end_date']),
+            models.Index(fields=["status"]),
+            models.Index(fields=["property_obj"]),
+            models.Index(fields=["lease_end_date"]),
         ]
 
     def __str__(self):
@@ -76,10 +71,10 @@ class Lease(models.Model):
         """Auto-update status based on dates"""
         today = timezone.now().date()
 
-        if self.status != 'terminated':
+        if self.status != "terminated":
             if today > self.lease_end_date:
-                self.status = 'expired'
+                self.status = "expired"
             elif today >= self.lease_start_date:
-                self.status = 'active'
+                self.status = "active"
 
         super().save(*args, **kwargs)

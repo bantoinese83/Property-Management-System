@@ -1,47 +1,24 @@
-import React from 'react';
-import classNames from 'classnames';
-import '../styles/Input.css';
+import * as React from 'react'
+import { cn } from '../../lib/utils'
+import '../styles/Input.css'
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  error?: string;
-  helperText?: string;
-  fullWidth?: boolean;
-  icon?: React.ReactNode;
-}
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      label,
-      error,
-      helperText,
-      fullWidth = false,
-      icon,
-      className,
-      ...props
-    },
-    ref
-  ) => {
+  ({ className, type, ...props }, ref) => {
     return (
-      <div className={classNames('input-group', { 'input-full-width': fullWidth })}>
-        {label && <label className="input-label">{label}</label>}
-        <div className={classNames('input-wrapper', { 'input-with-icon': icon })}>
-          {icon && <div className="input-icon">{icon}</div>}
-          <input
-            ref={ref}
-            className={classNames('input', className, {
-              'input-error': error,
-            })}
-            {...props}
-          />
-        </div>
-        {error && <span className="input-error-text">{error}</span>}
-        {helperText && <span className="input-helper-text">{helperText}</span>}
-      </div>
-    );
+      <input
+        type={type}
+        className={cn(
+          'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
   }
-);
+)
+Input.displayName = 'Input'
 
-Input.displayName = 'Input';
-export default Input;
+export { Input }

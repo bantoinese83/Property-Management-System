@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Generated files
+*.min.js
+*.min.css
+
+# Package files
+package.json
+package-lock.json
+
+# Config files that should maintain specific formatting
+*.config.js
+*.config.ts
+vite.config.ts
+vitest.config.ts
+
+# Lock files
+yarn.lock
+pnpm-lock.yaml
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

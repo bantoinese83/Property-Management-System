@@ -1,4 +1,13 @@
+/* Import component styles */
+@import './styles/Button.css';
+@import './styles/Input.css';
+@import './styles/Card.css';
+@import './styles/Modal.css';
+@import './styles/Badge.css';
+@import './styles/Select.css';
+
 /* Import all page styles */
+@import './styles/pages/DashboardPage.css';
 @import './styles/pages/PropertiesPage.css';
 @import './styles/pages/TenantsPage.css';
 @import './styles/pages/LoginPage.css';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 const MaintenancePage: React.FC = () => {
   return (
@@ -6,7 +6,7 @@ const MaintenancePage: React.FC = () => {
       <h1>Maintenance</h1>
       <p>Maintenance requests page - Coming soon!</p>
     </div>
-  );
-};
+  )
+}
 
-export default MaintenancePage;
+export default MaintenancePage

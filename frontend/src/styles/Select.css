@@ -1,0 +1,312 @@
+/* Shadcn/ui inspired select styles with CSS custom properties */
+
+.relative {
+  position: relative;
+}
+
+.z-50 {
+  z-index: 50;
+}
+
+.max-h-96 {
+  max-height: 24rem;
+}
+
+.min-w-\\[8rem\\] {
+  min-width: 8rem;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.rounded-md {
+  border-radius: var(--border-radius-md);
+}
+
+.bg-popover {
+  background-color: white;
+}
+
+.text-popover-foreground {
+  color: var(--color-gray-900);
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.data-\\[state\\='open\\']\\:animate-in[data-state='open'] {
+  animation: in 200ms ease-out;
+}
+
+.data-\\[state\\='closed\\']\\:animate-out[data-state='closed'] {
+  animation: out 200ms ease-in;
+}
+
+.data-\\[state\\='closed\\']\\:fade-out-0[data-state='closed'] {
+  animation: fadeOut 200ms ease-in;
+}
+
+.data-\\[state\\='open\\']\\:fade-in-0[data-state='open'] {
+  animation: fadeIn 200ms ease-out;
+}
+
+.data-\\[state\\='closed\\']\\:zoom-out-95[data-state='closed'] {
+  animation: out 200ms ease-in;
+}
+
+.data-\\[state\\='open\\']\\:zoom-in-95[data-state='open'] {
+  animation: in 200ms ease-out;
+}
+
+.data-\\[side\\='bottom\\']\\:slide-in-from-top-2[data-side='bottom'] {
+  animation: slideInFromTop2 200ms ease-out;
+}
+
+.data-\\[side\\='left\\']\\:slide-in-from-right-2[data-side='left'] {
+  animation: slideInFromRight2 200ms ease-out;
+}
+
+.data-\\[side\\='right\\']\\:slide-in-from-left-2[data-side='right'] {
+  animation: slideInFromLeft2 200ms ease-out;
+}
+
+.data-\\[side\\='top\\']\\:slide-in-from-bottom-2[data-side='top'] {
+  animation: slideInFromBottom2 200ms ease-out;
+}
+
+.py-1 {
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+}
+
+.p-1 {
+  padding: var(--spacing-xs);
+}
+
+.h-\\[var\\(--radix-select-trigger-height\\)\\] {
+  height: var(--radix-select-trigger-height);
+}
+
+.w-full {
+  width: 100%;
+}
+
+.min-w-\\[var\\(--radix-select-trigger-width\\)\\] {
+  min-width: var(--radix-select-trigger-width);
+}
+
+.py-1\\.5 {
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+}
+
+.pl-8 {
+  padding-left: 2rem;
+}
+
+.pr-2 {
+  padding-right: var(--spacing-xs);
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.relative {
+  position: relative;
+}
+
+.flex {
+  display: flex;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.cursor-default {
+  cursor: default;
+}
+
+.select-none {
+  user-select: none;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.rounded-sm {
+  border-radius: var(--border-radius-sm);
+}
+
+.py-1\\.5 {
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+}
+
+.pl-8 {
+  padding-left: 2rem;
+}
+
+.pr-2 {
+  padding-right: var(--spacing-xs);
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.outline-none {
+  outline: none;
+}
+
+.focus\\:bg-accent:focus {
+  background-color: var(--color-gray-100);
+}
+
+.focus\\:text-accent-foreground:focus {
+  color: var(--color-gray-900);
+}
+
+.data-\\[disabled\\]\\:pointer-events-none[data-disabled] {
+  pointer-events: none;
+}
+
+.data-\\[disabled\\]\\:opacity-50[data-disabled] {
+  opacity: 0.5;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.left-2 {
+  left: var(--spacing-xs);
+}
+
+.h-3\\.5 {
+  height: 0.875rem;
+}
+
+.w-3\\.5 {
+  width: 0.875rem;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.h-4 {
+  height: 1rem;
+}
+
+.w-4 {
+  width: 1rem;
+}
+
+.-mx-1 {
+  margin-left: -0.25rem;
+  margin-right: -0.25rem;
+}
+
+.my-1 {
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.h-px {
+  height: 1px;
+}
+
+.bg-muted {
+  background-color: var(--color-gray-200);
+}
+
+/* Animations */
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideInFromTop2 {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom2 {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft2 {
+  from {
+    opacity: 0;
+    transform: translateX(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight2 {
+  from {
+    opacity: 0;
+    transform: translateX(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

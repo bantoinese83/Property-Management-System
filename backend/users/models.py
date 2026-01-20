@@ -1,28 +1,21 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import EmailValidator, URLValidator
+from django.core.validators import URLValidator
+from django.db import models
+
 
 class User(AbstractUser):
     """Custom user model with extended fields"""
 
     USER_TYPE_CHOICES = (
-        ('admin', 'Administrator'),
-        ('manager', 'Property Manager'),
-        ('owner', 'Property Owner'),
-        ('tenant', 'Tenant'),
+        ("admin", "Administrator"),
+        ("manager", "Property Manager"),
+        ("owner", "Property Owner"),
+        ("tenant", "Tenant"),
     )
 
-    user_type = models.CharField(
-        max_length=20,
-        choices=USER_TYPE_CHOICES,
-        default='owner'
-    )
+    user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default="owner")
     phone_number = models.CharField(max_length=20, blank=True)
-    profile_picture = models.ImageField(
-        upload_to='profiles/',
-        blank=True,
-        null=True
-    )
+    profile_picture = models.ImageField(upload_to="profiles/", blank=True, null=True)
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.TextField(blank=True)
     city = models.CharField(max_length=100, blank=True)
@@ -36,10 +29,10 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=['email']),
-            models.Index(fields=['user_type']),
+            models.Index(fields=["email"]),
+            models.Index(fields=["user_type"]),
         ]
 
     def __str__(self):
@@ -52,13 +45,12 @@ class User(AbstractUser):
 class UserProfile(models.Model):
     """Extended user profile for additional data"""
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
     company_name = models.CharField(max_length=255, blank=True)
     website = models.URLField(blank=True, validators=[URLValidator()])
     notification_preferences = models.JSONField(
-        default=dict,
-        help_text="User's notification preferences"
+        default=dict, help_text="User's notification preferences"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

@@ -50,4 +50,4 @@ export const API_ENDPOINTS = {
     CREATE: '/payments/',
     UPDATE: (id: number) => `/payments/${id}/`,
   },
-};
+}

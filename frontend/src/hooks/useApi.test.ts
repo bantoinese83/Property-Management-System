@@ -63,15 +63,12 @@ describe('useApi', () => {
   })
 
   it('retries on error when retryOnError is set', async () => {
-    const mockError = new Error('Server error')
     const mockErrorResponse = {
       response: { status: 500 },
     }
     mockClient.get.mockRejectedValueOnce(mockErrorResponse)
 
-    const { result } = renderHook(() =>
-      useApi('/api/test', { retryOnError: 2 })
-    )
+    const { result } = renderHook(() => useApi('/api/test', { retryOnError: 2 }))
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false)

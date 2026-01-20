@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+
 class IsPropertyOwner(permissions.BasePermission):
     """Only property owner can edit/delete"""
 
@@ -7,6 +8,7 @@ class IsPropertyOwner(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.owner == request.user
+
 
 class IsPropertyOwnerOrReadOnly(permissions.BasePermission):
     """Owner has all permissions, others have read-only"""
@@ -16,33 +18,36 @@ class IsPropertyOwnerOrReadOnly(permissions.BasePermission):
             return True
         return obj.owner == request.user
 
+
 class IsTenantOrAdmin(permissions.BasePermission):
     """Tenant can only see own data"""
 
     def has_object_permission(self, request, view, obj):
-        if request.user.user_type == 'admin':
+        if request.user.user_type == "admin":
             return True
-        if hasattr(obj, 'tenant'):
+        if hasattr(obj, "tenant"):
             return obj.tenant.id == request.user.id
         return False
+
 
 class IsOwnerOrPropertyManager(permissions.BasePermission):
     """Allow owner or assigned property manager"""
 
     def has_object_permission(self, request, view, obj):
-        if request.user.user_type == 'admin':
+        if request.user.user_type == "admin":
             return True
-        if hasattr(obj, 'owner'):
+        if hasattr(obj, "owner"):
             return obj.owner == request.user
-        if hasattr(obj, 'property') and hasattr(obj.property, 'owner'):
+        if hasattr(obj, "property") and hasattr(obj.property, "owner"):
             return obj.property.owner == request.user
         return False
+
 
 class IsLeaseTenantOrPropertyOwner(permissions.BasePermission):
     """Allow tenant or property owner to access lease"""
 
     def has_object_permission(self, request, view, obj):
-        if request.user.user_type == 'admin':
+        if request.user.user_type == "admin":
             return True
         # Property owner can access
         if obj.property.owner == request.user:
@@ -52,11 +57,12 @@ class IsLeaseTenantOrPropertyOwner(permissions.BasePermission):
             return True
         return False
 
+
 class IsPaymentRelatedParty(permissions.BasePermission):
     """Allow parties related to payment (tenant, property owner, admin)"""
 
     def has_object_permission(self, request, view, obj):
-        if request.user.user_type == 'admin':
+        if request.user.user_type == "admin":
             return True
         # Property owner can access payments for their properties
         if obj.lease.property.owner == request.user:
@@ -66,11 +72,12 @@ class IsPaymentRelatedParty(permissions.BasePermission):
             return True
         return False
 
+
 class IsMaintenanceRelatedParty(permissions.BasePermission):
     """Allow parties related to maintenance request"""
 
     def has_object_permission(self, request, view, obj):
-        if request.user.user_type == 'admin':
+        if request.user.user_type == "admin":
             return True
         # Property owner can access maintenance for their properties
         if obj.property.owner == request.user:

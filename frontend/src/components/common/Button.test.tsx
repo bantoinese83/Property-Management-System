@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Button from './Button'
 
@@ -12,13 +12,13 @@ describe('Button', () => {
   })
 
   it('renders with different variants', () => {
-    render(<Button variant="secondary">Secondary</Button>)
+    render(<Button variant='secondary'>Secondary</Button>)
     const button = screen.getByRole('button', { name: /secondary/i })
     expect(button).toHaveClass('btn-secondary')
   })
 
   it('renders with different sizes', () => {
-    render(<Button size="lg">Large Button</Button>)
+    render(<Button size='lg'>Large Button</Button>)
     const button = screen.getByRole('button', { name: /large button/i })
     expect(button).toHaveClass('btn-lg')
   })
@@ -54,7 +54,7 @@ describe('Button', () => {
   })
 
   it('renders with custom className', () => {
-    render(<Button className="custom-class">Custom</Button>)
+    render(<Button className='custom-class'>Custom</Button>)
     const button = screen.getByRole('button', { name: /custom/i })
     expect(button).toHaveClass('custom-class')
   })

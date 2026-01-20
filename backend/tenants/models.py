@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Tenant(models.Model):
     """Tenant model for lease holders"""
 
@@ -37,10 +38,10 @@ class Tenant(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=['email']),
-            models.Index(fields=['is_active']),
+            models.Index(fields=["email"]),
+            models.Index(fields=["is_active"]),
         ]
 
     def __str__(self):
@@ -52,14 +53,12 @@ class Tenant(models.Model):
 
     def get_active_leases(self):
         """Get all active leases for this tenant"""
-        from leases.models import Lease
         from django.utils import timezone
+        from leases.models import Lease
+
         today = timezone.now().date()
         return Lease.objects.filter(
-            tenant=self,
-            status='active',
-            lease_start_date__lte=today,
-            lease_end_date__gte=today
+            tenant=self, status="active", lease_start_date__lte=today, lease_end_date__gte=today
         )
 
     def get_monthly_rent_total(self):

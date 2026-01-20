@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { AuthProvider, useAuth } from './AuthContext'
+import { AuthProvider } from './AuthContext'
+import { useAuth } from '../hooks/useAuth'
 
 // Mock the API client
 vi.mock('../api/client', () => ({
@@ -29,9 +30,7 @@ function TestComponent() {
 
   return (
     <div>
-      <div data-testid="user-info">
-        {user ? `Logged in as: ${user.username}` : 'Not logged in'}
-      </div>
+      <div data-testid='user-info'>{user ? `Logged in as: ${user.username}` : 'Not logged in'}</div>
       <button onClick={handleLogin}>Login</button>
       <button onClick={handleLogout}>Logout</button>
     </div>
