@@ -5,6 +5,7 @@ The `urlpatterns` list routes URLs to views.
 """
 
 from accounting.views import AccountingPeriodViewSet, FinancialTransactionViewSet
+from core.views import health_check, readiness_check, metrics
 from documents.views import DocumentViewSet
 from django.contrib import admin
 from django.urls import include, path
@@ -43,4 +44,8 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/webhooks/stripe/", stripe_webhook, name="stripe-webhook"),
+    # Health check endpoints
+    path("health/", health_check, name="health-check"),
+    path("ready/", readiness_check, name="readiness-check"),
+    path("metrics/", metrics, name="metrics"),
 ]

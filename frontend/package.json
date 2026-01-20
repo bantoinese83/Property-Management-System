@@ -4,19 +4,35 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
+    "dev:debug": "vite --host 0.0.0.0 --mode development --logLevel info",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "build:analyze": "ANALYZE=true npm run build",
+    "build:production": "NODE_ENV=production npm run build",
+    "preview": "vite preview --host 0.0.0.0",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --fix --cache",
+    "lint:errors": "eslint . --quiet",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "preview": "vite preview",
+    "format:write": "prettier --write . --loglevel warn",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
     "test": "vitest",
-    "test:ui": "vitest --ui",
+    "test:ui": "vitest --ui --host 0.0.0.0",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "type-check": "tsc --noEmit",
-    "quality": "npm run lint && npm run format:check && npm run type-check && npm run test:run"
+    "test:watch": "vitest --watch",
+    "test:debug": "vitest --reporter verbose",
+    "quality": "npm run lint && npm run format:check && npm run type-check && npm run test:run",
+    "quality:fix": "npm run lint:fix && npm run format:write && npm run type-check",
+    "clean": "rm -rf dist node_modules/.vite .eslintcache",
+    "deps:check": "npx npm-check-updates",
+    "deps:update": "npx npm-check-updates -u",
+    "size": "npx vite-bundle-analyzer dist/assets/*.js",
+    "serve": "npm run build && npm run preview",
+    "storybook": "echo 'Storybook not configured yet - run: npx storybook init'",
+    "docs": "echo 'Component documentation not configured yet'"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -66,6 +82,8 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.17",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "vite-bundle-analyzer": "^0.11.1"
   }
 }
