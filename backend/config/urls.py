@@ -70,6 +70,7 @@ urlpatterns = [
     path("api/reports/<int:report_id>/delete/", delete_report, name="delete-report"),
     # Templates and generated documents
     path("api/templates/", include("templates.urls")),
+    path("api/ai/", include("ai.urls")),
     # API Documentation
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
