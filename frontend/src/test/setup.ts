@@ -6,6 +6,7 @@
 
 import { beforeAll, afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
+import '@testing-library/jest-dom'
 
 // Mock environment variables
 Object.defineProperty(window, 'import.meta', {
@@ -34,18 +35,22 @@ Object.defineProperty(window, 'matchMedia', {
 })
 
 // Mock ResizeObserver
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}))
+;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = vi
+  .fn()
+  .mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  }))
 
 // Mock IntersectionObserver
-global.IntersectionObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}))
+;(globalThis as unknown as { IntersectionObserver: unknown }).IntersectionObserver = vi
+  .fn()
+  .mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  }))
 
 // Mock localStorage
 const localStorageMock = {
@@ -191,12 +196,12 @@ afterEach(() => {
   vi.clearAllMocks()
 
   // Reset localStorage mock
-  localStorageMock.clear()
-  sessionStorageMock.clear()
+  ;(localStorageMock as unknown as { clear: () => void }).clear()
+  ;(sessionStorageMock as unknown as { clear: () => void }).clear()
 })
 
 // Custom test utilities
-global.testUtils = {
+;(globalThis as unknown as { testUtils: unknown }).testUtils = {
   // Helper to wait for async operations
   waitForAsync: () => new Promise(resolve => setTimeout(resolve, 0)),
 

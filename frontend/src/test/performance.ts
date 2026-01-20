@@ -4,7 +4,7 @@
  * Provides tools to measure and assert component performance.
  */
 
-import { ReactElement } from 'react'
+import { type ReactElement } from 'react'
 import { render } from '@testing-library/react'
 
 // Performance thresholds (in milliseconds)
@@ -54,8 +54,9 @@ export async function measureComponentPerformance(
     const endTime = performance.now()
     times.push(endTime - startTime)
 
-    // Count DOM nodes
-    const _domNodes = container.querySelectorAll('*').length
+    // Count DOM nodes (unused in current implementation)
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    container.querySelectorAll('*').length
 
     unmount()
   }
@@ -65,12 +66,14 @@ export async function measureComponentPerformance(
   const maxTime = Math.max(...times)
 
   // Performance logging (only in development)
-  if (process.env.NODE_ENV === 'development') {
-    console.warn(`Performance Results:
-    Average: ${avgRenderTime.toFixed(2)}ms
-    Min: ${minTime.toFixed(2)}ms
-    Max: ${maxTime.toFixed(2)}ms
-    Iterations: ${iterations}`)
+  try {
+    // Check if we're in a browser environment
+    if (typeof window !== 'undefined') {
+      const message = `Performance Results:\n    Average: ${avgRenderTime.toFixed(2)}ms\n    Min: ${minTime.toFixed(2)}ms\n    Max: ${maxTime.toFixed(2)}ms\n    Iterations: ${iterations}`
+      console.warn(message)
+    }
+  } catch {
+    // Ignore in non-browser environments
   }
 
   let memoryUsage: number | undefined
@@ -244,7 +247,6 @@ export async function detectMemoryLeaks(
   const memoryUsages: number[] = []
 
   for (let i = 0; i < iterations; i++) {
-    const _startTime = performance.now()
     const { unmount } = render(component)
 
     await new Promise(resolve => setTimeout(resolve, 100)) // Allow for async operations
@@ -257,7 +259,6 @@ export async function detectMemoryLeaks(
     }
 
     unmount()
-    const _endTime = performance.now()
   }
 
   if (memoryUsages.length < 2) {
