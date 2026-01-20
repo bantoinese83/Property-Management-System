@@ -1,90 +1,30 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@layer base {
+  html,
+  body,
+  #root {
+    @apply w-full h-full;
+  }
 
-:root {
-  --color-primary: #2563eb;
-  --color-secondary: #64748b;
-  --color-danger: #ef4444;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-white: #ffffff;
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
-
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-
-  --border-radius-sm: 0.375rem;
-  --border-radius-md: 0.5rem;
-  --border-radius-lg: 0.75rem;
-
-  --font-primary:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
-    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-}
-
-html,
-body,
-#root {
-  width: 100%;
-  height: 100%;
-}
-
-body {
-  font-family: var(--font-primary);
-  background-color: var(--color-gray-50);
-  color: var(--color-gray-900);
-  line-height: 1.5;
-}
-
-a {
-  color: var(--color-primary);
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
+  body {
+    @apply font-sans bg-gray-50 text-gray-900 antialiased;
   }
 }
 
-/* Alerts */
-.alert {
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius-md);
-  margin-bottom: var(--spacing-md);
-}
+@layer utilities {
+  /* Custom alert styles that work with Tailwind */
+  .alert {
+    @apply p-4 rounded-md mb-4;
+  }
 
-.alert-success {
-  background-color: #d1fae5;
-  color: #065f46;
-  border: 1px solid #6ee7b7;
-}
+  .alert-success {
+    @apply bg-green-50 text-green-800 border border-green-200;
+  }
 
-.alert-error {
-  background-color: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fca5a5;
-}
+  .alert-error {
+    @apply bg-red-50 text-red-800 border border-red-200;
+  }
 
-.alert-warning {
-  background-color: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
+  .alert-warning {
+    @apply bg-yellow-50 text-yellow-800 border border-yellow-200;
+  }
 }

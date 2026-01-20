@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { cn } from '../../lib/utils'
-import '../../styles/Card.css'
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string
@@ -11,7 +10,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, title, subtitle, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', className)}
+      className={cn('rounded-lg border border-gray-200 bg-white text-gray-900 shadow-sm', className)}
       {...props}
     >
       {(title || subtitle) && (
@@ -48,7 +47,7 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
+  <p ref={ref} className={cn('text-sm text-gray-600', className)} {...props} />
 ))
 CardDescription.displayName = 'CardDescription'
 

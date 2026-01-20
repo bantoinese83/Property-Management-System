@@ -1,11 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    tailwindcss(),
     // Bundle analyzer - run with ANALYZE=true npm run build
     ...(process.env.ANALYZE === 'true' ? [visualizer({ filename: 'dist/stats.html', open: true })] : [])
   ],
@@ -21,7 +23,7 @@ export default defineConfig({
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
           'form-vendor': ['react-hook-form', 'zod'],
-          'utils-vendor': ['axios', 'date-fns', 'clsx', 'tailwind-merge'],
+          'utils-vendor': ['axios', 'date-fns', 'clsx', 'tailwind-merge', 'tailwindcss'],
           'icons-vendor': ['lucide-react']
         }
       }
@@ -41,7 +43,8 @@ export default defineConfig({
       'axios',
       '@radix-ui/react-dialog',
       'lucide-react',
-      'date-fns'
+      'date-fns',
+      'tailwindcss'
     ]
   }
 })
