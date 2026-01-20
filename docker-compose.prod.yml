@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: pms-prod-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-property_mgmt}
+      POSTGRES_USER: ${DB_USER:-property_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./backup:/backup
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-property_user}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - pms-prod-network
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: pms-prod-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    volumes:
+      - redis_prod_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - pms-prod-network
+
+  # Django Backend
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/${GITHUB_REPOSITORY}/backend:latest}
+    container_name: pms-prod-backend
+    environment:
+      DEBUG: False
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: postgresql://${DB_USER:-property_user}:${DB_PASSWORD}@db:5432/${DB_NAME:-property_mgmt}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-}@redis:6379/0
+      EMAIL_BACKEND: django.core.mail.backends.smtp.EmailBackend
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+      EMAIL_USE_TLS: ${EMAIL_USE_TLS:-True}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME}
+      AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME}
+    volumes:
+      - static_prod_volume:/code/staticfiles
+      - media_prod_volume:/code/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - pms-prod-network
+
+  # React Frontend
+  frontend:
+    image: ${FRONTEND_IMAGE:-ghcr.io/${GITHUB_REPOSITORY}/frontend:latest}
+    container_name: pms-prod-frontend
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+    restart: unless-stopped
+    networks:
+      - pms-prod-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: pms-prod-nginx
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/ssl/certs:ro
+      - static_prod_volume:/code/staticfiles:ro
+      - media_prod_volume:/code/media:ro
+      - ./logs/nginx:/var/log/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    networks:
+      - pms-prod-network
+
+volumes:
+  postgres_prod_data:
+    driver: local
+  redis_prod_data:
+    driver: local
+  static_prod_volume:
+    driver: local
+  media_prod_volume:
+    driver: local
+
+networks:
+  pms-prod-network:
+    driver: bridge

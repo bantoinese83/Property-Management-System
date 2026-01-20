@@ -1,0 +1,4 @@
+/* Import all page styles */
+@import './styles/pages/PropertiesPage.css';
+@import './styles/pages/TenantsPage.css';
+@import './styles/pages/LoginPage.css';
