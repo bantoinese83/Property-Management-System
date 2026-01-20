@@ -1,8 +1,8 @@
-# 🚀 PropManage Complete Go-to-Market Strategy
+# 🚀 TenantBase Complete Go-to-Market Strategy
 
 ## Executive Summary
 
-**Company:** PropManage - Enterprise-grade property management software
+**Company:** TenantBase - Enterprise-grade property management software
 **Positioning:** The modern, developer-friendly PMS that handles edge cases other systems ignore
 **Target Market:** Small-to-medium property managers (5-200 rental units)
 **Value Proposition:** 50% cheaper than competitors with better reliability and modern features
@@ -269,7 +269,7 @@ Create a community of property managers who advocate for your solution.
 
 ### Key Documents
 - **Marketing Website:** `marketing_website.html`
-- **Go-to-Market Strategy:** `PropManage_GoToMarket_Strategy.md`
+- **Go-to-Market Strategy:** `TenantBase_GoToMarket_Strategy.md`
 - **Content Marketing:** `Content_Marketing_Strategy.md`
 - **Sales Playbook:** `Sales_Playbook.md`
 
@@ -284,7 +284,7 @@ Create a community of property managers who advocate for your solution.
 
 ## 🎬 Final Thoughts
 
-PropManage has a unique opportunity to disrupt the property management software market by focusing on reliability and modern design in an underserved segment. The combination of:
+TenantBase has a unique opportunity to disrupt the property management software market by focusing on reliability and modern design in an underserved segment. The combination of:
 
 - **Technical excellence** (edge case handling, modern APIs)
 - **Customer focus** (pain point-driven development)
@@ -293,8 +293,8 @@ PropManage has a unique opportunity to disrupt the property management software 
 
 Creates a compelling path to $2M+ ARR within 2-3 years. Success depends on executing relentlessly on the fundamentals: reliability, customer satisfaction, and data-driven iteration.
 
-**The property management industry is ready for a reliable, modern alternative. PropManage can be that solution.**
+**The property management industry is ready for a reliable, modern alternative. TenantBase can be that solution.**
 
 ---
 
-*Prepared for PropManage launch - January 2024*
+*Prepared for TenantBase launch - January 2024*

@@ -1,5 +1,5 @@
 """
-Django settings for Property Management System.
+Django settings for TenantBase.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/6.0/topics/settings/
@@ -266,7 +266,7 @@ CELERY_TIMEZONE = TIME_ZONE
 # Generates OpenAPI 3.0 schema and provides Swagger UI documentation
 # Access at: /api/docs/ (Swagger UI) and /api/redoc/ (ReDoc)
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Property Management System API",
+    "TITLE": "TenantBase API",
     "DESCRIPTION": "Comprehensive API for property management, tenant tracking, lease management, and financial reporting.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
@@ -289,7 +289,7 @@ SPECTACULAR_SETTINGS = {
         {"name": "Notifications", "description": "Email and system notifications"},
     ],
     "CONTACT": {
-        "name": "Property Management System",
+        "name": "TenantBase",
         "email": "support@property-mgmt.com",
     },
     "LICENSE": {

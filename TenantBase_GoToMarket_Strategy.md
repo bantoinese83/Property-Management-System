@@ -1,4 +1,4 @@
-# 🚀 PropManage Go-to-Market Strategy
+# 🚀 TenantBase Go-to-Market Strategy
 
 ## Executive Summary
 
@@ -78,7 +78,7 @@
 
 ### Direct Competitors (Head-to-Head)
 
-| Feature | PropManage | Buildium | TenantCloud | Stessa |
+| Feature | TenantBase | Buildium | TenantCloud | Stessa |
 |---------|------------|----------|-------------|--------|
 | **Target Segment** | 5-200 units | 5-500 units | 1-200 units | 5-200 units |
 | **Pricing** | $49-199/mo | $99-299/mo | $79-249/mo | $99-299/mo |
@@ -91,7 +91,7 @@
 
 ### Key Differentiators
 
-#### ✅ **PropManage Advantages:**
+#### ✅ **TenantBase Advantages:**
 - **50% cheaper** than Buildium/TenantCloud
 - **Superior reliability** (99.9% uptime, edge case handling)
 - **Developer-friendly** (50+ API integrations)
@@ -150,7 +150,7 @@
 ```
 Calculate Your Savings:
 Current PMS Cost: $_______/month
-PropManage Cost: $_______/month
+TenantBase Cost: $_______/month
 Monthly Savings: $_______
 Annual Savings: $_______
 ROI: 300% (based on 20 hours saved/week)
@@ -159,12 +159,12 @@ ROI: 300% (based on 20 hours saved/week)
 #### 2. Comparison Table
 ```html
 <div class="comparison-table">
-  <h3>Why Choose PropManage?</h3>
+  <h3>Why Choose TenantBase?</h3>
   <table>
     <thead>
       <tr>
         <th>Feature</th>
-        <th>PropManage</th>
+        <th>TenantBase</th>
         <th>Buildium</th>
         <th>TenantCloud</th>
       </tr>
@@ -195,7 +195,7 @@ ROI: 300% (based on 20 hours saved/week)
 
 #### 3. Customer Stories
 **Add real testimonials from target segment:**
-- "We manage 75 units. Our old system crashed 3 times during tax season. PropManage handled everything flawlessly." - Jennifer M., Property Manager
+- "We manage 75 units. Our old system crashed 3 times during tax season. TenantBase handled everything flawlessly." - Jennifer M., Property Manager
 
 ---
 
@@ -293,12 +293,12 @@ Awareness → Interest → Consideration → Purchase → Retention → Advocacy
 **Lead Nurture Sequence:**
 1. **Welcome Email:** Thank you + overview of benefits
 2. **Feature Spotlight:** One key feature per email
-3. **Competitor Comparison:** Why choose PropManage
+3. **Competitor Comparison:** Why choose TenantBase
 4. **Social Proof:** Customer success stories
 5. **Scarcity/Urgency:** Limited beta spots available
 
 **Trial User Sequence:**
-1. **Day 1:** Welcome to PropManage
+1. **Day 1:** Welcome to TenantBase
 2. **Day 3:** Quick setup guide
 3. **Day 7:** Feature deep dive
 4. **Day 14:** Success metrics + upgrade prompt
@@ -419,4 +419,4 @@ Create a community of property managers sharing best practices and success stori
 
 ---
 
-*This strategy positions PropManage as the reliable, modern alternative in a crowded market. Success depends on executing relentlessly on reliability while building genuine relationships with property managers who value both functionality and peace of mind.*
+*This strategy positions TenantBase as the reliable, modern alternative in a crowded market. Success depends on executing relentlessly on reliability while building genuine relationships with property managers who value both functionality and peace of mind.*

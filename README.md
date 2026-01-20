@@ -1,4 +1,4 @@
-# 🏢 PropManage - Enterprise-Grade Property Management System
+# 🏢 TenantBase - Enterprise-Grade Property Management System
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/bantoinese83/Property-Management-System/actions)
 [![Docker Ready](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com)
@@ -14,7 +14,9 @@
 
 **The modern, developer-friendly PMS that handles edge cases other systems ignore. Enterprise-grade reliability with consumer-friendly UX. Built for property managers who need software that actually works.**
 
-[🎯 **Marketing Website**](marketing_website.html) • [📖 **Live Demo**](http://localhost/) • [📚 **API Documentation**](http://localhost/api/docs/) • [🐛 **Report Bug**](https://github.com/bantoinese83/Property-Management-System/issues) • [✨ **Request Feature**](https://github.com/bantoinese83/Property-Management-System/issues)
+[TenantBase.io](https://tenantbase.io) • [📖 **Live Demo**](https://tenantbase.io/demo/) • [📚 **API Documentation**](https://tenantbase.io/docs/) • [🐛 **Report Bug**](https://github.com/bantoinese83/Property-Management-System/issues) • [✨ **Request Feature**](https://github.com/bantoinese83/Property-Management-System/issues)
+
+[🎯 **Marketing Website**](marketing_website.html) • [📖 **Live Demo**](https://tenantbase.io/demo/) • [📚 **API Documentation**](https://tenantbase.io/docs/) • [🐛 **Report Bug**](https://github.com/bantoinese83/Property-Management-System/issues) • [✨ **Request Feature**](https://github.com/bantoinese83/Property-Management-System/issues)
 
 ---
 
@@ -408,7 +410,7 @@ curl -s -I http://localhost/ | grep "200 OK"
 - **Year 2**: $500K ARR (400+ customers)
 - **Year 3**: $2M+ ARR (2000+ customers)
 
-**📈 [Complete GTM Strategy](PropManage_GoToMarket_Strategy.md)** • **📞 [Sales Playbook](Sales_Playbook.md)** • **🎨 [Marketing Website](marketing_website.html)**
+**📈 [Complete GTM Strategy](TenantBase_GoToMarket_Strategy.md)** • **📞 [Sales Playbook](Sales_Playbook.md)** • **🎨 [Marketing Website](marketing_website.html)**
 
 ---
 

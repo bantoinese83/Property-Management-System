@@ -1,4 +1,4 @@
-# 📈 PropManage Sales Playbook
+# 📈 TenantBase Sales Playbook
 
 ## Overview
 **Target:** Small-to-medium property managers (5-200 units)
@@ -52,7 +52,7 @@
 **Subject Line:** "Property Managers: Stop Losing Data to Crashes"
 
 **Opening (30 seconds):**
-"Hi [Name], I'm [Your Name] from PropManage. I noticed you're in property management - are you dealing with PMS systems that crash during month-end reporting?
+"Hi [Name], I'm [Your Name] from TenantBase. I noticed you're in property management - are you dealing with PMS systems that crash during month-end reporting?
 
 We've helped 500+ property managers eliminate those headaches. Unlike Buildium at $249/month, we offer enterprise reliability for $99/month.
 
@@ -72,7 +72,7 @@ Would you have 5 minutes next week to discuss your current challenges?"
 **Structure:**
 1. **Rapport Building (5 min):** Ask about their business, challenges
 2. **Pain Exploration (10 min):** Dig deep into current problems
-3. **Solution Presentation (10 min):** Show how PropManage solves their issues
+3. **Solution Presentation (10 min):** Show how TenantBase solves their issues
 4. **Objection Handling (5 min):** Address concerns
 
 **Key Discovery Questions:**
@@ -128,7 +128,7 @@ Key takeaways:
 - You're managing [X units] with [current challenges]
 - Looking to [specific goals]
 
-As discussed, PropManage can help you:
+As discussed, TenantBase can help you:
 - Eliminate system crashes
 - Save 20 hours/week
 - Integrate with your existing tools
@@ -143,11 +143,11 @@ Best,
 
 #### Day 3: Feature Deep Dive
 ```
-Subject: How PropManage handles [their specific pain point]
+Subject: How TenantBase handles [their specific pain point]
 
 Hi [Name],
 
-Following up on our demo - I wanted to share how PropManage specifically solves [their challenge].
+Following up on our demo - I wanted to share how TenantBase specifically solves [their challenge].
 
 [Personalized content about their use case]
 
@@ -164,7 +164,7 @@ Best,
 
 #### Day 7: Social Proof
 ```
-Subject: What other property managers say about PropManage
+Subject: What other property managers say about TenantBase
 
 Hi [Name],
 
@@ -186,7 +186,7 @@ Subject: Last chance for 50% savings vs Buildium
 
 Hi [Name],
 
-Just a friendly reminder that PropManage offers the same reliability as Buildium for 50% less.
+Just a friendly reminder that TenantBase offers the same reliability as Buildium for 50% less.
 
 Your trial expires in 2 days. Don't miss out on:
 - ✅ 99.9% uptime guarantee
@@ -446,4 +446,4 @@ Best,
 - **Team Structure:** Clear roles and responsibilities
 - **Customer Success:** Retention drives referrals
 
-This sales playbook provides a complete framework for converting property managers into loyal PropManage customers. Focus on reliability messaging, quantified ROI, and personalized solutions to overcome the natural skepticism in the property management industry.
+This sales playbook provides a complete framework for converting property managers into loyal TenantBase customers. Focus on reliability messaging, quantified ROI, and personalized solutions to overcome the natural skepticism in the property management industry.

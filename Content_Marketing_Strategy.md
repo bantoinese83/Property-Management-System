@@ -1,4 +1,4 @@
-# 🎯 PropManage Content Marketing Strategy
+# 🎯 TenantBase Content Marketing Strategy
 
 ## SEO-Focused Blog Content for Property Managers
 
@@ -44,7 +44,7 @@
   - On-site management capabilities
 
 #### 3. **Comparison Content** (Decision Stage)
-- **"Buildium vs PropManage: Which is Right for Your Property Management Business?"**
+- **"Buildium vs TenantBase: Which is Right for Your Property Management Business?"**
   - Feature comparison
   - Pricing analysis ($249 vs $99)
   - Use case recommendations
@@ -254,4 +254,4 @@
 - [ ] A/B test content formats
 - [ ] Analyze and iterate based on data
 
-This content strategy positions PropManage as the thought leader in reliable property management software, building trust and authority while driving qualified leads through the funnel.
+This content strategy positions TenantBase as the thought leader in reliable property management software, building trust and authority while driving qualified leads through the funnel.
