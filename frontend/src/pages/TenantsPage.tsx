@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 import { useApi } from '../hooks/useApi'
 import { API_ENDPOINTS } from '../api/endpoints'
 import type { Tenant } from '../types/models'
+import { AppSidebar } from '../components/app-sidebar'
+import { SiteHeader } from '../components/site-header'
+import { SidebarInset, SidebarProvider } from '../components/ui/sidebar'
 import { Button } from '../components/common/Button'
 import { Card } from '../components/common/Card'
 import { Modal } from '../components/common/Modal'
@@ -9,6 +12,8 @@ import { LoadingSpinner, ErrorMessage } from '../components/common'
 import TenantForm from '../components/tenants/TenantForm'
 import { DocumentUpload } from '../components/common/DocumentUpload'
 import { DocumentList } from '../components/common/DocumentList'
+import { Input } from '../components/common/Input'
+import { Users, FileText, DollarSign } from 'lucide-react'
 
 interface TenantsResponse {
   results: Tenant[]
@@ -76,152 +81,283 @@ const TenantsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className='flex h-[80vh] items-center justify-center'>
-        <LoadingSpinner size='lg' />
-      </div>
+      <SidebarProvider
+        style={{
+          "--sidebar-width": "280px",
+          "--header-height": "60px",
+        } as React.CSSProperties}
+      >
+        <AppSidebar variant="inset" />
+        <SidebarInset>
+          <SiteHeader />
+          <div className="flex flex-1 items-center justify-center p-4 lg:p-6">
+            <LoadingSpinner size="lg" />
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
     )
   }
 
   if (error) {
     return (
-      <div className='flex h-[80vh] items-center justify-center'>
-        <ErrorMessage message={error.message} title='Failed to load tenants' />
-      </div>
+      <SidebarProvider
+        style={{
+          "--sidebar-width": "280px",
+          "--header-height": "60px",
+        } as React.CSSProperties}
+      >
+        <AppSidebar variant="inset" />
+        <SidebarInset>
+          <SiteHeader />
+          <div className="flex flex-1 items-center justify-center p-4 lg:p-6">
+            <ErrorMessage message={error.message} title='Failed to load tenants' />
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
     )
   }
 
   return (
-    <div className='tenants-page'>
-      <div className='tenants-header'>
-        <div>
-          <h1>Tenants</h1>
-          <p>Manage tenant information and profiles</p>
-        </div>
-        <Button variant='primary' onClick={handleAddTenant}>
-          Add Tenant
-        </Button>
-      </div>
+    <SidebarProvider
+      style={{
+        "--sidebar-width": "280px",
+        "--header-height": "60px",
+      } as React.CSSProperties}
+    >
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          {/* Header Section */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Tenants</h1>
+              <p className="text-muted-foreground">
+                Manage tenant information and profiles
+              </p>
+            </div>
+            <Button variant="primary" onClick={handleAddTenant}>
+              Add Tenant
+            </Button>
+          </div>
 
-      <div className='tenants-filters'>
-        <div className='filter-group'>
-          <input
-            type='text'
-            placeholder='Search tenants...'
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className='search-input'
-          />
-        </div>
-      </div>
-
-      <div className='tenants-stats'>
-        <div className='stat-card'>
-          <h3>Total Tenants</h3>
-          <span className='stat-number'>{tenants.length}</span>
-        </div>
-        <div className='stat-card'>
-          <h3>Active Tenants</h3>
-          <span className='stat-number'>{tenants.filter(t => t.is_active).length}</span>
-        </div>
-        <div className='stat-card'>
-          <h3>Active Leases</h3>
-          <span className='stat-number'>
-            {tenants.reduce((sum, t) => sum + t.active_lease_count, 0)}
-          </span>
-        </div>
-        <div className='stat-card'>
-          <h3>Total Monthly Rent</h3>
-          <span className='stat-number'>
-            $
-            {tenants.reduce((sum, t) => sum + parseFloat(t.monthly_rent_total), 0).toLocaleString()}
-          </span>
-        </div>
-      </div>
-
-      <div className='tenants-grid'>
-        {tenants.map(tenant => (
-          <Card
-            key={tenant.id}
-            title={tenant.full_name}
-            subtitle={tenant.email}
-            className='tenant-card'
-          >
-            <div className='tenant-info'>
-              <div className='tenant-details'>
-                <div className='tenant-contact'>
-                  <span className='tenant-phone'>{tenant.phone}</span>
-                  <span className='tenant-address'>
-                    {tenant.city}, {tenant.state}
-                  </span>
+          {/* Stats Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-lg border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Tenants</p>
+                  <p className="text-2xl font-bold tabular-nums lg:text-3xl">
+                    {tenants.length}
+                  </p>
                 </div>
-                <div className='tenant-status'>
-                  <span className={`status-badge ${tenant.is_active ? 'active' : 'inactive'}`}>
-                    {tenant.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                  {tenant.credit_score && (
-                    <span className='credit-score'>Credit: {tenant.credit_score}</span>
-                  )}
-                </div>
-              </div>
-
-              <div className='tenant-leases'>
-                <div className='lease-info'>
-                  <span className='lease-count'>{tenant.active_lease_count} active lease(s)</span>
-                  <span className='monthly-rent'>${tenant.monthly_rent_total}/month</span>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <Users className="h-5 w-5 text-primary" />
                 </div>
               </div>
             </div>
 
-            <div className='tenant-actions'>
-              <Button variant='ghost' size='sm' onClick={() => handleEditTenant(tenant)}>
-                Edit
-              </Button>
-              <Button variant='ghost' size='sm' onClick={() => handleViewDocuments(tenant)}>
-                Documents
-              </Button>
-              <Button variant='danger' size='sm' onClick={() => handleDeleteTenant(tenant.id)}>
-                Delete
+            <div className="rounded-lg border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Active Tenants</p>
+                  <p className="text-2xl font-bold tabular-nums lg:text-3xl">
+                    {tenants.filter(t => t.is_active).length}
+                  </p>
+                </div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-lg border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Active Leases</p>
+                  <p className="text-2xl font-bold tabular-nums lg:text-3xl">
+                    {tenants.reduce((sum, t) => sum + t.active_lease_count, 0)}
+                  </p>
+                </div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <FileText className="h-5 w-5 text-primary" />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-lg border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Monthly Revenue</p>
+                  <p className="text-2xl font-bold tabular-nums lg:text-3xl">
+                    ${tenants.reduce((sum, t) => sum + parseFloat(t.monthly_rent_total), 0).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <DollarSign className="h-5 w-5 text-primary" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters Section */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-1 items-center space-x-2">
+              <Input
+                placeholder="Search tenants..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+          </div>
+
+          {/* Tenants Grid */}
+          {tenants.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {tenants.map((tenant) => (
+                <Card key={tenant.id} className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                      <h3 className="font-semibold leading-none tracking-tight">
+                        {tenant.full_name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {tenant.email}
+                      </p>
+                    </div>
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
+                      <Users className="h-3 w-3 text-primary" />
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Phone</p>
+                      <p className="font-medium">{tenant.phone}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Location</p>
+                      <p className="font-medium">{tenant.city}, {tenant.state}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Active Leases</p>
+                      <p className="font-medium">{tenant.active_lease_count}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Monthly Rent</p>
+                      <p className="font-medium">${tenant.monthly_rent_total}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center gap-2">
+                    <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                      tenant.is_active
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {tenant.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                    {tenant.credit_score && (
+                      <span className="text-xs text-muted-foreground">
+                        Credit: {tenant.credit_score}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-6 flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditTenant(tenant)}
+                      className="flex-1"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleViewDocuments(tenant)}
+                      className="flex-1"
+                    >
+                      Documents
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteTenant(tenant.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold">No tenants found</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Get started by adding your first tenant.
+              </p>
+              <Button className="mt-4" onClick={handleAddTenant}>
+                Add Your First Tenant
               </Button>
             </div>
-          </Card>
-        ))}
-      </div>
+          )}
+        </div>
+      </SidebarInset>
 
       {/* Add Tenant Modal */}
-      <Modal isOpen={showAddModal} onClose={handleCloseModal} title='Add New Tenant'>
+      <Modal
+        isOpen={showAddModal}
+        onClose={handleCloseModal}
+        title="Add New Tenant"
+        size="2xl"
+      >
         <TenantForm onClose={handleCloseModal} />
       </Modal>
 
       {/* Edit Tenant Modal */}
-      <Modal isOpen={!!editingTenant} onClose={handleCloseModal} title='Edit Tenant'>
-        {editingTenant && <TenantForm tenant={editingTenant} onClose={handleCloseModal} />}
+      <Modal
+        isOpen={!!editingTenant}
+        onClose={handleCloseModal}
+        title="Edit Tenant"
+        size="2xl"
+      >
+        {editingTenant && (
+          <TenantForm
+            tenant={editingTenant}
+            onClose={handleCloseModal}
+          />
+        )}
       </Modal>
 
-      {/* Documents Modal */}
+      {/* View Documents Modal */}
       <Modal
         isOpen={!!viewingDocuments}
         onClose={handleCloseModal}
         title={`Documents - ${viewingDocuments?.full_name}`}
       >
         {viewingDocuments && (
-          <div className='space-y-6'>
+          <div className="space-y-6">
             <DocumentUpload
-              modelName='tenant'
+              modelName="tenant"
               objectId={viewingDocuments.id}
               onUploadSuccess={handleDocumentUploadSuccess}
             />
-            <div className='mt-6'>
-              <h4 className='text-md font-medium mb-3'>Existing Documents</h4>
-              <DocumentList
-                modelName='tenant'
-                objectId={viewingDocuments.id}
-                refreshTrigger={refreshDocsTrigger}
-              />
-            </div>
+            <DocumentList
+              modelName="tenant"
+              objectId={viewingDocuments.id}
+              refreshTrigger={refreshDocsTrigger}
+            />
           </div>
         )}
       </Modal>
-    </div>
+    </SidebarProvider>
   )
 }
 

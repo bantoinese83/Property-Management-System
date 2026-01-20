@@ -1,4 +1,5 @@
 from django.utils import timezone
+import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -7,6 +8,15 @@ from rest_framework.response import Response
 
 from .models import MaintenanceRequest
 from .serializers import MaintenanceRequestSerializer
+
+
+class MaintenanceRequestFilter(django_filters.FilterSet):
+    property = django_filters.NumberFilter(field_name='property', lookup_expr='exact')
+    tenant_id = django_filters.NumberFilter(field_name='tenant', lookup_expr='exact')
+
+    class Meta:
+        model = MaintenanceRequest
+        fields = ['priority', 'status', 'property', 'category', 'tenant_id']
 
 
 class MaintenanceRequestViewSet(viewsets.ModelViewSet):
@@ -24,7 +34,7 @@ class MaintenanceRequestViewSet(viewsets.ModelViewSet):
     serializer_class = MaintenanceRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["priority", "status", "property", "category"]
+    filterset_class = MaintenanceRequestFilter
     search_fields = ["title", "description", "property__property_name"]
     ordering_fields = ["requested_date", "priority", "status"]
     ordering = ["-requested_date"]

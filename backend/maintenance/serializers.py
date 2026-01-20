@@ -14,7 +14,7 @@ class MaintenanceRequestSerializer(serializers.ModelSerializer):
         model = MaintenanceRequest
         fields = [
             "id",
-            "property",
+            "property_obj",
             "property_name",
             "tenant",
             "tenant_name",

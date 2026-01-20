@@ -5,6 +5,8 @@ import {
   MoreVerticalIcon,
   UserCircleIcon,
 } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/hooks/useAuth"
 
 import {
   Avatar,
@@ -37,6 +39,8 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const { logout } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <SidebarMenu>
@@ -96,7 +100,11 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              console.log('Logout clicked')
+              logout()
+              navigate('/login')
+            }}>
               <LogOutIcon />
               Log out
             </DropdownMenuItem>

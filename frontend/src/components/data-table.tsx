@@ -282,7 +282,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     id: "actions",
-    cell: () => (
+    cell: ({ row }) => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -295,11 +295,22 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => console.log('Edit clicked for:', row.original.id)}>
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => console.log('Copy clicked for:', row.original.id)}>
+            Make a copy
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => console.log('Favorite clicked for:', row.original.id)}>
+            Favorite
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Delete</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => console.log('Delete clicked for:', row.original.id)}
+            className="text-destructive focus:text-destructive"
+          >
+            Delete
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),

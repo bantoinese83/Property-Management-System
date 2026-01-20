@@ -1,5 +1,6 @@
 from django.db.models import Sum
 from django.utils import timezone
+import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -7,6 +8,16 @@ from rest_framework.response import Response
 
 from .models import AccountingPeriod, FinancialTransaction
 from .serializers import AccountingPeriodSerializer, FinancialTransactionSerializer
+
+
+class FinancialTransactionFilter(django_filters.FilterSet):
+    property = django_filters.NumberFilter(field_name='property_obj', lookup_expr='exact')
+    date_from = django_filters.DateFilter(field_name='transaction_date', lookup_expr='gte')
+    date_to = django_filters.DateFilter(field_name='transaction_date', lookup_expr='lte')
+
+    class Meta:
+        model = FinancialTransaction
+        fields = ['transaction_type', 'category', 'property']
 
 
 class FinancialTransactionViewSet(viewsets.ModelViewSet):
@@ -24,7 +35,7 @@ class FinancialTransactionViewSet(viewsets.ModelViewSet):
     serializer_class = FinancialTransactionSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["transaction_type", "category", "property"]
+    filterset_class = FinancialTransactionFilter
     search_fields = ["description", "vendor_name"]
     ordering_fields = ["transaction_date", "amount"]
     ordering = ["-transaction_date"]
@@ -36,7 +47,7 @@ class FinancialTransactionViewSet(viewsets.ModelViewSet):
         if user.user_type == "admin":
             return FinancialTransaction.objects.all()
         elif user.user_type in ["owner", "manager"]:
-            return FinancialTransaction.objects.filter(property__owner=user)
+            return FinancialTransaction.objects.filter(property_obj__owner=user)
         else:
             return FinancialTransaction.objects.none()
 
@@ -110,6 +121,14 @@ class FinancialTransactionViewSet(viewsets.ModelViewSet):
         )
 
 
+class AccountingPeriodFilter(django_filters.FilterSet):
+    property = django_filters.NumberFilter(field_name='property_obj', lookup_expr='exact')
+
+    class Meta:
+        model = AccountingPeriod
+        fields = ['property', 'is_closed', 'period_type']
+
+
 class AccountingPeriodViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing accounting periods.
@@ -124,7 +143,7 @@ class AccountingPeriodViewSet(viewsets.ModelViewSet):
     serializer_class = AccountingPeriodSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ["property", "is_closed", "period_type"]
+    filterset_class = AccountingPeriodFilter
     ordering_fields = ["period_start", "period_end"]
     ordering = ["-period_start"]
 
@@ -135,7 +154,7 @@ class AccountingPeriodViewSet(viewsets.ModelViewSet):
         if user.user_type == "admin":
             return AccountingPeriod.objects.all()
         elif user.user_type in ["owner", "manager"]:
-            return AccountingPeriod.objects.filter(property__owner=user)
+            return AccountingPeriod.objects.filter(property_obj__owner=user)
         else:
             return AccountingPeriod.objects.none()
 
@@ -145,7 +164,7 @@ class AccountingPeriodViewSet(viewsets.ModelViewSet):
         period = self.get_object()
 
         # Check permissions
-        if period.property.owner != request.user and request.user.user_type != "admin":
+        if period.property_obj.owner != request.user and request.user.user_type != "admin":
             return Response(
                 {"error": "You do not have permission to close this period"},
                 status=status.HTTP_403_FORBIDDEN,

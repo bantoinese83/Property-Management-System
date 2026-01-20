@@ -146,7 +146,7 @@ class AccountingPeriod(models.Model):
         unique_together = ("property_obj", "period_start", "period_end")
 
     def __str__(self):
-        return f"{self.property.property_name} - {self.period_start} to {self.period_end}"
+        return f"{self.property_obj.property_name} - {self.period_start} to {self.period_end}"
 
     @property
     def profit_margin(self):

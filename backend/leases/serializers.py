@@ -14,7 +14,7 @@ class LeaseSerializer(serializers.ModelSerializer):
         model = Lease
         fields = [
             "id",
-            "property",
+            "property_obj",
             "property_name",
             "tenant",
             "tenant_name",

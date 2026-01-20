@@ -1,4 +1,5 @@
 from django.utils import timezone
+import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -7,6 +8,15 @@ from rest_framework.response import Response
 
 from .models import Lease
 from .serializers import LeaseSerializer
+
+
+class LeaseFilter(django_filters.FilterSet):
+    property = django_filters.NumberFilter(field_name='property_obj', lookup_expr='exact')
+    tenant_id = django_filters.NumberFilter(field_name='tenant', lookup_expr='exact')
+
+    class Meta:
+        model = Lease
+        fields = ['status', 'property', 'tenant_id']
 
 
 class LeaseViewSet(viewsets.ModelViewSet):
@@ -25,8 +35,8 @@ class LeaseViewSet(viewsets.ModelViewSet):
     serializer_class = LeaseSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["status", "property_obj", "tenant"]
-    search_fields = ["tenant__first_name", "tenant__last_name", "property__property_name"]
+    filterset_class = LeaseFilter
+    search_fields = ["tenant__first_name", "tenant__last_name", "property_obj__property_name"]
     ordering_fields = ["lease_start_date", "lease_end_date", "created_at"]
     ordering = ["-lease_start_date"]
 

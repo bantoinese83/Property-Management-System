@@ -1,4 +1,5 @@
 from django.utils import timezone
+import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -6,6 +7,14 @@ from rest_framework.response import Response
 
 from .models import RentPayment
 from .serializers import RentPaymentSerializer
+
+
+class RentPaymentFilter(django_filters.FilterSet):
+    property = django_filters.NumberFilter(field_name='lease_obj__property', lookup_expr='exact')
+
+    class Meta:
+        model = RentPayment
+        fields = ['status', 'payment_method', 'property']
 
 
 class RentPaymentViewSet(viewsets.ModelViewSet):
@@ -28,8 +37,8 @@ class RentPaymentViewSet(viewsets.ModelViewSet):
         filters.SearchFilter,
         filters.OrderingFilter,
     ]
-    filterset_fields = ["status", "payment_method", "lease__property"]
-    search_fields = ["lease__tenant__first_name", "lease__tenant__last_name"]
+    filterset_class = RentPaymentFilter
+    search_fields = ["lease_obj__tenant__first_name", "lease_obj__tenant__last_name"]
     ordering_fields = ["payment_date", "due_date", "amount"]
     ordering = ["-payment_date"]
 

@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Link } from "react-router-dom"
 import {
   BarChartIcon,
   ClipboardListIcon,
@@ -77,10 +78,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="/dashboard">
+              <Link to="/dashboard" onClick={() => console.log('Header logo clicked')}>
                 <LayoutDashboardIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Property Management</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
