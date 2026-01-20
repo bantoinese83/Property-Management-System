@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "maintenance",
     "payments",
     "accounting",
+    "documents",
 ]
 
 MIDDLEWARE = [
@@ -207,6 +208,22 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
+
+CELERY_BEAT_SCHEDULE = {
+    "check-lease-expiries-daily": {
+        "task": "leases.tasks.check_lease_expiries",
+        "schedule": 86400.0,  # Every 24 hours
+    },
+    "check-payment-due-dates-daily": {
+        "task": "payments.tasks.check_payment_due_dates",
+        "schedule": 86400.0,  # Every 24 hours
+    },
+}
+
+# Stripe Configuration
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY", "")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 
 # Logging
 LOGGING = {

@@ -5,6 +5,7 @@ The `urlpatterns` list routes URLs to views.
 """
 
 from accounting.views import AccountingPeriodViewSet, FinancialTransactionViewSet
+from documents.views import DocumentViewSet
 from django.contrib import admin
 from django.urls import include, path
 from leases.views import LeaseViewSet
@@ -14,6 +15,11 @@ from properties.views import PropertyImageViewSet, PropertyViewSet
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from tenants.views import TenantViewSet
+from payments.webhooks import stripe_webhook
+
+# Global error handlers
+handler404 = "core.exceptions.handler404"
+handler500 = "core.exceptions.handler500"
 
 # Import ViewSets
 from users.views import UserViewSet
@@ -29,10 +35,12 @@ router.register(r"maintenance", MaintenanceRequestViewSet, basename="maintenance
 router.register(r"payments", RentPaymentViewSet, basename="payment")
 router.register(r"accounting/transactions", FinancialTransactionViewSet, basename="transaction")
 router.register(r"accounting/periods", AccountingPeriodViewSet, basename="accounting-period")
+router.register(r"documents", DocumentViewSet, basename="document")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/webhooks/stripe/", stripe_webhook, name="stripe-webhook"),
 ]

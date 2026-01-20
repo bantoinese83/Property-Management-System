@@ -1,7 +1,8 @@
 import React from 'react'
+import { type AxiosError } from 'axios'
 import { useForm } from '../../hooks/useForm'
 import { API_ENDPOINTS } from '../../api/endpoints'
-import { Tenant } from '../../types/models'
+import { type Tenant } from '../../types/models'
 import { Button } from '../common/Button'
 import { Input } from '../common/Input'
 import client from '../../api/client'
@@ -11,51 +12,58 @@ interface TenantFormProps {
   onClose: () => void
 }
 
+type TenantFormValues = Omit<
+  Tenant,
+  'id' | 'full_name' | 'active_lease_count' | 'monthly_rent_total' | 'created_at' | 'updated_at'
+>
+
 const TenantForm: React.FC<TenantFormProps> = ({ tenant, onClose }) => {
   const isEditing = !!tenant
 
-  const { values, errors, loading, handleChange, handleSubmit, setValue } = useForm<Tenant>({
-    initialValues: tenant || {
-      first_name: '',
-      last_name: '',
-      email: '',
-      phone: '',
-      date_of_birth: undefined,
-      address: '',
-      city: '',
-      state: '',
-      zip_code: '',
-      emergency_contact_name: '',
-      emergency_contact_phone: '',
-      emergency_contact_relationship: '',
-      employer_name: '',
-      employer_phone: '',
-      annual_income: undefined,
-      previous_landlord_name: '',
-      previous_landlord_phone: '',
-      is_active: true,
-      credit_score: undefined,
-    },
-    onSubmit: async formData => {
-      try {
-        const url = isEditing
-          ? API_ENDPOINTS.TENANTS.DETAIL(tenant!.id)
-          : API_ENDPOINTS.TENANTS.LIST
+  const { values, errors, loading, handleChange, handleSubmit, setValue } =
+    useForm<TenantFormValues>({
+      initialValues: (tenant as TenantFormValues) || {
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        date_of_birth: undefined,
+        address: '',
+        city: '',
+        state: '',
+        zip_code: '',
+        emergency_contact_name: '',
+        emergency_contact_phone: '',
+        emergency_contact_relationship: '',
+        employer_name: '',
+        employer_phone: '',
+        annual_income: undefined,
+        previous_landlord_name: '',
+        previous_landlord_phone: '',
+        is_active: true,
+        credit_score: undefined,
+      },
+      onSubmit: async formData => {
+        try {
+          const url = isEditing
+            ? API_ENDPOINTS.TENANTS.DETAIL(tenant!.id)
+            : API_ENDPOINTS.TENANTS.LIST
 
-        const method = isEditing ? 'PUT' : 'POST'
+          const method = isEditing ? 'PUT' : 'POST'
 
-        await client({
-          method,
-          url,
-          data: formData,
-        })
+          await client({
+            method,
+            url,
+            data: formData,
+          })
 
-        onClose()
-      } catch (error) {
-        throw new Error(error.response?.data?.detail || 'Failed to save tenant')
-      }
-    },
-  })
+          onClose()
+        } catch (error) {
+          const axiosError = error as AxiosError<{ detail?: string }>
+          throw new Error(axiosError.response?.data?.detail || 'Failed to save tenant')
+        }
+      },
+    })
 
   return (
     <form onSubmit={handleSubmit} className='tenant-form'>

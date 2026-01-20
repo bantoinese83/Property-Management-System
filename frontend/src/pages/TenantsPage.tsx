@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import { useApi } from '../hooks/useApi'
 import { API_ENDPOINTS } from '../api/endpoints'
-import { Tenant } from '../types/models'
+import type { Tenant } from '../types/models'
 import { Button } from '../components/common/Button'
 import { Card } from '../components/common/Card'
 import { Modal } from '../components/common/Modal'
+import { LoadingSpinner, ErrorMessage } from '../components/common'
 import TenantForm from '../components/tenants/TenantForm'
+import { DocumentUpload } from '../components/common/DocumentUpload'
+import { DocumentList } from '../components/common/DocumentList'
 import '../styles/pages/TenantsPage.css'
 
 interface TenantsResponse {
@@ -18,9 +21,11 @@ interface TenantsResponse {
 const TenantsPage: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingTenant, setEditingTenant] = useState<Tenant | null>(null)
+  const [viewingDocuments, setViewingDocuments] = useState<Tenant | null>(null)
+  const [refreshDocsTrigger, setRefreshDocsTrigger] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
 
-  const { data, loading, refetch } = useApi<TenantsResponse>(
+  const { data, loading, error, refetch } = useApi<TenantsResponse>(
     `${API_ENDPOINTS.TENANTS.LIST}?search=${searchTerm}`
   )
 
@@ -34,10 +39,19 @@ const TenantsPage: React.FC = () => {
     setEditingTenant(tenant)
   }
 
+  const handleViewDocuments = (tenant: Tenant) => {
+    setViewingDocuments(tenant)
+  }
+
   const handleCloseModal = () => {
     setShowAddModal(false)
     setEditingTenant(null)
+    setViewingDocuments(null)
     refetch() // Refresh the list
+  }
+
+  const handleDocumentUploadSuccess = () => {
+    setRefreshDocsTrigger(prev => prev + 1)
   }
 
   const handleDeleteTenant = async (tenantId: number) => {
@@ -61,8 +75,21 @@ const TenantsPage: React.FC = () => {
     }
   }
 
-  if (loading) return <div className='loading'>Loading tenants...</div>
-  if (error) return <div className='error'>Error loading tenants: {error.message}</div>
+  if (loading) {
+    return (
+      <div className='flex h-[80vh] items-center justify-center'>
+        <LoadingSpinner size='lg' />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='flex h-[80vh] items-center justify-center'>
+        <ErrorMessage message={error.message} title='Failed to load tenants' />
+      </div>
+    )
+  }
 
   return (
     <div className='tenants-page'>
@@ -150,6 +177,9 @@ const TenantsPage: React.FC = () => {
               <Button variant='ghost' size='sm' onClick={() => handleEditTenant(tenant)}>
                 Edit
               </Button>
+              <Button variant='ghost' size='sm' onClick={() => handleViewDocuments(tenant)}>
+                Documents
+              </Button>
               <Button variant='danger' size='sm' onClick={() => handleDeleteTenant(tenant.id)}>
                 Delete
               </Button>
@@ -166,6 +196,31 @@ const TenantsPage: React.FC = () => {
       {/* Edit Tenant Modal */}
       <Modal isOpen={!!editingTenant} onClose={handleCloseModal} title='Edit Tenant'>
         {editingTenant && <TenantForm tenant={editingTenant} onClose={handleCloseModal} />}
+      </Modal>
+
+      {/* Documents Modal */}
+      <Modal
+        isOpen={!!viewingDocuments}
+        onClose={handleCloseModal}
+        title={`Documents - ${viewingDocuments?.full_name}`}
+      >
+        {viewingDocuments && (
+          <div className='space-y-6'>
+            <DocumentUpload
+              modelName='tenant'
+              objectId={viewingDocuments.id}
+              onUploadSuccess={handleDocumentUploadSuccess}
+            />
+            <div className='mt-6'>
+              <h4 className='text-md font-medium mb-3'>Existing Documents</h4>
+              <DocumentList
+                modelName='tenant'
+                objectId={viewingDocuments.id}
+                refreshTrigger={refreshDocsTrigger}
+              />
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   )

@@ -1,7 +1,8 @@
 import React from 'react'
+import { type AxiosError } from 'axios'
 import { useForm } from '../../hooks/useForm'
 import { API_ENDPOINTS } from '../../api/endpoints'
-import { Property } from '../../types/models'
+import { type Property } from '../../types/models'
 import { Button } from '../common/Button'
 import { Input } from '../common/Input'
 import { Label } from '../common/Label'
@@ -13,51 +14,66 @@ interface PropertyFormProps {
   onClose: () => void
 }
 
+type PropertyFormValues = Omit<
+  Property,
+  | 'id'
+  | 'owner'
+  | 'owner_name'
+  | 'full_address'
+  | 'monthly_income'
+  | 'occupancy_rate'
+  | 'images'
+  | 'created_at'
+  | 'updated_at'
+>
+
 const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
   const isEditing = !!property
 
-  const { values, errors, loading, handleChange, handleSubmit, setValue } = useForm<Property>({
-    initialValues: property || {
-      property_name: '',
-      description: '',
-      address: '',
-      city: '',
-      state: '',
-      zip_code: '',
-      country: 'USA',
-      property_type: 'apartment',
-      total_units: 1,
-      year_built: undefined,
-      square_footage: undefined,
-      bedrooms: undefined,
-      bathrooms: undefined,
-      purchase_price: undefined,
-      purchase_date: undefined,
-      annual_property_tax: undefined,
-      insurance_cost: undefined,
-      is_active: true,
-      is_listed_for_rent: true,
-    },
-    onSubmit: async formData => {
-      try {
-        const url = isEditing
-          ? API_ENDPOINTS.PROPERTIES.DETAIL(property!.id)
-          : API_ENDPOINTS.PROPERTIES.LIST
+  const { values, errors, loading, handleChange, handleSubmit, setValue } =
+    useForm<PropertyFormValues>({
+      initialValues: (property as PropertyFormValues) || {
+        property_name: '',
+        description: '',
+        address: '',
+        city: '',
+        state: '',
+        zip_code: '',
+        country: 'USA',
+        property_type: 'apartment',
+        total_units: 1,
+        year_built: undefined,
+        square_footage: undefined,
+        bedrooms: undefined,
+        bathrooms: undefined,
+        purchase_price: undefined,
+        purchase_date: undefined,
+        annual_property_tax: undefined,
+        insurance_cost: undefined,
+        is_active: true,
+        is_listed_for_rent: true,
+      },
+      onSubmit: async formData => {
+        try {
+          const url = isEditing
+            ? API_ENDPOINTS.PROPERTIES.DETAIL(property!.id)
+            : API_ENDPOINTS.PROPERTIES.LIST
 
-        const method = isEditing ? 'PUT' : 'POST'
+          const method = isEditing ? 'PUT' : 'POST'
 
-        await client({
-          method,
-          url,
-          data: formData,
-        })
+          await client({
+            method,
+            url,
+            data: formData,
+          })
 
-        onClose()
-      } catch (error) {
-        throw new Error(error.response?.data?.detail || 'Failed to save property')
-      }
-    },
-  })
+          onClose()
+        } catch (error) {
+          const axiosError = error as AxiosError<{ detail?: string }>
+          throw new Error(axiosError.response?.data?.detail || 'Failed to save property')
+        }
+      },
+    })
 
   return (
     <form onSubmit={handleSubmit} className='property-form'>

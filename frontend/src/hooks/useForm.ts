@@ -1,4 +1,4 @@
-import { useState, useCallback, ChangeEvent, FormEvent } from 'react'
+import { useState, useCallback, type ChangeEvent, type FormEvent } from 'react'
 
 interface UseFormOptions<T> {
   initialValues: T

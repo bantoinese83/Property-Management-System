@@ -49,5 +49,14 @@ export const API_ENDPOINTS = {
     DETAIL: (id: number) => `/payments/${id}/`,
     CREATE: '/payments/',
     UPDATE: (id: number) => `/payments/${id}/`,
+    CREATE_STRIPE_SESSION: (id: number) => `/payments/${id}/create_checkout_session/`,
+  },
+
+  // Documents
+  DOCUMENTS: {
+    LIST: '/documents/',
+    DETAIL: (id: number) => `/documents/${id}/`,
+    CREATE: '/documents/',
+    DELETE: (id: number) => `/documents/${id}/`,
   },
 }

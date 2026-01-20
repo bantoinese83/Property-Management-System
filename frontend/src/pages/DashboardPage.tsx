@@ -4,6 +4,7 @@ import { API_ENDPOINTS } from '../api/endpoints'
 import { useAuth } from '../hooks/useAuth'
 import { Card } from '../components/common/Card'
 import { Button } from '../components/common/Button'
+import { ErrorMessage, SkeletonCard } from '../components/common'
 import '../styles/pages/DashboardPage.css'
 
 interface DashboardAnalytics {
@@ -54,9 +55,57 @@ const DashboardPage: React.FC = () => {
     `${API_ENDPOINTS.PROPERTIES.LIST}dashboard_analytics/`
   )
 
-  if (loading) return <div className='loading'>Loading dashboard...</div>
-  if (error) return <div className='error'>Error loading dashboard: {error.message}</div>
-  if (!data) return <div className='loading'>No data available</div>
+  if (loading) {
+    return (
+      <div className='dashboard-page'>
+        <div className='dashboard-header'>
+          <div>
+            <Skeleton height={32} width={200} className='mb-2' />
+            <Skeleton height={20} width={300} />
+          </div>
+        </div>
+
+        <div className='dashboard-metrics'>
+          <div className='metrics-grid'>
+            {Array.from({ length: 4 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        </div>
+
+        <div className='dashboard-content'>
+          <div className='dashboard-charts'>
+            <div className='chart-container'>
+              <Skeleton height={300} variant='rounded' className='mb-4' />
+            </div>
+          </div>
+
+          <div className='dashboard-activity'>
+            <SkeletonCard />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='flex h-[80vh] items-center justify-center'>
+        <ErrorMessage message={error.message} title='Failed to load dashboard' />
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div className='flex h-[80vh] items-center justify-center'>
+        <ErrorMessage
+          message='No analytics data was returned from the server.'
+          title='No Data Available'
+        />
+      </div>
+    )
+  }
 
   const { summary, charts, recent_activity } = data
 

@@ -173,3 +173,18 @@ export interface User {
   date_joined: string
   last_login?: string
 }
+
+export interface Document {
+  id: number
+  title: string
+  description: string
+  file: string
+  file_type: string
+  file_size: number
+  content_type: number
+  object_id: number
+  uploaded_by: number
+  uploaded_by_name: string
+  created_at: string
+  updated_at: string
+}

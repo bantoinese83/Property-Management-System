@@ -1,14 +1,27 @@
 import * as React from 'react'
 import { cn } from '../../lib/utils'
-import '../styles/Card.css'
+import '../../styles/Card.css'
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  title?: string
+  subtitle?: string
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, title, subtitle, children, ...props }, ref) => (
     <div
       ref={ref}
       className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', className)}
       {...props}
-    />
+    >
+      {(title || subtitle) && (
+        <CardHeader>
+          {title && <CardTitle>{title}</CardTitle>}
+          {subtitle && <CardDescription>{subtitle}</CardDescription>}
+        </CardHeader>
+      )}
+      {children && <CardContent>{children}</CardContent>}
+    </div>
   )
 )
 Card.displayName = 'Card'

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { AuthProvider } from './AuthContext'
+import { AuthProvider } from './AuthProvider'
 import { useAuth } from '../hooks/useAuth'
 
 // Mock the API client
@@ -18,8 +18,12 @@ import client from '../api/client'
 function TestComponent() {
   const { user, login, logout, loading } = useAuth()
 
-  const handleLogin = () => {
-    login('testuser', 'testpass')
+  const handleLogin = async () => {
+    try {
+      await login('testuser', 'testpass')
+    } catch (_err) {
+      // Error is handled by context
+    }
   }
 
   const handleLogout = () => {
@@ -38,7 +42,7 @@ function TestComponent() {
 }
 
 describe('AuthContext', () => {
-  const mockClient = vi.mocked(client)
+  const mockClient = vi.mocked(client, true)
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -79,6 +83,11 @@ describe('AuthContext', () => {
       </AuthProvider>
     )
 
+    // Wait for initial loading to finish
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
+    })
+
     const loginButton = screen.getByRole('button', { name: /login/i })
     await user.click(loginButton)
 
@@ -101,6 +110,11 @@ describe('AuthContext', () => {
         <TestComponent />
       </AuthProvider>
     )
+
+    // Wait for initial loading to finish
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
+    })
 
     const loginButton = screen.getByRole('button', { name: /login/i })
     await user.click(loginButton)
@@ -129,6 +143,11 @@ describe('AuthContext', () => {
         <TestComponent />
       </AuthProvider>
     )
+
+    // Wait for initial loading to finish
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
+    })
 
     // Login first
     const loginButton = screen.getByRole('button', { name: /login/i })

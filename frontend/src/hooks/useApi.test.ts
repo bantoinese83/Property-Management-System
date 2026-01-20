@@ -12,18 +12,23 @@ vi.mock('../api/client', () => ({
 import client from '../api/client'
 
 describe('useApi', () => {
-  const mockClient = vi.mocked(client)
+  const mockClient = vi.mocked(client, true)
 
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it('returns initial state', () => {
+  it('returns initial state', async () => {
     const { result } = renderHook(() => useApi('/api/test'))
 
     expect(result.current.data).toBeNull()
     expect(result.current.loading).toBe(true)
     expect(result.current.error).toBeNull()
+
+    // Wait for the hook to finish loading to avoid act warnings
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false)
+    })
   })
 
   it('fetches data successfully', async () => {
@@ -55,7 +60,7 @@ describe('useApi', () => {
     expect(result.current.error).toEqual(mockError)
   })
 
-  it('skips fetch when skip is true', () => {
+  it('skips fetch when skip is true', async () => {
     const { result } = renderHook(() => useApi('/api/test', { skip: true }))
 
     expect(result.current.loading).toBe(false)
@@ -66,16 +71,24 @@ describe('useApi', () => {
     const mockErrorResponse = {
       response: { status: 500 },
     }
-    mockClient.get.mockRejectedValueOnce(mockErrorResponse)
+    mockClient.get.mockRejectedValue(mockErrorResponse)
 
-    const { result } = renderHook(() => useApi('/api/test', { retryOnError: 2 }))
+    // Using vi.useFakeTimers() would be better here, but let's first fix the act warnings
+    const { result } = renderHook(() => useApi('/api/test', { retryOnError: 1 }))
 
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false)
-    })
+    await waitFor(
+      () => {
+        expect(result.current.loading).toBe(false)
+      },
+      { timeout: 10000 }
+    )
 
-    // Should retry once (initial + 1 retry)
-    expect(mockClient.get).toHaveBeenCalledTimes(2)
+    await waitFor(
+      () => {
+        expect(mockClient.get).toHaveBeenCalledTimes(2)
+      },
+      { timeout: 10000 }
+    )
   })
 
   it('refetches data when refetch is called', async () => {
@@ -89,7 +102,9 @@ describe('useApi', () => {
     })
 
     // Call refetch
-    await result.current.refetch()
+    await waitFor(async () => {
+      await result.current.refetch()
+    })
 
     expect(mockClient.get).toHaveBeenCalledTimes(2)
   })

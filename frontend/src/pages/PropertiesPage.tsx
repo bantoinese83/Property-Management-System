@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import { useApi } from '../hooks/useApi'
 import { API_ENDPOINTS } from '../api/endpoints'
-import { Property } from '../types/models'
+import type { Property } from '../types/models'
 import { Button } from '../components/common/Button'
 import { Card } from '../components/common/Card'
 import { Modal } from '../components/common/Modal'
+import { LoadingSpinner, ErrorMessage } from '../components/common'
 import PropertyForm from '../components/properties/PropertyForm'
+import { DocumentUpload } from '../components/common/DocumentUpload'
+import { DocumentList } from '../components/common/DocumentList'
 import '../styles/pages/PropertiesPage.css'
 
 interface PropertiesResponse {
@@ -18,10 +21,12 @@ interface PropertiesResponse {
 const PropertiesPage: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingProperty, setEditingProperty] = useState<Property | null>(null)
+  const [viewingDocuments, setViewingDocuments] = useState<Property | null>(null)
+  const [refreshDocsTrigger, setRefreshDocsTrigger] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
   const [propertyTypeFilter, setPropertyTypeFilter] = useState('')
 
-  const { data, loading, refetch } = useApi<PropertiesResponse>(
+  const { data, loading, error, refetch } = useApi<PropertiesResponse>(
     `${API_ENDPOINTS.PROPERTIES.LIST}?search=${searchTerm}&property_type=${propertyTypeFilter}`
   )
 
@@ -35,10 +40,19 @@ const PropertiesPage: React.FC = () => {
     setEditingProperty(property)
   }
 
+  const handleViewDocuments = (property: Property) => {
+    setViewingDocuments(property)
+  }
+
   const handleCloseModal = () => {
     setShowAddModal(false)
     setEditingProperty(null)
+    setViewingDocuments(null)
     refetch() // Refresh the list
+  }
+
+  const handleDocumentUploadSuccess = () => {
+    setRefreshDocsTrigger(prev => prev + 1)
   }
 
   const handleDeleteProperty = async (propertyId: number) => {
@@ -62,8 +76,21 @@ const PropertiesPage: React.FC = () => {
     }
   }
 
-  if (loading) return <div className='loading'>Loading properties...</div>
-  if (error) return <div className='error'>Error loading properties: {error.message}</div>
+  if (loading) {
+    return (
+      <div className='flex h-[80vh] items-center justify-center'>
+        <LoadingSpinner size='lg' />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='flex h-[80vh] items-center justify-center'>
+        <ErrorMessage message={error.message} title='Failed to load properties' />
+      </div>
+    )
+  }
 
   return (
     <div className='properties-page'>
@@ -157,6 +184,9 @@ const PropertiesPage: React.FC = () => {
               <Button variant='ghost' size='sm' onClick={() => handleEditProperty(property)}>
                 Edit
               </Button>
+              <Button variant='ghost' size='sm' onClick={() => handleViewDocuments(property)}>
+                Documents
+              </Button>
               <Button variant='danger' size='sm' onClick={() => handleDeleteProperty(property.id)}>
                 Delete
               </Button>
@@ -173,6 +203,31 @@ const PropertiesPage: React.FC = () => {
       {/* Edit Property Modal */}
       <Modal isOpen={!!editingProperty} onClose={handleCloseModal} title='Edit Property'>
         {editingProperty && <PropertyForm property={editingProperty} onClose={handleCloseModal} />}
+      </Modal>
+
+      {/* Documents Modal */}
+      <Modal
+        isOpen={!!viewingDocuments}
+        onClose={handleCloseModal}
+        title={`Documents - ${viewingDocuments?.property_name}`}
+      >
+        {viewingDocuments && (
+          <div className='space-y-6'>
+            <DocumentUpload
+              modelName='property'
+              objectId={viewingDocuments.id}
+              onUploadSuccess={handleDocumentUploadSuccess}
+            />
+            <div className='mt-6'>
+              <h4 className='text-md font-medium mb-3'>Existing Documents</h4>
+              <DocumentList
+                modelName='property'
+                objectId={viewingDocuments.id}
+                refreshTrigger={refreshDocsTrigger}
+              />
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   )

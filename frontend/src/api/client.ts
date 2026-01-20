@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosError } from 'axios'
+import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
@@ -84,8 +84,9 @@ class APIClient {
     }
   }
 
-  private isRetry(config: { headers: Record<string, unknown> }): boolean {
-    return config.headers['X-Retry-Count'] ? parseInt(config.headers['X-Retry-Count']) > 0 : false
+  private isRetry(config: InternalAxiosRequestConfig): boolean {
+    const retryCount = config.headers?.['X-Retry-Count']
+    return retryCount ? parseInt(String(retryCount)) > 0 : false
   }
 
   private logout() {

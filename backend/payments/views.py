@@ -23,7 +23,11 @@ class RentPaymentViewSet(viewsets.ModelViewSet):
 
     serializer_class = RentPaymentSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_fields = ["status", "payment_method", "lease__property"]
     search_fields = ["lease__tenant__first_name", "lease__tenant__last_name"]
     ordering_fields = ["payment_date", "due_date", "amount"]
@@ -67,7 +71,9 @@ class RentPaymentViewSet(viewsets.ModelViewSet):
         payment = self.get_object()
 
         # Check permissions
-        if payment.lease.property.owner != request.user and request.user.user_type != "admin":
+        is_owner = payment.lease.property.owner == request.user
+        is_admin = request.user.user_type == "admin"
+        if not is_owner and not is_admin:
             return Response(
                 {"error": "You do not have permission to update this payment"},
                 status=status.HTTP_403_FORBIDDEN,
@@ -106,9 +112,15 @@ class RentPaymentViewSet(viewsets.ModelViewSet):
             payment_date__gte=month_start, payment_date__lte=today
         )
 
-        total_collected = sum(p.amount for p in payments if p.status == "paid")
-        total_pending = sum(p.amount for p in payments if p.status == "pending")
-        total_overdue = sum(p.amount for p in payments if p.status == "overdue")
+        total_collected = sum(
+            p.amount for p in payments if p.status == "paid"
+        )
+        total_pending = sum(
+            p.amount for p in payments if p.status == "pending"
+        )
+        total_overdue = sum(
+            p.amount for p in payments if p.status == "overdue"
+        )
 
         return Response(
             {
@@ -119,3 +131,71 @@ class RentPaymentViewSet(viewsets.ModelViewSet):
                 "total_payments": payments.count(),
             }
         )
+
+    @action(detail=True, methods=["post"])
+    def create_checkout_session(self, request, pk=None):
+        """Create a Stripe checkout session for a payment"""
+        payment = self.get_object()
+
+        if payment.status == "paid":
+            return Response(
+                {"error": "This payment has already been completed."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            import stripe
+            from django.conf import settings
+
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+
+            # success_url and cancel_url should ideally come from
+            # frontend or settings. Using defaults for local development
+            success_url = request.data.get(
+                "success_url",
+                (
+                    "http://localhost:5173/payments?success=true"
+                    "&session_id={CHECKOUT_SESSION_ID}"
+                ),
+            )
+            cancel_url = request.data.get(
+                "cancel_url",
+                "http://localhost:5173/payments?canceled=true",
+            )
+
+            prop_name = payment.lease_obj.property.property_name
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=["card"],
+                line_items=[
+                    {
+                        "price_data": {
+                            "currency": "usd",
+                            "product_data": {
+                                "name": f"Rent Payment - {prop_name}",
+                                "description": (
+                                    f"Payment for "
+                                    f"{payment.due_date.strftime('%B %Y')}"
+                                ),
+                            },
+                            "unit_amount": int(
+                                payment.total_amount * 100
+                            ),  # Amount in cents
+                        },
+                        "quantity": 1,
+                    }
+                ],
+                mode="payment",
+                success_url=success_url,
+                cancel_url=cancel_url,
+                client_reference_id=str(payment.id),
+                metadata={
+                    "payment_id": str(payment.id),
+                },
+            )
+
+            return Response({"url": checkout_session.url})
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

@@ -73,7 +73,7 @@
 ### **Option 1: Docker (Recommended)**
 ```bash
 # Clone and start
-git clone <repo-url>
+git clone https://github.com/bantoinese83/Property-Management-System.git
 cd property-management-system
 make setup  # Install dependencies and pre-commit hooks
 
