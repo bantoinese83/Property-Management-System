@@ -81,6 +81,26 @@ const data = {
       url: '/documents',
       icon: FileIcon,
     },
+    {
+      title: 'AI Assistant',
+      url: '/ai',
+      icon: Brain,
+    },
+    {
+      title: 'Document Analysis',
+      url: '/ai/documents',
+      icon: FileTextIcon,
+    },
+    {
+      title: 'Property Inspection',
+      url: '/ai/inspection',
+      icon: Camera,
+    },
+    {
+      title: 'Financial Analysis',
+      url: '/ai/financial',
+      icon: DollarSign,
+    },
   ],
 }
 
