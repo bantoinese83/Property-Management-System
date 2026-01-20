@@ -82,6 +82,7 @@ services:
              gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120"
     environment:
       DEBUG: ${DEBUG:-True}
+      DJANGO_ENV: ${DJANGO_ENV:-development}
       SECRET_KEY: ${SECRET_KEY:-your-secret-key}
       DB_NAME: property_mgmt
       DB_USER: property_user

@@ -3,7 +3,15 @@
  * Only available in development mode
  */
 
-import { AxiosResponse } from 'axios'
+// Define AxiosResponse type locally to avoid import issues
+interface AxiosResponse<T = any> {
+  data: T
+  status: number
+  statusText: string
+  headers: any
+  config: any
+  request?: any
+}
 
 // Development-only utilities
 export const devUtils = {

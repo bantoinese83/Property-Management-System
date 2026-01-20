@@ -7,7 +7,6 @@ import { Card } from '../components/common/Card'
 import { LoadingSpinner, ErrorMessage, LoadingOverlay } from '../components/common'
 import { Badge } from '../components/common/Badge'
 import { Plus, TrendingUp, TrendingDown, DollarSign, Calendar } from 'lucide-react'
-import '../styles/pages/AccountingPage.css'
 
 interface AccountingResponse {
   results: FinancialTransaction[]

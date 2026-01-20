@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { cn } from '../../lib/utils'
-import '../../styles/Card.css'
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string

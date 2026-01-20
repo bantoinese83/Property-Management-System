@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { Input } from '../components/common/Input'
 import { Button } from '../components/common/Button'
-import '../styles/pages/LoginPage.css'
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
@@ -45,6 +44,7 @@ const LoginPage: React.FC = () => {
             value={username}
             onChange={e => setUsername(e.target.value)}
             placeholder='Enter your username'
+            autoComplete='username'
             fullWidth
             required
           />
@@ -55,6 +55,7 @@ const LoginPage: React.FC = () => {
             value={password}
             onChange={e => setPassword(e.target.value)}
             placeholder='Enter your password'
+            autoComplete='current-password'
             fullWidth
             required
           />

@@ -17,6 +17,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from tenants.views import TenantViewSet
 from payments.webhooks import stripe_webhook
+# API Documentation will use Django REST framework's browsable API
 
 # Global error handlers
 handler404 = "core.exceptions.handler404"
@@ -44,6 +45,7 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/webhooks/stripe/", stripe_webhook, name="stripe-webhook"),
+    # API Documentation (Django REST framework browsable API)
     # Health check endpoints
     path("health/", health_check, name="health-check"),
     path("ready/", readiness_check, name="readiness-check"),

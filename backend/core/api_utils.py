@@ -6,6 +6,7 @@ Provides response caching, compression, rate limiting, and performance monitorin
 
 import hashlib
 import json
+import os
 from functools import wraps
 from typing import Any, Callable, Dict, Optional, TypeVar
 from django.core.cache import cache
@@ -280,7 +281,11 @@ def rate_limit(requests_per_minute: int = 60, key_prefix: str = "api_ratelimit")
             # Get current request count
             request_count = cache.get(cache_key, 0)
 
-            if request_count >= requests_per_minute:
+            # Allow much higher limits in development
+            is_development = os.getenv('DJANGO_ENV', 'production') == 'development'
+            effective_limit = 300 if is_development else requests_per_minute  # 300 requests/min in dev
+
+            if request_count >= effective_limit:
                 return APIResponse.error(
                     "Rate limit exceeded. Please try again later.",
                     "RATE_LIMIT_EXCEEDED",

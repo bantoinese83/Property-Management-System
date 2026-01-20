@@ -9,7 +9,6 @@ import { LoadingSpinner, ErrorMessage } from '../components/common'
 import TenantForm from '../components/tenants/TenantForm'
 import { DocumentUpload } from '../components/common/DocumentUpload'
 import { DocumentList } from '../components/common/DocumentList'
-import '../styles/pages/TenantsPage.css'
 
 interface TenantsResponse {
   results: Tenant[]

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { type AxiosError } from 'axios'
 import client from '../api/client'
 
@@ -33,9 +33,12 @@ export function useApi<T = unknown>(
   const [isRefetching, setIsRefetching] = useState(false)
   const retryCount = useRef(0)
 
+  // Memoize options to prevent unnecessary re-renders
+  const memoizedOptions = useMemo(() => options, [options.skip, options.refetchInterval, options.retryOnError])
+
   const fetchData = useCallback(
     async (isRetry = false) => {
-      if (options.skip) return
+      if (memoizedOptions.skip) return
 
       try {
         if (!isRetry) {
@@ -48,8 +51,8 @@ export function useApi<T = unknown>(
         retryCount.current = 0
 
         // Call success callback
-        if (options.onSuccess) {
-          options.onSuccess(response.data)
+        if (memoizedOptions.onSuccess) {
+          memoizedOptions.onSuccess(response.data)
         }
       } catch (err) {
         const axiosError = err as AxiosError<{ detail?: string }>
@@ -57,17 +60,18 @@ export function useApi<T = unknown>(
         setError(error)
 
         // Call error callback
-        if (options.onError) {
-          options.onError(error)
+        if (memoizedOptions.onError) {
+          memoizedOptions.onError(error)
         }
 
-        // Auto-retry logic for server errors
+        // Auto-retry logic for server errors (but not rate limits)
         if (
-          options.retryOnError &&
-          retryCount.current < options.retryOnError &&
+          memoizedOptions.retryOnError &&
+          retryCount.current < memoizedOptions.retryOnError &&
           axiosError.response &&
           typeof axiosError.response.status === 'number' &&
-          axiosError.response.status >= 500
+          axiosError.response.status >= 500 &&
+          axiosError.response.status !== 429  // Don't retry rate limits
         ) {
           retryCount.current++
           setTimeout(() => fetchData(true), 1000 * Math.pow(2, retryCount.current))
@@ -77,14 +81,14 @@ export function useApi<T = unknown>(
         setLoading(false)
       }
     },
-    [url, options]
+    [url, memoizedOptions]
   )
 
   useEffect(() => {
-    if (!options.skip) {
+    if (!memoizedOptions.skip) {
       fetchData()
     }
-  }, [url, options.skip, fetchData])
+  }, [url, memoizedOptions.skip])
 
   const retry = useCallback(async () => {
     retryCount.current = 0
@@ -92,11 +96,11 @@ export function useApi<T = unknown>(
   }, [fetchData])
 
   useEffect(() => {
-    if (options.refetchInterval) {
-      const interval = setInterval(fetchData, options.refetchInterval)
+    if (memoizedOptions.refetchInterval) {
+      const interval = setInterval(fetchData, memoizedOptions.refetchInterval)
       return () => clearInterval(interval)
     }
-  }, [options.refetchInterval, fetchData])
+  }, [memoizedOptions.refetchInterval])
 
   const isError = !!error
   const isSuccess = !!data && !isError

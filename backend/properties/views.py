@@ -161,9 +161,9 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
         from django.utils import timezone
 
-        from apps.leases.models import Lease
-        from apps.maintenance.models import MaintenanceRequest
-        from apps.payments.models import RentPayment
+        from leases.models import Lease
+        from maintenance.models import MaintenanceRequest
+        from payments.models import RentPayment
 
         properties = self.get_queryset()
 
@@ -190,32 +190,32 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
         # Recent payments (last 30 days)
         recent_payments = RentPayment.objects.filter(
-            lease__property__in=properties, payment_date__gte=today - timedelta(days=30)
+            lease_obj__property_obj__in=properties, payment_date__gte=today - timedelta(days=30)
         )
         monthly_collections = sum(float(p.amount) for p in recent_payments if p.status == "paid")
 
         # Outstanding payments
         outstanding_payments = RentPayment.objects.filter(
-            lease__property__in=properties, status__in=["pending", "overdue"]
+            lease_obj__property_obj__in=properties, status__in=["pending", "overdue"]
         )
         total_outstanding = sum(float(p.amount) for p in outstanding_payments)
 
         # Maintenance requests
         open_maintenance = MaintenanceRequest.objects.filter(
-            property__in=properties, status__in=["open", "assigned", "in_progress"]
+            property_obj__in=properties, status__in=["open", "assigned", "in_progress"]
         ).count()
 
         urgent_maintenance = MaintenanceRequest.objects.filter(
-            property__in=properties,
+            property_obj__in=properties,
             priority="urgent",
             status__in=["open", "assigned", "in_progress"],
         ).count()
 
         # Lease data
-        active_leases = Lease.objects.filter(property__in=properties, status="active").count()
+        active_leases = Lease.objects.filter(property_obj__in=properties, status="active").count()
 
         expiring_leases = Lease.objects.filter(
-            property__in=properties, status="active", lease_end_date__lte=today + timedelta(days=30)
+            property_obj__in=properties, status="active", lease_end_date__lte=today + timedelta(days=30)
         ).count()
 
         # Monthly trends (last 12 months)
@@ -225,7 +225,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
             month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(days=1)
 
             month_payments = RentPayment.objects.filter(
-                lease__property__in=properties,
+                lease_obj__property_obj__in=properties,
                 payment_date__gte=month_start,
                 payment_date__lte=month_end,
                 status="paid",
@@ -264,22 +264,22 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
         # Recent payments
         recent_payments_activity = RentPayment.objects.filter(
-            lease__property__in=properties
+            lease_obj__property_obj__in=properties
         ).order_by("-created_at")[:5]
 
         for payment in recent_payments_activity:
             recent_activity.append(
                 {
                     "type": "payment",
-                    "description": f"Rent payment received from {payment.lease.tenant.first_name} {payment.lease.tenant.last_name}",
+                    "description": f"Rent payment received from {payment.lease_obj.tenant.first_name} {payment.lease_obj.tenant.last_name}",
                     "amount": str(payment.amount),
                     "date": payment.created_at.isoformat(),
-                    "property": payment.lease.property.property_name,
+                    "property": payment.lease_obj.property_obj.property_name,
                 }
             )
 
         # Recent maintenance
-        recent_maintenance = MaintenanceRequest.objects.filter(property__in=properties).order_by(
+        recent_maintenance = MaintenanceRequest.objects.filter(property_obj__in=properties).order_by(
             "-created_at"
         )[:5]
 
@@ -290,7 +290,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
                     "description": f"Maintenance request: {maintenance.title}",
                     "priority": maintenance.priority,
                     "date": maintenance.created_at.isoformat(),
-                    "property": maintenance.property.property_name,
+                    "property": maintenance.property_obj.property_name,
                 }
             )
 

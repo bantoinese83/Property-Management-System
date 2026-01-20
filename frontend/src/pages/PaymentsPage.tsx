@@ -7,7 +7,6 @@ import { Button } from '../components/common/Button'
 import { Card } from '../components/common/Card'
 import { Badge } from '../components/common/Badge'
 import { LoadingSpinner, ErrorMessage } from '../components/common'
-import '../styles/pages/PaymentsPage.css'
 
 interface PaymentsResponse {
   results: RentPayment[]

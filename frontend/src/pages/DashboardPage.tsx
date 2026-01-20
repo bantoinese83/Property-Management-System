@@ -1,11 +1,13 @@
 import React from 'react'
 import { useApi } from '../hooks/useApi'
 import { API_ENDPOINTS } from '../api/endpoints'
-import { useAuth } from '../hooks/useAuth'
-import { Card } from '../components/common/Card'
-import { Button } from '../components/common/Button'
-import { ErrorMessage, SkeletonCard, Skeleton } from '../components/common'
-import '../styles/pages/DashboardPage.css'
+import { AppSidebar } from '../components/app-sidebar'
+import { ChartAreaInteractive } from '../components/chart-area-interactive'
+import { DataTable } from '../components/data-table'
+import { SiteHeader } from '../components/site-header'
+import { SidebarInset, SidebarProvider } from '../components/ui/sidebar'
+import { ErrorMessage } from '../components/common'
+import { Home, Building2, BarChart3, DollarSign } from 'lucide-react'
 
 interface DashboardAnalytics {
   summary: {
@@ -49,65 +51,85 @@ interface DashboardAnalytics {
   }>
 }
 
+// Using real property data for the table instead of sample data
+
 const DashboardPage: React.FC = () => {
-  const { user, logout } = useAuth()
-  const { data, loading, error, refetch } = useApi<DashboardAnalytics>(
+  const { data, loading, error } = useApi<DashboardAnalytics>(
     `${API_ENDPOINTS.PROPERTIES.LIST}dashboard_analytics/`
   )
 
   if (loading) {
     return (
-      <div className='dashboard-page'>
-        <div className='dashboard-header'>
-          <div>
-            <Skeleton height={32} width={200} className='mb-2' />
-            <Skeleton height={20} width={300} />
-          </div>
-        </div>
-
-        <div className='dashboard-metrics'>
-          <div className='metrics-grid'>
-            {Array.from({ length: 4 }).map((_, index) => (
-              <SkeletonCard key={index} />
-            ))}
-          </div>
-        </div>
-
-        <div className='dashboard-content'>
-          <div className='dashboard-charts'>
-            <div className='chart-container'>
-              <Skeleton height={300} variant='rounded' className='mb-4' />
+      <SidebarProvider
+        style={{
+          "--sidebar-width": "280px",
+          "--header-height": "60px",
+        } as React.CSSProperties}
+      >
+        <AppSidebar variant="inset" />
+        <SidebarInset>
+          <SiteHeader />
+          <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+            {/* Loading skeleton for metrics cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="h-32 rounded-lg bg-muted animate-pulse" />
+              ))}
             </div>
-          </div>
 
-          <div className='dashboard-activity'>
-            <SkeletonCard />
+            {/* Loading skeleton for chart */}
+            <div className="h-96 rounded-lg bg-muted animate-pulse" />
+
+            {/* Loading skeleton for table */}
+            <div className="h-64 rounded-lg bg-muted animate-pulse" />
           </div>
-        </div>
-      </div>
+        </SidebarInset>
+      </SidebarProvider>
     )
   }
 
   if (error) {
     return (
-      <div className='flex h-[80vh] items-center justify-center'>
-        <ErrorMessage message={error.message} title='Failed to load dashboard' />
-      </div>
+      <SidebarProvider
+        style={{
+          "--sidebar-width": "280px",
+          "--header-height": "60px",
+        } as React.CSSProperties}
+      >
+        <AppSidebar variant="inset" />
+        <SidebarInset>
+          <SiteHeader />
+          <div className="flex flex-1 items-center justify-center p-4 lg:p-6">
+            <ErrorMessage message={error.message} title='Failed to load dashboard' />
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
     )
   }
 
   if (!data) {
     return (
-      <div className='flex h-[80vh] items-center justify-center'>
-        <ErrorMessage
-          message='No analytics data was returned from the server.'
-          title='No Data Available'
-        />
-      </div>
+      <SidebarProvider
+        style={{
+          "--sidebar-width": "280px",
+          "--header-height": "60px",
+        } as React.CSSProperties}
+      >
+        <AppSidebar variant="inset" />
+        <SidebarInset>
+          <SiteHeader />
+          <div className="flex flex-1 items-center justify-center p-4 lg:p-6">
+            <ErrorMessage
+              message='No analytics data was returned from the server.'
+              title='No Data Available'
+            />
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
     )
   }
 
-  const { summary, charts, recent_activity } = data
+  const { summary, charts } = data
 
   const formatCurrency = (amount: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -121,207 +143,131 @@ const DashboardPage: React.FC = () => {
   }
 
   return (
-    <div className='dashboard-page'>
-      <div className='dashboard-header'>
-        <div>
-          <h1>Property Management Dashboard</h1>
-          <p>Welcome back, {user?.username}! Here's an overview of your property portfolio.</p>
-        </div>
-        <div className='header-actions'>
-          <Button variant='ghost' onClick={() => refetch()}>
-            Refresh
-          </Button>
-          <Button variant='secondary' onClick={logout}>
-            Logout
-          </Button>
-        </div>
-      </div>
-
-      {/* Summary Metrics */}
-      <div className='metrics-grid'>
-        <Card className='metric-card'>
-          <div className='metric-value'>{summary.total_properties}</div>
-          <div className='metric-label'>Total Properties</div>
-          <div className='metric-icon'>🏠</div>
-        </Card>
-
-        <Card className='metric-card'>
-          <div className='metric-value'>{summary.total_units}</div>
-          <div className='metric-label'>Total Units</div>
-          <div className='metric-icon'>🏢</div>
-        </Card>
-
-        <Card className='metric-card'>
-          <div className='metric-value'>{formatPercent(summary.average_occupancy)}</div>
-          <div className='metric-label'>Average Occupancy</div>
-          <div className='metric-icon'>📊</div>
-        </Card>
-
-        <Card className='metric-card'>
-          <div className='metric-value'>{formatCurrency(summary.total_monthly_income)}</div>
-          <div className='metric-label'>Monthly Income</div>
-          <div className='metric-icon'>💰</div>
-        </Card>
-
-        <Card className='metric-card'>
-          <div className='metric-value'>{summary.active_leases}</div>
-          <div className='metric-label'>Active Leases</div>
-          <div className='metric-icon'>📄</div>
-        </Card>
-
-        <Card className='metric-card'>
-          <div className='metric-value'>{summary.open_maintenance}</div>
-          <div className='metric-label'>Open Maintenance</div>
-          <div className='metric-icon'>🔧</div>
-        </Card>
-      </div>
-
-      {/* Financial Overview */}
-      <div className='dashboard-section'>
-        <h2>Financial Overview</h2>
-        <div className='financial-grid'>
-          <Card className='financial-card'>
-            <h3>Monthly Collections</h3>
-            <div className='financial-amount'>{formatCurrency(summary.monthly_collections)}</div>
-            <p>Last 30 days</p>
-          </Card>
-
-          <Card className='financial-card'>
-            <h3>Outstanding Payments</h3>
-            <div className='financial-amount outstanding'>
-              {formatCurrency(summary.total_outstanding)}
-            </div>
-            <p>Pending collection</p>
-          </Card>
-
-          <Card className='financial-card'>
-            <h3>Annual Income</h3>
-            <div className='financial-amount'>{formatCurrency(summary.total_annual_income)}</div>
-            <p>Projected yearly total</p>
-          </Card>
-
-          <Card className='financial-card'>
-            <h3>Occupancy Details</h3>
-            <div className='occupancy-details'>
-              <div className='occupancy-item'>
-                <span className='occupancy-label'>Occupied:</span>
-                <span className='occupancy-value'>{summary.occupied_units}</span>
+    <SidebarProvider
+      style={{
+        "--sidebar-width": "280px",
+        "--header-height": "60px",
+      } as React.CSSProperties}
+    >
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          {/* Metrics Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* Total Properties */}
+            <div className="rounded-lg border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Properties</p>
+                  <p className="text-2xl font-bold tabular-nums lg:text-3xl">
+                    {summary.total_properties}
+                  </p>
+                </div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <Home className="h-5 w-5 text-primary" />
+                </div>
               </div>
-              <div className='occupancy-item'>
-                <span className='occupancy-label'>Vacant:</span>
-                <span className='occupancy-value'>{summary.vacant_units}</span>
+              <div className="mt-4">
+                <span className="text-sm text-muted-foreground">Property portfolio</span>
               </div>
             </div>
-          </Card>
-        </div>
-      </div>
 
-      {/* Charts and Analytics */}
-      <div className='dashboard-section'>
-        <h2>Property Portfolio</h2>
-        <div className='portfolio-grid'>
-          <Card className='portfolio-card'>
-            <h3>Property Types Distribution</h3>
-            <div className='property-types'>
-              {Object.entries(charts.property_types).map(([type, data]) => (
-                <div key={type} className='property-type-item'>
-                  <div className='property-type-header'>
-                    <span className='property-type-name'>{type}</span>
-                    <span className='property-type-count'>{data.count} properties</span>
-                  </div>
-                  <div className='property-type-stats'>
-                    <span>{data.total_units} units</span>
-                    <span>{formatCurrency(data.monthly_income.toString())}/mo</span>
-                  </div>
+            {/* Total Units */}
+            <div className="rounded-lg border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Units</p>
+                  <p className="text-2xl font-bold tabular-nums lg:text-3xl">
+                    {summary.total_units}
+                  </p>
                 </div>
-              ))}
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <Building2 className="h-5 w-5 text-primary" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <span className="text-sm text-muted-foreground">Available units</span>
+              </div>
             </div>
-          </Card>
 
-          <Card className='portfolio-card'>
-            <h3>Monthly Revenue Trend</h3>
-            <div className='revenue-chart'>
-              {charts.monthly_revenue.map(month => (
-                <div key={month.month} className='revenue-bar'>
-                  <div className='revenue-label'>{month.month}</div>
-                  <div
-                    className='revenue-fill'
-                    style={{
-                      height: `${Math.max((month.revenue / 10000) * 100, 10)}px`,
-                    }}
-                    title={`$${month.revenue.toLocaleString()}`}
-                  ></div>
-                  <div className='revenue-value'>${month.revenue.toLocaleString()}</div>
+            {/* Average Occupancy */}
+            <div className="rounded-lg border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Average Occupancy</p>
+                  <p className="text-2xl font-bold tabular-nums lg:text-3xl">
+                    {formatPercent(summary.average_occupancy)}
+                  </p>
                 </div>
-              ))}
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <span className="text-sm text-muted-foreground">Occupancy rate</span>
+              </div>
             </div>
-          </Card>
-        </div>
-      </div>
 
-      {/* Alerts and Notifications */}
-      {(summary.expiring_leases > 0 || summary.urgent_maintenance > 0) && (
-        <div className='dashboard-section'>
-          <h2>Alerts</h2>
-          <div className='alerts-grid'>
-            {summary.expiring_leases > 0 && (
-              <Card className='alert-card warning'>
-                <div className='alert-icon'>⚠️</div>
-                <div className='alert-content'>
-                  <h4>Expiring Leases</h4>
-                  <p>{summary.expiring_leases} lease(s) expiring within 30 days</p>
+            {/* Monthly Income */}
+            <div className="rounded-lg border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Monthly Income</p>
+                  <p className="text-2xl font-bold tabular-nums lg:text-3xl">
+                    {formatCurrency(summary.total_monthly_income)}
+                  </p>
                 </div>
-              </Card>
-            )}
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <DollarSign className="h-5 w-5 text-primary" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <span className="text-sm text-muted-foreground">Monthly revenue</span>
+              </div>
+            </div>
+          </div>
 
-            {summary.urgent_maintenance > 0 && (
-              <Card className='alert-card urgent'>
-                <div className='alert-icon'>🚨</div>
-                <div className='alert-content'>
-                  <h4>Urgent Maintenance</h4>
-                  <p>{summary.urgent_maintenance} urgent maintenance request(s)</p>
-                </div>
-              </Card>
-            )}
+          {/* Chart Section */}
+          <div className="rounded-lg border bg-card p-6 shadow-sm">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold">Revenue Overview</h3>
+              <p className="text-sm text-muted-foreground">
+                Monthly revenue and collections for the past year
+              </p>
+            </div>
+            <ChartAreaInteractive
+              data={charts.monthly_revenue.map(item => ({
+                month: item.month,
+                revenue: item.revenue,
+                collections: item.collections
+              }))}
+            />
+          </div>
+
+          {/* Property Types Table */}
+          <div className="rounded-lg border bg-card p-6 shadow-sm">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold">Property Types</h3>
+              <p className="text-sm text-muted-foreground">
+                Overview of your property portfolio by type
+              </p>
+            </div>
+            <DataTable
+              data={Object.entries(charts.property_types).map(([type, data], index) => ({
+                id: index + 1,
+                header: type,
+                type: "Property Type",
+                status: "Active",
+                target: data.total_units.toString(),
+                limit: data.occupied_units.toString(),
+                reviewer: `${data.count} properties`
+              }))}
+            />
           </div>
         </div>
-      )}
-
-      {/* Recent Activity */}
-      <div className='dashboard-section'>
-        <h2>Recent Activity</h2>
-        <Card className='activity-card'>
-          <div className='activity-list'>
-            {recent_activity.length === 0 ? (
-              <p className='no-activity'>No recent activity</p>
-            ) : (
-              recent_activity.map((activity, index) => (
-                <div key={index} className={`activity-item ${activity.type}`}>
-                  <div className='activity-icon'>{activity.type === 'payment' ? '💰' : '🔧'}</div>
-                  <div className='activity-content'>
-                    <div className='activity-description'>{activity.description}</div>
-                    <div className='activity-meta'>
-                      <span className='activity-property'>{activity.property}</span>
-                      <span className='activity-date'>
-                        {new Date(activity.date).toLocaleDateString()}
-                      </span>
-                      {activity.amount && (
-                        <span className='activity-amount'>{formatCurrency(activity.amount)}</span>
-                      )}
-                      {activity.priority && (
-                        <span className={`activity-priority ${activity.priority}`}>
-                          {activity.priority}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </Card>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
 

@@ -9,7 +9,6 @@ import { LoadingSpinner, ErrorMessage } from '../components/common'
 import PropertyForm from '../components/properties/PropertyForm'
 import { DocumentUpload } from '../components/common/DocumentUpload'
 import { DocumentList } from '../components/common/DocumentList'
-import '../styles/pages/PropertiesPage.css'
 
 interface PropertiesResponse {
   results: Property[]

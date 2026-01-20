@@ -73,7 +73,7 @@ class Property(models.Model):
 
         today = timezone.now().date()
         active_leases = Lease.objects.filter(
-            property=self, status="active", lease_start_date__lte=today, lease_end_date__gte=today
+            property_obj=self, status="active", lease_start_date__lte=today, lease_end_date__gte=today
         ).count()
 
         if self.total_units == 0:
@@ -86,7 +86,7 @@ class Property(models.Model):
 
         today = timezone.now().date()
         total_rent = Lease.objects.filter(
-            property=self, status="active", lease_start_date__lte=today, lease_end_date__gte=today
+            property_obj=self, status="active", lease_start_date__lte=today, lease_end_date__gte=today
         ).aggregate(total=models.Sum("monthly_rent"))["total"]
 
         return total_rent or 0
