@@ -58,7 +58,8 @@ def setup_logging():
     """Configure application-wide logging."""
     # Create logger
     logger = logging.getLogger('pms')
-    logger.setLevel(getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))
+    log_level = getattr(settings, 'LOG_LEVEL', 'INFO')
+    logger.setLevel(getattr(logging, log_level.upper(), logging.INFO))
 
     # Remove existing handlers
     for handler in logger.handlers[:]:

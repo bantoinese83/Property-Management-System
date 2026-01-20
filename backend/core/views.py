@@ -2,7 +2,6 @@
 Health check and monitoring views for the Property Management System.
 """
 
-import psutil
 import os
 from django.conf import settings
 from django.db import connection
@@ -222,6 +221,8 @@ def check_file_system():
 def check_memory():
     """Check memory usage."""
     try:
+        # Try to use psutil if available, otherwise return unknown
+        import psutil
         memory = psutil.virtual_memory()
         memory_percent = memory.percent
 
@@ -245,6 +246,8 @@ def check_memory():
             }
         }
 
+    except ImportError:
+        return {'status': 'unknown', 'message': 'psutil not available'}
     except Exception as e:
         logger.warning(f"Memory check failed: {str(e)}")
         return {'status': 'unknown', 'error': str(e)}
@@ -253,6 +256,7 @@ def check_memory():
 def check_disk_space():
     """Check disk space availability."""
     try:
+        import psutil
         disk = psutil.disk_usage('/')
         disk_percent = disk.percent
 
@@ -276,6 +280,8 @@ def check_disk_space():
             }
         }
 
+    except ImportError:
+        return {'status': 'unknown', 'message': 'psutil not available'}
     except Exception as e:
         logger.warning(f"Disk space check failed: {str(e)}")
         return {'status': 'unknown', 'error': str(e)}
@@ -345,6 +351,7 @@ def get_cache_metrics():
 def get_system_metrics():
     """Get system-level metrics."""
     try:
+        import psutil
         cpu_percent = psutil.cpu_percent(interval=0.1)
         memory = psutil.virtual_memory()
         disk = psutil.disk_usage('/')
@@ -364,6 +371,8 @@ def get_system_metrics():
             'load_average': psutil.getloadavg() if hasattr(psutil, 'getloadavg') else None,
         }
 
+    except ImportError:
+        return {'message': 'System metrics unavailable - psutil not installed'}
     except Exception as e:
         logger.error(f"System metrics collection failed: {str(e)}")
         return {'error': str(e)}
