@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from '../api/endpoints'
 import { useAuth } from '../hooks/useAuth'
 import { Card } from '../components/common/Card'
 import { Button } from '../components/common/Button'
-import { ErrorMessage, SkeletonCard } from '../components/common'
+import { ErrorMessage, SkeletonCard, Skeleton } from '../components/common'
 import '../styles/pages/DashboardPage.css'
 
 interface DashboardAnalytics {

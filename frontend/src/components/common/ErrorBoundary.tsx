@@ -45,7 +45,7 @@ class ErrorBoundary extends Component<Props, State> {
     }
 
     // Optional error reporting (could integrate with services like Sentry)
-    if (process.env.NODE_ENV === 'production') {
+    if (import.meta.env.PROD) {
       // Report to error tracking service
       this.reportError(error, errorInfo)
     }

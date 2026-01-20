@@ -23,7 +23,10 @@ interface UseApiResponse<T> {
   retry: () => Promise<void>
 }
 
-export function useApi<T = unknown>(url: string, options: UseApiOptions<T> = {}): UseApiResponse<T> {
+export function useApi<T = unknown>(
+  url: string,
+  options: UseApiOptions<T> = {}
+): UseApiResponse<T> {
   const [data, setData] = useState<T | null>(null)
   const [loading, setLoading] = useState(!options.skip)
   const [error, setError] = useState<Error | null>(null)
@@ -74,7 +77,7 @@ export function useApi<T = unknown>(url: string, options: UseApiOptions<T> = {})
         setLoading(false)
       }
     },
-    [url, options.skip, options.retryOnError, options.onSuccess, options.onError]
+    [url, options]
   )
 
   useEffect(() => {

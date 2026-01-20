@@ -188,3 +188,34 @@ export interface Document {
   created_at: string
   updated_at: string
 }
+
+export interface FinancialTransaction {
+  id: number
+  property: number
+  property_name?: string
+  transaction_type: 'income' | 'expense'
+  category: string
+  category_display?: string
+  amount: number | string
+  description: string
+  transaction_date: string
+  lease?: number
+  lease_tenant_name?: string
+  maintenance_request?: number
+  maintenance_title?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface AccountingPeriod {
+  id: number
+  period_name: string
+  start_date: string
+  end_date: string
+  is_closed: boolean
+  total_income: number
+  total_expenses: number
+  net_profit: number
+  created_at: string
+  updated_at: string
+}

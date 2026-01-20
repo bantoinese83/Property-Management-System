@@ -8,6 +8,7 @@ import TenantsPage from './pages/TenantsPage'
 import LeasesPage from './pages/LeasesPage'
 import MaintenancePage from './pages/MaintenancePage'
 import PaymentsPage from './pages/PaymentsPage'
+import AccountingPage from './pages/AccountingPage'
 
 import './App.css'
 
@@ -16,7 +17,7 @@ function App() {
     <Router>
       <AuthProvider>
         <ErrorBoundary
-          showErrorDetails={process.env.NODE_ENV === 'development'}
+          showErrorDetails={import.meta.env.DEV}
           maxRetries={3}
           onError={(error, errorInfo) => {
             // Log to console in development, could send to error tracking service in production
@@ -31,6 +32,7 @@ function App() {
             <Route path='/leases' element={<LeasesPage />} />
             <Route path='/maintenance' element={<MaintenancePage />} />
             <Route path='/payments' element={<PaymentsPage />} />
+            <Route path='/accounting' element={<AccountingPage />} />
             <Route path='/' element={<Navigate to='/dashboard' replace />} />
             <Route path='*' element={<Navigate to='/dashboard' replace />} />
           </Routes>

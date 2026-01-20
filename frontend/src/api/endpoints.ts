@@ -52,6 +52,24 @@ export const API_ENDPOINTS = {
     CREATE_STRIPE_SESSION: (id: number) => `/payments/${id}/create_checkout_session/`,
   },
 
+  // Accounting
+  ACCOUNTING: {
+    TRANSACTIONS: {
+      LIST: '/accounting/transactions/',
+      DETAIL: (id: number) => `/accounting/transactions/${id}/`,
+      CREATE: '/accounting/transactions/',
+      UPDATE: (id: number) => `/accounting/transactions/${id}/`,
+      DELETE: (id: number) => `/accounting/transactions/${id}/`,
+    },
+    PERIODS: {
+      LIST: '/accounting/periods/',
+      DETAIL: (id: number) => `/accounting/periods/${id}/`,
+      CREATE: '/accounting/periods/',
+      UPDATE: (id: number) => `/accounting/periods/${id}/`,
+      DELETE: (id: number) => `/accounting/periods/${id}/`,
+    },
+  },
+
   // Documents
   DOCUMENTS: {
     LIST: '/documents/',
