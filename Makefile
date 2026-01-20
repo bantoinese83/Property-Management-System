@@ -26,6 +26,9 @@ help: ## Show this help message
 	@echo "🔧 MAINTENANCE"
 	@grep -E '^(health|clean|logs|status):.*## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}'
 	@echo ""
+	@echo "🛠️  DEV TOOLS"
+	@grep -E '^(dev-tools|dev-health|dev-reset-db|dev-quality|dev-fix|dev-db-stats|dev-perf-test|dev-create-user):.*## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2}'
+	@echo ""
 	@echo "📋 QUICK COMMANDS"
 	@echo "  \033[36mmake setup\033[0m              - Complete development setup"
 	@echo "  \033[36mmake dev\033[0m                - Start all development servers"
@@ -288,6 +291,30 @@ shell-backend: ## Open Django shell
 
 shell-db: ## Open database shell
 	docker-compose exec db psql -U property_user property_mgmt
+
+dev-tools: ## Run development tools (requires Python 3.11+)
+	python scripts/dev-tools.py $(filter-out $@,$(MAKECMDGOALS))
+
+dev-health: ## Check service health with dev tools
+	python scripts/dev-tools.py health
+
+dev-reset-db: ## Reset database with dev tools
+	python scripts/dev-tools.py reset-db
+
+dev-quality: ## Run quality checks with dev tools
+	python scripts/dev-tools.py quality
+
+dev-fix: ## Auto-fix code quality issues
+	python scripts/dev-tools.py fix
+
+dev-db-stats: ## Show database statistics
+	python scripts/dev-tools.py db-stats
+
+dev-perf-test: ## Run performance tests
+	python scripts/dev-tools.py perf-test
+
+dev-create-user: ## Create a test user
+	python scripts/dev-tools.py create-test-user
 
 format-fix: ## Auto-fix formatting issues
 	@echo "🔧 Auto-fixing formatting issues..."

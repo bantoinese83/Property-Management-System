@@ -91,7 +91,11 @@ const PaymentsPage: React.FC = () => {
     }
 
     try {
-      exportToCSV(payments as unknown as Record<string, unknown>[], entityColumns.payments as ExportColumn[], 'payments')
+      exportToCSV(
+        payments as unknown as Record<string, unknown>[],
+        entityColumns.payments as ExportColumn[],
+        'payments'
+      )
       toast.success('Export successful', {
         description: 'Payments data has been exported to CSV.',
       })

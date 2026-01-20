@@ -82,7 +82,11 @@ const MaintenancePage: React.FC = () => {
     }
 
     try {
-      exportToCSV(requests as unknown as Record<string, unknown>[], entityColumns.maintenance as ExportColumn[], 'maintenance_requests')
+      exportToCSV(
+        requests as unknown as Record<string, unknown>[],
+        entityColumns.maintenance as ExportColumn[],
+        'maintenance_requests'
+      )
       toast.success('Export successful', {
         description: 'Maintenance requests data has been exported to CSV.',
       })

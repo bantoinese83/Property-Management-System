@@ -8,7 +8,11 @@ export interface ExportColumn {
   formatter?: (value: unknown) => unknown
 }
 
-export const exportToCSV = (data: Record<string, unknown>[], columns: ExportColumn[], filename: string) => {
+export const exportToCSV = (
+  data: Record<string, unknown>[],
+  columns: ExportColumn[],
+  filename: string
+) => {
   // Create CSV header
   const headers = columns.map(col => col.label).join(',')
 

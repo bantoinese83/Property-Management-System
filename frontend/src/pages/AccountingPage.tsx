@@ -66,7 +66,11 @@ const AccountingPage: React.FC = () => {
     }
 
     try {
-      exportToCSV(transactions as unknown as Record<string, unknown>[], entityColumns.transactions as ExportColumn[], 'accounting_transactions')
+      exportToCSV(
+        transactions as unknown as Record<string, unknown>[],
+        entityColumns.transactions as ExportColumn[],
+        'accounting_transactions'
+      )
       toast.success('Export successful', {
         description: 'Accounting transactions data has been exported to CSV.',
       })

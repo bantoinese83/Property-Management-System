@@ -88,6 +88,9 @@ class FinancialTransaction(models.Model):
             models.Index(fields=["transaction_type"]),
             models.Index(fields=["category"]),
             models.Index(fields=["transaction_date"]),
+            models.Index(fields=["transaction_type", "transaction_date"]),  # For financial reports
+            models.Index(fields=["property_obj", "transaction_date"]),  # For property financial history
+            models.Index(fields=["lease"]),  # For lease-related transactions
         ]
 
     def __str__(self):

@@ -1,9 +1,45 @@
+"""
+Property models for the Property Management System.
+
+This module contains all models related to property management,
+including properties, property images, and related functionality.
+"""
+
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 
 
 class Property(models.Model):
+    """
+    Represents a rental property in the system.
+
+    This model stores all information about a property that can be rented out,
+    including physical details, financial information, and management data.
+
+    Attributes:
+        owner (ForeignKey): The user who owns this property
+        property_name (str): Human-readable name for the property
+        description (str): Optional detailed description
+        address (str): Street address
+        city (str): City name
+        state (str): State/province code
+        zip_code (str): Postal code
+        country (str): Country (defaults to USA)
+        latitude/longitude (Decimal): Geographic coordinates for mapping
+        property_type (str): Type of property (apartment, house, etc.)
+        total_units (int): Number of rentable units
+        year_built (int): Year the property was constructed
+        square_footage (int): Total square footage
+        bedrooms/bathrooms (int/Decimal): Unit specifications
+        purchase_price (Decimal): Original purchase cost
+        purchase_date (Date): When the property was acquired
+        annual_property_tax (Decimal): Annual tax amount
+        insurance_cost (Decimal): Annual insurance cost
+        is_active (bool): Whether property is currently managed
+        is_listed_for_rent (bool): Whether property is available for rent
+        created_at/updated_at (DateTime): Audit timestamps
+    """
     PROPERTY_TYPE_CHOICES = (
         ("single_family", "Single Family Home"),
         ("apartment", "Apartment"),

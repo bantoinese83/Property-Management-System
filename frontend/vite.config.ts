@@ -17,54 +17,82 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunks
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
-          'form-vendor': ['zod'],
-          'utils-vendor': ['axios', 'date-fns', 'clsx', 'tailwind-merge'],
-          'icons-vendor': ['lucide-react']
+        manualChunks: (id) => {
+          // Vendor chunks for better caching
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'react-vendor'
+            }
+            if (id.includes('@radix-ui')) {
+              return 'radix-vendor'
+            }
+            if (id.includes('lucide-react') || id.includes('react-icons')) {
+              return 'icons-vendor'
+            }
+            if (id.includes('axios') || id.includes('date-fns') || id.includes('clsx')) {
+              return 'utils-vendor'
+            }
+            if (id.includes('recharts') || id.includes('zod') || id.includes('@tanstack')) {
+              return 'data-vendor'
+            }
+            return 'vendor'
+          }
+          // Feature-based code splitting
+          if (id.includes('/pages/')) {
+            const pageName = id.split('/pages/')[1].split('.')[0].toLowerCase()
+            return `page-${pageName}`
+          }
+          // Component chunks
+          if (id.includes('/components/')) {
+            if (id.includes('/ui/')) {
+              return 'ui-components'
+            }
+            if (id.includes('/common/')) {
+              return 'common-components'
+            }
+            return 'feature-components'
+          }
         }
       }
     },
     // Performance optimizations
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 600,
     minify: 'esbuild',
     sourcemap: process.env.NODE_ENV === 'development',
-    // Enable CSS code splitting
-    cssCodeSplit: true
+    cssCodeSplit: true,
+    // Enable compression
+    reportCompressedSize: false,
+    // Target modern browsers for smaller bundles
+    target: 'esnext',
+    // Optimize assets
+    assetsInlineLimit: 4096
   },
-  // Optimize dependencies
+  // Optimize dependencies for faster development
   optimizeDeps: {
     include: [
       'react',
       'react-dom',
+      'react-router-dom',
       'axios',
-      // Radix UI components (only installed ones)
-      '@radix-ui/react-avatar',
-      '@radix-ui/react-checkbox',
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-dropdown-menu',
-      '@radix-ui/react-label',
-      '@radix-ui/react-popover',
-      '@radix-ui/react-select',
-      '@radix-ui/react-separator',
-      '@radix-ui/react-slot',
-      '@radix-ui/react-tabs',
-      '@radix-ui/react-toast',
-      '@radix-ui/react-toggle',
-      '@radix-ui/react-toggle-group',
-      '@radix-ui/react-tooltip',
-      // Other libraries
       'lucide-react',
       'date-fns',
-      'recharts',
-      'sonner',
-      'vaul',
+      'clsx',
+      'tailwind-merge',
       'zod',
+      'sonner',
+      // Core UI libraries
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@radix-ui/react-toast',
+      // Table and data libraries
       '@tanstack/react-table',
-      '@tanstack/react-query',
-      'next-themes',
+      // Utility libraries
+      'class-variance-authority'
+    ],
+    exclude: [
+      // Exclude large libraries that should be lazy loaded
+      'recharts',
       '@dnd-kit/core',
       '@dnd-kit/modifiers',
       '@dnd-kit/sortable',

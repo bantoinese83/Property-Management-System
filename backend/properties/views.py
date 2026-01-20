@@ -1,10 +1,10 @@
-from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from core.mixins import BaseViewSet
 from .models import Property, PropertyImage
 from .serializers import PropertyImageSerializer, PropertyListSerializer, PropertySerializer
 
@@ -15,21 +15,36 @@ class PropertyPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class PropertyViewSet(viewsets.ModelViewSet):
+class PropertyViewSet(BaseViewSet):
     """
-    ViewSet for managing properties.
+    ViewSet for managing rental properties.
 
-    GET /api/properties/ - List all properties (filtered by owner)
-    POST /api/properties/ - Create new property
-    GET /api/properties/{id}/ - Get property details
-    PUT /api/properties/{id}/ - Update property
-    DELETE /api/properties/{id}/ - Delete property
-    GET /api/properties/{id}/occupancy_details/ - Get occupancy info
-    GET /api/properties/{id}/financial_summary/ - Get financial stats
-    GET /api/properties/dashboard_stats/ - Get dashboard statistics
+    This ViewSet provides comprehensive CRUD operations for properties,
+    along with advanced analytics and reporting features.
+
+    Endpoints:
+        GET /api/properties/ - List properties with filtering and pagination
+        POST /api/properties/ - Create new property
+        GET /api/properties/{id}/ - Retrieve property details
+        PUT /api/properties/{id}/ - Update property information
+        DELETE /api/properties/{id}/ - Delete property (admin only)
+        GET /api/properties/{id}/occupancy_details/ - Get occupancy analytics
+        GET /api/properties/{id}/financial_summary/ - Get financial metrics
+        GET /api/properties/dashboard_stats/ - Get dashboard statistics (cached)
+        GET /api/properties/dashboard_analytics/ - Get comprehensive analytics (cached)
+
+    Permissions:
+        - Owners can only see/manage their own properties
+        - Admins can see/manage all properties
+        - Managers have restricted access based on configuration
+
+    Features:
+        - Automatic audit logging for all changes
+        - Redis caching for expensive analytics queries
+        - Optimized database queries with select_related/prefetch_related
+        - Comprehensive filtering and search capabilities
     """
 
-    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["property_type", "is_active", "city", "state"]
     search_fields = ["property_name", "address", "city"]
@@ -37,16 +52,6 @@ class PropertyViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
     pagination_class = PropertyPagination
 
-    def get_queryset(self):
-        """Filter properties by user role"""
-        user = self.request.user
-
-        if user.user_type == "admin":
-            return Property.objects.all()
-        elif user.user_type in ["owner", "manager"]:
-            return Property.objects.filter(owner=user)
-        else:
-            return Property.objects.none()
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -149,6 +154,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
             }
         )
 
+    @method_decorator(cache_page(600))  # Cache for 10 minutes
     @action(detail=False, methods=["get"])
     def dashboard_analytics(self, request):
         """Get comprehensive dashboard analytics"""

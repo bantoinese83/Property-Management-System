@@ -6,6 +6,7 @@ The `urlpatterns` list routes URLs to views.
 
 from django.contrib import admin
 from django.urls import include, path
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -69,7 +70,10 @@ urlpatterns = [
     path("api/reports/<int:report_id>/delete/", delete_report, name="delete-report"),
     # Templates and generated documents
     path("api/templates/", include("templates.urls")),
-    # API Documentation (Django REST framework browsable API)
+    # API Documentation
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     # Health check endpoints
     path("health/", health_check, name="health-check"),
     path("ready/", readiness_check, name="readiness-check"),

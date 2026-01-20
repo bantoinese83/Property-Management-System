@@ -65,7 +65,11 @@ const LeasesPage: React.FC = () => {
     }
 
     try {
-      exportToCSV(leases as unknown as Record<string, unknown>[], entityColumns.leases as ExportColumn[], 'leases')
+      exportToCSV(
+        leases as unknown as Record<string, unknown>[],
+        entityColumns.leases as ExportColumn[],
+        'leases'
+      )
       toast.success('Export successful', {
         description: 'Leases data has been exported to CSV.',
       })

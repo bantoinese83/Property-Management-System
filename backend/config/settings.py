@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "django_filters",
+    "drf_spectacular",
     # Local apps
     "users",
     "properties",
@@ -224,6 +225,33 @@ EMAIL_TEMPLATES_DIR = os.path.join(BASE_DIR, "templates", "emails")
 BACKUP_DIR = os.path.join(BASE_DIR, "..", "backups")
 BACKUP_MAX_RETRIES = 3
 
+# Caching Configuration (Redis)
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("REDIS_URL", "redis://localhost:6379/1"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {
+                "max_connections": 20,
+                "decode_responses": True,
+            },
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+        },
+        "KEY_PREFIX": "pms",
+        "TIMEOUT": 300,  # 5 minutes default
+    }
+}
+
+# Cache settings for different data types
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 300  # 5 minutes
+CACHE_MIDDLEWARE_KEY_PREFIX = "pms_cache"
+
+# Session caching
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
 # Celery Configuration
 CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.getenv("REDIS_URL", "redis://localhost:6379/0")
@@ -231,6 +259,42 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
+
+# DRF Spectacular Configuration (API Documentation)
+# Generates OpenAPI 3.0 schema and provides Swagger UI documentation
+# Access at: /api/docs/ (Swagger UI) and /api/redoc/ (ReDoc)
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Property Management System API",
+    "DESCRIPTION": "Comprehensive API for property management, tenant tracking, lease management, and financial reporting.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SORT_OPERATIONS": True,
+    "TAGS": [
+        {"name": "Authentication", "description": "User authentication and authorization"},
+        {"name": "Properties", "description": "Property management and analytics"},
+        {"name": "Tenants", "description": "Tenant profiles and management"},
+        {"name": "Leases", "description": "Lease agreements and tracking"},
+        {"name": "Maintenance", "description": "Work order management"},
+        {"name": "Payments", "description": "Rent collection and transactions"},
+        {"name": "Accounting", "description": "Financial reporting and transactions"},
+        {"name": "Reports", "description": "Data export and analytics"},
+        {"name": "Audit", "description": "System activity logging"},
+        {"name": "Templates", "description": "Document templates and generation"},
+        {"name": "Notifications", "description": "Email and system notifications"},
+    ],
+    "CONTACT": {
+        "name": "Property Management System",
+        "email": "support@property-mgmt.com",
+    },
+    "LICENSE": {
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
+}
 
 CELERY_BEAT_SCHEDULE = {
     "check-lease-expiries-daily": {
