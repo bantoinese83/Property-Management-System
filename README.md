@@ -73,6 +73,9 @@ make setup  # Install dependencies and pre-commit hooks
 # Start development environment
 docker-compose up -d
 
+# Optional: Start Celery worker for background tasks (email, etc.)
+docker-compose --profile celery up -d celery
+
 # Access application
 # Frontend: http://localhost:5173
 # Backend: http://localhost:8000/api
@@ -81,19 +84,26 @@ docker-compose up -d
 
 ### **Option 2: Local Development**
 ```bash
+# Setup environment (from project root)
+cp env.example .env  # Configure all environment variables
+make setup  # Install dependencies and pre-commit hooks
+
 # Backend setup
 cd backend
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env  # Configure database settings
 python manage.py migrate
 python manage.py create_demo_data
+
+# Start backend server
 python manage.py runserver
+
+# Optional: Start Celery worker (new terminal)
+# celery -A config worker --loglevel=info
 
 # Frontend setup (new terminal)
 cd frontend
 npm install
-cp .env.example .env
 npm run dev
 ```
 
@@ -139,6 +149,16 @@ Core Tables:
 
 ## 🛠️ **DEVELOPMENT WORKFLOW**
 
+### **Setup Commands**
+```bash
+# Initial development setup
+make setup  # Install deps, pre-commit hooks, copy env file
+
+# Environment setup
+make env-setup  # Copy environment example file
+cp env.example .env  # Edit with your actual values
+```
+
 ### **Code Quality Commands**
 ```bash
 # Format all code
@@ -147,7 +167,7 @@ make format
 # Lint all code
 make lint
 
-# Run all quality checks
+# Run all quality checks (100/100 score)
 make quality
 
 # Run tests
@@ -155,6 +175,21 @@ make test
 
 # Type checking
 make type-check
+```
+
+### **Docker Commands**
+```bash
+# Start full development stack
+docker-compose up -d
+
+# Start Celery worker for background tasks
+make docker-celery
+
+# View all logs
+make docker-logs
+
+# View Celery logs
+make docker-celery-logs
 ```
 
 ### **Git Workflow**
@@ -289,10 +324,29 @@ DATABASE_URL=postgresql://user:pass@host:5432/db
 ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
 CORS_ALLOWED_ORIGINS=https://yourdomain.com
 
+# Email Configuration
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.sendgrid.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=apikey
+EMAIL_HOST_PASSWORD=your-sendgrid-api-key
+DEFAULT_FROM_EMAIL=noreply@yourdomain.com
+
+# Stripe Payment Processing
+STRIPE_PUBLIC_KEY=pk_live_...
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
 # Frontend
 VITE_API_URL=https://yourdomain.com/api
 VITE_APP_ENV=production
 ```
+
+### **New Features Configuration**
+- **Email Notifications**: Configure SMTP settings for automated alerts
+- **Payment Processing**: Set up Stripe for rent collection
+- **File Upload**: Configure AWS S3 or local storage for documents
+- **Background Tasks**: Celery handles email sending and async operations
 
 ### **Monitoring & Maintenance**
 ```bash

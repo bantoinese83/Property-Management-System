@@ -83,6 +83,12 @@ docker-down: ## Stop Docker containers
 docker-logs: ## Show Docker logs
 	docker-compose logs -f
 
+docker-celery: ## Start Celery worker
+	docker-compose --profile celery up -d celery
+
+docker-celery-logs: ## Show Celery logs
+	docker-compose logs -f celery
+
 # Database commands
 migrate: ## Run Django migrations
 	cd backend && python manage.py migrate
@@ -105,8 +111,13 @@ clean-backend: ## Clean backend cache and artifacts
 
 clean: clean-frontend clean-backend ## Clean all artifacts
 
+# Environment setup
+env-setup: ## Copy environment example file
+	cp env.example .env
+	@echo "Environment file created. Please edit .env with your actual values."
+
 # Development workflow
-setup: install pre-commit-install ## Initial development setup
+setup: install pre-commit-install env-setup ## Initial development setup
 
 dev-frontend: ## Start frontend development server
 	cd frontend && npm run dev
