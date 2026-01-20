@@ -13,7 +13,7 @@ export const FormError: React.FC<FormErrorProps> = ({
   error,
   className,
   showIcon = true,
-  variant = 'error'
+  variant = 'error',
 }) => {
   if (!error) return null
 
@@ -26,35 +26,35 @@ export const FormError: React.FC<FormErrorProps> = ({
 
     switch (variant) {
       case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+        return <AlertCircle className='w-4 h-4 text-red-600 flex-shrink-0' />
       case 'warning':
-        return <AlertCircle className="w-4 h-4 text-yellow-600 flex-shrink-0" />
+        return <AlertCircle className='w-4 h-4 text-yellow-600 flex-shrink-0' />
       case 'info':
-        return <Info className="w-4 h-4 text-blue-600 flex-shrink-0" />
+        return <Info className='w-4 h-4 text-blue-600 flex-shrink-0' />
       default:
-        return <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+        return <AlertCircle className='w-4 h-4 text-red-600 flex-shrink-0' />
     }
   }
 
   const getStyles = () => {
-    const baseStyles = "flex items-start gap-2 text-sm px-3 py-2 rounded-md"
+    const baseStyles = 'flex items-start gap-2 text-sm px-3 py-2 rounded-md'
 
     switch (variant) {
       case 'error':
-        return cn(baseStyles, "bg-red-50 text-red-700 border border-red-200")
+        return cn(baseStyles, 'bg-red-50 text-red-700 border border-red-200')
       case 'warning':
-        return cn(baseStyles, "bg-yellow-50 text-yellow-700 border border-yellow-200")
+        return cn(baseStyles, 'bg-yellow-50 text-yellow-700 border border-yellow-200')
       case 'info':
-        return cn(baseStyles, "bg-blue-50 text-blue-700 border border-blue-200")
+        return cn(baseStyles, 'bg-blue-50 text-blue-700 border border-blue-200')
       default:
-        return cn(baseStyles, "bg-red-50 text-red-700 border border-red-200")
+        return cn(baseStyles, 'bg-red-50 text-red-700 border border-red-200')
     }
   }
 
   return (
     <div className={cn(getStyles(), className)}>
       {getIcon()}
-      <span className="leading-5">{errorMessage}</span>
+      <span className='leading-5'>{errorMessage}</span>
     </div>
   )
 }

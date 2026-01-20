@@ -17,7 +17,7 @@ export const RetryButton: React.FC<RetryButtonProps> = ({
   text = 'Try Again',
   variant = 'outline',
   size = 'sm',
-  className
+  className,
 }) => {
   return (
     <Button
@@ -29,12 +29,12 @@ export const RetryButton: React.FC<RetryButtonProps> = ({
     >
       {loading ? (
         <>
-          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+          <RefreshCw className='w-4 h-4 mr-2 animate-spin' />
           Retrying...
         </>
       ) : (
         <>
-          <RefreshCw className="w-4 h-4 mr-2" />
+          <RefreshCw className='w-4 h-4 mr-2' />
           {text}
         </>
       )}

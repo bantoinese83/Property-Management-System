@@ -13,25 +13,24 @@ export const ExamplePropertyForm: React.FC = () => {
     address: '',
     city: '',
     state: '',
-    zip_code: ''
+    zip_code: '',
   })
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const { submit, loading, error, clearError, retry } = useFormSubmit({
     successMessage: 'Property created successfully!',
-    onSuccess: (data) => {
+    onSuccess: _data => {
       // Handle success - maybe redirect or clear form
-      console.log('Property created:', data)
       setFormData({
         property_name: '',
         address: '',
         city: '',
         state: '',
-        zip_code: ''
+        zip_code: '',
       })
       setFieldErrors({})
-    }
+    },
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,130 +53,100 @@ export const ExamplePropertyForm: React.FC = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6">Create Property</h2>
+    <div className='max-w-md mx-auto p-6'>
+      <h2 className='text-2xl font-bold mb-6'>Create Property</h2>
 
-      <LoadingWrapper loading={loading} overlay className="space-y-4">
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <LoadingWrapper loading={loading} overlay className='space-y-4'>
+        <form onSubmit={handleSubmit} className='space-y-4'>
           {/* Property Name */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Property Name *
-            </label>
+            <label className='block text-sm font-medium mb-1'>Property Name *</label>
             <input
-              type="text"
+              type='text'
               value={formData.property_name}
-              onChange={(e) => handleInputChange('property_name', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Downtown Apartments"
+              onChange={e => handleInputChange('property_name', e.target.value)}
+              className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='e.g., Downtown Apartments'
             />
             {fieldErrors.property_name && (
-              <FormError error={fieldErrors.property_name} className="mt-1" />
+              <FormError error={fieldErrors.property_name} className='mt-1' />
             )}
           </div>
 
           {/* Address */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Address *
-            </label>
+            <label className='block text-sm font-medium mb-1'>Address *</label>
             <input
-              type="text"
+              type='text'
               value={formData.address}
-              onChange={(e) => handleInputChange('address', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., 123 Main St"
+              onChange={e => handleInputChange('address', e.target.value)}
+              className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='e.g., 123 Main St'
             />
-            {fieldErrors.address && (
-              <FormError error={fieldErrors.address} className="mt-1" />
-            )}
+            {fieldErrors.address && <FormError error={fieldErrors.address} className='mt-1' />}
           </div>
 
           {/* City */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              City *
-            </label>
+            <label className='block text-sm font-medium mb-1'>City *</label>
             <input
-              type="text"
+              type='text'
               value={formData.city}
-              onChange={(e) => handleInputChange('city', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Dallas"
+              onChange={e => handleInputChange('city', e.target.value)}
+              className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='e.g., Dallas'
             />
-            {fieldErrors.city && (
-              <FormError error={fieldErrors.city} className="mt-1" />
-            )}
+            {fieldErrors.city && <FormError error={fieldErrors.city} className='mt-1' />}
           </div>
 
           {/* State */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              State *
-            </label>
+            <label className='block text-sm font-medium mb-1'>State *</label>
             <input
-              type="text"
+              type='text'
               value={formData.state}
-              onChange={(e) => handleInputChange('state', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., TX"
+              onChange={e => handleInputChange('state', e.target.value)}
+              className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='e.g., TX'
               maxLength={50}
             />
-            {fieldErrors.state && (
-              <FormError error={fieldErrors.state} className="mt-1" />
-            )}
+            {fieldErrors.state && <FormError error={fieldErrors.state} className='mt-1' />}
           </div>
 
           {/* ZIP Code */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              ZIP Code *
-            </label>
+            <label className='block text-sm font-medium mb-1'>ZIP Code *</label>
             <input
-              type="text"
+              type='text'
               value={formData.zip_code}
-              onChange={(e) => handleInputChange('zip_code', e.target.value)}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., 75201 or 75201-1234"
+              onChange={e => handleInputChange('zip_code', e.target.value)}
+              className='w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='e.g., 75201 or 75201-1234'
               maxLength={10}
             />
-            {fieldErrors.zip_code && (
-              <FormError error={fieldErrors.zip_code} className="mt-1" />
-            )}
+            {fieldErrors.zip_code && <FormError error={fieldErrors.zip_code} className='mt-1' />}
           </div>
 
           {/* General Error */}
-          {error && (
-            <FormError error={error} className="mb-4" />
-          )}
+          {error && <FormError error={error} className='mb-4' />}
 
           {/* Submit Buttons */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="submit"
-              loading={loading}
-              fullWidth
-            >
+          <div className='flex gap-3 pt-4'>
+            <Button type='submit' loading={loading} fullWidth>
               {loading ? 'Creating Property...' : 'Create Property'}
             </Button>
 
-            {error && (
-              <RetryButton
-                onRetry={retry}
-                loading={loading}
-                text="Retry"
-                size="default"
-              />
-            )}
+            {error && <RetryButton onRetry={retry} loading={loading} text='Retry' size='default' />}
           </div>
         </form>
       </LoadingWrapper>
 
       {/* Help Text */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <h3 className="text-sm font-medium text-blue-900 mb-1">Need Help?</h3>
-        <p className="text-sm text-blue-700">
-          All fields marked with * are required. We'll validate your information and provide helpful error messages if something needs to be corrected.
+      <div className='mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200'>
+        <h3 className='text-sm font-medium text-blue-900 mb-1'>Need Help?</h3>
+        <p className='text-sm text-blue-700'>
+          All fields marked with * are required. We'll validate your information and provide helpful
+          error messages if something needs to be corrected.
         </p>
       </div>
     </div>

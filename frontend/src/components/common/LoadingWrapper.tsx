@@ -16,7 +16,7 @@ export const LoadingWrapper: React.FC<LoadingWrapperProps> = ({
   spinnerSize = 'md',
   loadingText,
   className = '',
-  overlay = false
+  overlay = false,
 }) => {
   if (!loading) {
     return <>{children}</>
@@ -26,7 +26,7 @@ export const LoadingWrapper: React.FC<LoadingWrapperProps> = ({
     return (
       <div className={`relative ${className}`}>
         {children}
-        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-lg">
+        <div className='absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-lg'>
           <LoadingSpinner size={spinnerSize} text={loadingText} />
         </div>
       </div>
