@@ -15,7 +15,7 @@ import { DocumentUpload } from '../components/common/DocumentUpload'
 import { DocumentList } from '../components/common/DocumentList'
 import { Input } from '../components/common/Input'
 import { Users, FileText, DollarSign, Download } from 'lucide-react'
-import { exportToCSV, entityColumns } from '../utils/export'
+import { exportToCSV, entityColumns, type ExportColumn } from '../utils/export'
 
 interface TenantsResponse {
   results: Tenant[]
@@ -63,20 +63,20 @@ const TenantsPage: React.FC = () => {
   const handleExportData = () => {
     if (tenants.length === 0) {
       toast.error('No data to export', {
-        description: 'There are no tenants to export.'
+        description: 'There are no tenants to export.',
       })
       return
     }
 
     try {
-      exportToCSV(tenants, entityColumns.tenants, 'tenants')
+      exportToCSV(tenants as unknown as Record<string, unknown>[], entityColumns.tenants as ExportColumn[], 'tenants')
       toast.success('Export successful', {
-        description: 'Tenants data has been exported to CSV.'
+        description: 'Tenants data has been exported to CSV.',
       })
     } catch (error) {
       console.error('Export failed:', error)
       toast.error('Export failed', {
-        description: 'An error occurred while exporting data.'
+        description: 'An error occurred while exporting data.',
       })
     }
   }

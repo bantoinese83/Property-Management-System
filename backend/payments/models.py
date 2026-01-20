@@ -22,9 +22,7 @@ class RentPayment(models.Model):
     lease_obj = models.ForeignKey("leases.Lease", on_delete=models.CASCADE, related_name="payments")
 
     # Payment details
-    amount = models.DecimalField(
-        max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)]
-    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)])
     payment_date = models.DateField()
     due_date = models.DateField()
 

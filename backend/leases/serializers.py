@@ -57,7 +57,5 @@ class LeaseSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if data.get("lease_end_date") and data.get("lease_start_date"):
             if data["lease_end_date"] <= data["lease_start_date"]:
-                raise serializers.ValidationError(
-                    {"lease_end_date": "End date must be after start date"}
-                )
+                raise serializers.ValidationError({"lease_end_date": "End date must be after start date"})
         return data

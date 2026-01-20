@@ -1,9 +1,10 @@
 import os
 import re
-from typing import Dict, Any, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 from django.conf import settings
-from django.template import Template, Context
+from django.template import Context, Template
 from django.utils import timezone
 
 from .models import DocumentTemplate, GeneratedDocument
@@ -16,7 +17,7 @@ class DocumentService:
     def extract_variables(content: str) -> List[str]:
         """Extract variable names from template content"""
         # Find all {{variable}} patterns
-        pattern = r'\{\{\s*(\w+)\s*\}\}'
+        pattern = r"\{\{\s*(\w+)\s*\}\}"
         matches = re.findall(pattern, content)
         return list(set(matches))  # Remove duplicates
 
@@ -32,16 +33,16 @@ class DocumentService:
             issues.append("Template content is empty")
 
         # Check for unmatched braces
-        open_braces = content.count('{{')
-        close_braces = content.count('}}')
+        open_braces = content.count("{{")
+        close_braces = content.count("}}")
         if open_braces != close_braces:
             issues.append(f"Unmatched braces: {open_braces} opening, {close_braces} closing")
 
         return {
-            'variables': variables,
-            'variable_count': len(variables),
-            'is_valid': len(issues) == 0,
-            'issues': issues
+            "variables": variables,
+            "variable_count": len(variables),
+            "is_valid": len(issues) == 0,
+            "issues": issues,
         }
 
     @staticmethod
@@ -53,14 +54,16 @@ class DocumentService:
             context = Context(variables)
 
             # Add common context variables
-            context.update({
-                'current_date': timezone.now().date(),
-                'current_datetime': timezone.now(),
-                'company_name': getattr(settings, 'COMPANY_NAME', 'Property Management Company'),
-                'company_address': getattr(settings, 'COMPANY_ADDRESS', ''),
-                'company_phone': getattr(settings, 'COMPANY_PHONE', ''),
-                'company_email': getattr(settings, 'COMPANY_EMAIL', ''),
-            })
+            context.update(
+                {
+                    "current_date": timezone.now().date(),
+                    "current_datetime": timezone.now(),
+                    "company_name": getattr(settings, "COMPANY_NAME", "Property Management Company"),
+                    "company_address": getattr(settings, "COMPANY_ADDRESS", ""),
+                    "company_phone": getattr(settings, "COMPANY_PHONE", ""),
+                    "company_email": getattr(settings, "COMPANY_EMAIL", ""),
+                }
+            )
 
             return template.render(context)
         except Exception as e:
@@ -73,7 +76,7 @@ class DocumentService:
         title: str,
         user,
         related_model: Optional[str] = None,
-        related_id: Optional[int] = None
+        related_id: Optional[int] = None,
     ) -> GeneratedDocument:
         """Generate a document from a template"""
 
@@ -100,10 +103,10 @@ class DocumentService:
             content=template.content,  # Store original template
             variables_data=variables,
             generated_content=rendered_content,
-            status='generated',
+            status="generated",
             related_model=related_model,
             related_id=related_id,
-            created_by=user
+            created_by=user,
         )
 
         # Update template usage stats
@@ -117,31 +120,27 @@ class DocumentService:
 
         # Define common variable descriptions
         variable_descriptions = {
-            'tenant_name': {'description': 'Full name of the tenant', 'type': 'string'},
-            'tenant_email': {'description': 'Email address of the tenant', 'type': 'email'},
-            'tenant_phone': {'description': 'Phone number of the tenant', 'type': 'phone'},
-            'tenant_address': {'description': 'Current address of the tenant', 'type': 'address'},
-
-            'property_name': {'description': 'Name of the property', 'type': 'string'},
-            'property_address': {'description': 'Full address of the property', 'type': 'address'},
-            'property_city': {'description': 'City where property is located', 'type': 'string'},
-            'property_state': {'description': 'State where property is located', 'type': 'string'},
-
-            'lease_start_date': {'description': 'Lease start date', 'type': 'date'},
-            'lease_end_date': {'description': 'Lease end date', 'type': 'date'},
-            'monthly_rent': {'description': 'Monthly rent amount', 'type': 'currency'},
-            'security_deposit': {'description': 'Security deposit amount', 'type': 'currency'},
-
-            'current_date': {'description': 'Current date (auto-filled)', 'type': 'date', 'auto': True},
-            'company_name': {'description': 'Company name (auto-filled)', 'type': 'string', 'auto': True},
+            "tenant_name": {"description": "Full name of the tenant", "type": "string"},
+            "tenant_email": {"description": "Email address of the tenant", "type": "email"},
+            "tenant_phone": {"description": "Phone number of the tenant", "type": "phone"},
+            "tenant_address": {"description": "Current address of the tenant", "type": "address"},
+            "property_name": {"description": "Name of the property", "type": "string"},
+            "property_address": {"description": "Full address of the property", "type": "address"},
+            "property_city": {"description": "City where property is located", "type": "string"},
+            "property_state": {"description": "State where property is located", "type": "string"},
+            "lease_start_date": {"description": "Lease start date", "type": "date"},
+            "lease_end_date": {"description": "Lease end date", "type": "date"},
+            "monthly_rent": {"description": "Monthly rent amount", "type": "currency"},
+            "security_deposit": {"description": "Security deposit amount", "type": "currency"},
+            "current_date": {"description": "Current date (auto-filled)", "type": "date", "auto": True},
+            "company_name": {"description": "Company name (auto-filled)", "type": "string", "auto": True},
         }
 
         variables_info = {}
         for var_name in template.variables or []:
-            variables_info[var_name] = variable_descriptions.get(var_name, {
-                'description': f'Variable: {var_name}',
-                'type': 'string'
-            })
+            variables_info[var_name] = variable_descriptions.get(
+                var_name, {"description": f"Variable: {var_name}", "type": "string"}
+            )
 
         return variables_info
 
@@ -151,13 +150,13 @@ class DocumentService:
 
         templates_data = [
             {
-                'name': 'residential_lease_agreement',
-                'display_name': 'Residential Lease Agreement',
-                'description': 'Standard residential lease agreement template',
-                'template_type': 'lease',
-                'category': 'residential',
-                'is_system_template': True,
-                'content': """
+                "name": "residential_lease_agreement",
+                "display_name": "Residential Lease Agreement",
+                "description": "Standard residential lease agreement template",
+                "template_type": "lease",
+                "category": "residential",
+                "is_system_template": True,
+                "content": """
 RESIDENTIAL LEASE AGREEMENT
 
 This Lease Agreement (the "Agreement") is made and entered into this {{ current_date }} day of {{ current_date|date:"F" }}, {{ current_date|date:"Y" }}, by and between:
@@ -185,16 +184,16 @@ SIGNATURES:
 Landlord: _______________________________ Date: ____________
 
 Tenant: _______________________________ Date: ____________
-"""
+""",
             },
             {
-                'name': 'rent_payment_reminder',
-                'display_name': 'Rent Payment Reminder Notice',
-                'description': 'Notice for reminding tenants of upcoming or overdue rent payments',
-                'template_type': 'notice',
-                'category': 'payment',
-                'is_system_template': True,
-                'content': """
+                "name": "rent_payment_reminder",
+                "display_name": "Rent Payment Reminder Notice",
+                "description": "Notice for reminding tenants of upcoming or overdue rent payments",
+                "template_type": "notice",
+                "category": "payment",
+                "is_system_template": True,
+                "content": """
 {{ company_name }}
 {{ company_address }}
 
@@ -224,16 +223,16 @@ Sincerely,
 {{ company_name }}
 {{ company_phone }}
 {{ company_email }}
-"""
+""",
             },
             {
-                'name': 'lease_termination_notice',
-                'display_name': 'Lease Termination Notice',
-                'description': 'Notice for lease termination or non-renewal',
-                'template_type': 'notice',
-                'category': 'termination',
-                'is_system_template': True,
-                'content': """
+                "name": "lease_termination_notice",
+                "display_name": "Lease Termination Notice",
+                "description": "Notice for lease termination or non-renewal",
+                "template_type": "notice",
+                "category": "termination",
+                "is_system_template": True,
+                "content": """
 {{ company_name }}
 {{ company_address }}
 
@@ -258,15 +257,14 @@ Sincerely,
 Property Management
 {{ company_phone }}
 {{ company_email }}
-"""
-            }
+""",
+            },
         ]
 
         created_count = 0
         for template_data in templates_data:
             template, created = DocumentTemplate.objects.get_or_create(
-                name=template_data['name'],
-                defaults=template_data
+                name=template_data["name"], defaults=template_data
             )
 
             if created:

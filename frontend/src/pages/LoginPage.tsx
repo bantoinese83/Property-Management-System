@@ -18,14 +18,11 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Login form submitted with:', { username, password })
     setError('')
     setLoading(true)
 
     try {
-      console.log('Attempting login...')
       await login(username, password)
-      console.log('Login successful, navigating to dashboard...')
       navigate('/dashboard')
     } catch (err) {
       console.error('Login failed:', err)

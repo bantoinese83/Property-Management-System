@@ -11,12 +11,8 @@ class Lease(models.Model):
         ("terminated", "Terminated"),
     )
 
-    property_obj = models.ForeignKey(
-        "properties.Property", on_delete=models.CASCADE, related_name="leases"
-    )
-    tenant = models.ForeignKey(
-        "tenants.Tenant", on_delete=models.SET_NULL, null=True, related_name="leases"
-    )
+    property_obj = models.ForeignKey("properties.Property", on_delete=models.CASCADE, related_name="leases")
+    tenant = models.ForeignKey("tenants.Tenant", on_delete=models.SET_NULL, null=True, related_name="leases")
 
     # Dates
     lease_start_date = models.DateField()

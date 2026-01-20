@@ -29,20 +29,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [])
 
   const login = useCallback(async (username: string, password: string) => {
-    console.log('AuthProvider login called with:', { username, password })
     setLoading(true)
     setError(null)
     try {
-      console.log('Making API call to /token/')
       const response = await client.post<{ access: string; refresh: string; user: User }>(
         '/token/',
         { username, password }
       )
-      console.log('API response received:', response.data)
       localStorage.setItem('access_token', response.data.access)
       localStorage.setItem('refresh_token', response.data.refresh)
       setUser(response.data.user)
-      console.log('User set in state:', response.data.user)
     } catch (err) {
       console.error('AuthProvider login error:', err)
       const error = err instanceof Error ? err : new Error('Login failed')

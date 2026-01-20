@@ -1,6 +1,6 @@
+import django_filters
 from django.db.models import Sum
 from django.utils import timezone
-import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -11,13 +11,13 @@ from .serializers import AccountingPeriodSerializer, FinancialTransactionSeriali
 
 
 class FinancialTransactionFilter(django_filters.FilterSet):
-    property = django_filters.NumberFilter(field_name='property_obj', lookup_expr='exact')
-    date_from = django_filters.DateFilter(field_name='transaction_date', lookup_expr='gte')
-    date_to = django_filters.DateFilter(field_name='transaction_date', lookup_expr='lte')
+    property = django_filters.NumberFilter(field_name="property_obj", lookup_expr="exact")
+    date_from = django_filters.DateFilter(field_name="transaction_date", lookup_expr="gte")
+    date_to = django_filters.DateFilter(field_name="transaction_date", lookup_expr="lte")
 
     class Meta:
         model = FinancialTransaction
-        fields = ['transaction_type', 'category', 'property']
+        fields = ["transaction_type", "category", "property"]
 
 
 class FinancialTransactionViewSet(viewsets.ModelViewSet):
@@ -71,20 +71,12 @@ class FinancialTransactionViewSet(viewsets.ModelViewSet):
             end_date = timezone.datetime.fromisoformat(end_date).date()
 
         # Filter transactions by user permissions and date range
-        transactions = self.get_queryset().filter(
-            transaction_date__gte=start_date, transaction_date__lte=end_date
-        )
+        transactions = self.get_queryset().filter(transaction_date__gte=start_date, transaction_date__lte=end_date)
 
         # Calculate totals
-        income_total = (
-            transactions.filter(transaction_type="income").aggregate(total=Sum("amount"))["total"]
-            or 0
-        )
+        income_total = transactions.filter(transaction_type="income").aggregate(total=Sum("amount"))["total"] or 0
 
-        expense_total = (
-            transactions.filter(transaction_type="expense").aggregate(total=Sum("amount"))["total"]
-            or 0
-        )
+        expense_total = transactions.filter(transaction_type="expense").aggregate(total=Sum("amount"))["total"] or 0
 
         net_income = income_total - expense_total
 
@@ -122,11 +114,11 @@ class FinancialTransactionViewSet(viewsets.ModelViewSet):
 
 
 class AccountingPeriodFilter(django_filters.FilterSet):
-    property = django_filters.NumberFilter(field_name='property_obj', lookup_expr='exact')
+    property = django_filters.NumberFilter(field_name="property_obj", lookup_expr="exact")
 
     class Meta:
         model = AccountingPeriod
-        fields = ['property', 'is_closed', 'period_type']
+        fields = ["property", "is_closed", "period_type"]
 
 
 class AccountingPeriodViewSet(viewsets.ModelViewSet):
@@ -171,9 +163,7 @@ class AccountingPeriodViewSet(viewsets.ModelViewSet):
             )
 
         if period.is_closed:
-            return Response(
-                {"error": "Period is already closed"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Period is already closed"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Calculate final totals
         period.calculate_totals()

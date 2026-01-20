@@ -36,7 +36,7 @@ export function useApi<T = unknown>(
   // Memoize options to prevent unnecessary re-renders
   const memoizedOptions = useMemo(
     () => options,
-    [options.skip, options.refetchInterval, options.retryOnError]
+    [options.skip, options.refetchInterval, options.retryOnError] // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   const fetchData = useCallback(
@@ -91,7 +91,7 @@ export function useApi<T = unknown>(
     if (!memoizedOptions.skip) {
       fetchData()
     }
-  }, [url, memoizedOptions.skip])
+  }, [url, memoizedOptions.skip, fetchData])
 
   const retry = useCallback(async () => {
     retryCount.current = 0
@@ -103,7 +103,7 @@ export function useApi<T = unknown>(
       const interval = setInterval(fetchData, memoizedOptions.refetchInterval)
       return () => clearInterval(interval)
     }
-  }, [memoizedOptions.refetchInterval])
+  }, [memoizedOptions.refetchInterval, fetchData])
 
   const isError = !!error
   const isSuccess = !!data && !isError

@@ -4,9 +4,7 @@ from .models import RentPayment
 
 
 class RentPaymentSerializer(serializers.ModelSerializer):
-    lease_property_name = serializers.CharField(
-        source="lease.property.property_name", read_only=True
-    )
+    lease_property_name = serializers.CharField(source="lease.property.property_name", read_only=True)
     lease_tenant_name = serializers.CharField(source="lease.tenant.full_name", read_only=True)
     is_late = serializers.SerializerMethodField()
     total_amount = serializers.SerializerMethodField()

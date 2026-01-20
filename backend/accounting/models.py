@@ -35,9 +35,7 @@ class FinancialTransaction(models.Model):
     # Transaction details
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
-    amount = models.DecimalField(
-        max_digits=12, decimal_places=2, validators=[MinValueValidator(0.01)]
-    )
+    amount = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0.01)])
 
     # Description and date
     description = models.TextField(blank=True)
@@ -105,9 +103,7 @@ class FinancialTransaction(models.Model):
 class AccountingPeriod(models.Model):
     """Model to track accounting periods (months/quarters)"""
 
-    property_obj = models.ForeignKey(
-        "properties.Property", on_delete=models.CASCADE, related_name="accounting_periods"
-    )
+    property_obj = models.ForeignKey("properties.Property", on_delete=models.CASCADE, related_name="accounting_periods")
 
     # Period details
     period_start = models.DateField()

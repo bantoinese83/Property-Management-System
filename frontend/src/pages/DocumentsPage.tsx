@@ -8,13 +8,7 @@ import { Button } from '../components/common/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/common/Input'
 import { LoadingSpinner, Badge } from '../components/common'
-import {
-  FileText,
-  Download,
-  Search,
-  AlertTriangle,
-  BarChart3
-} from 'lucide-react'
+import { FileText, Download, Search, AlertTriangle, BarChart3 } from 'lucide-react'
 
 interface DocumentTemplate {
   id: number
@@ -44,40 +38,54 @@ const DocumentsPage: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null)
-  const [templateVariables, setTemplateVariables] = useState<Record<string, any>>({})
+  const [templateVariables, setTemplateVariables] = useState<Record<string, string>>({})
   const [documentTitle, setDocumentTitle] = useState('')
   const [generatingDocument, setGeneratingDocument] = useState(false)
 
-  const { data: templatesData, loading: templatesLoading } = useApi<{ templates: DocumentTemplate[] }>(
-    `${API_ENDPOINTS.TEMPLATES.LIST}?category=${categoryFilter}&type=${typeFilter}`
-  )
+  const { data: templatesData, loading: templatesLoading } = useApi<{
+    templates: DocumentTemplate[]
+  }>(`${API_ENDPOINTS.TEMPLATES.LIST}?category=${categoryFilter}&type=${typeFilter}`)
 
-  const { data: documentsData, loading: documentsLoading, refetch: refetchDocuments } = useApi<{ documents: GeneratedDocument[] }>(
-    API_ENDPOINTS.GENERATED_DOCUMENTS.LIST
-  )
+  const {
+    data: documentsData,
+    loading: documentsLoading,
+    refetch: refetchDocuments,
+  } = useApi<{ documents: GeneratedDocument[] }>(API_ENDPOINTS.GENERATED_DOCUMENTS.LIST)
 
   const templates = templatesData?.templates || []
   const documents = documentsData?.documents || []
 
   const getTemplateIcon = (templateType: string) => {
     switch (templateType) {
-      case 'lease': return <FileText className='h-5 w-5' />
-      case 'notice': return <AlertTriangle className='h-5 w-5' />
-      case 'report': return <BarChart3 className='h-5 w-5' />
-      case 'contract': return <FileText className='h-5 w-5' />
-      case 'form': return <FileText className='h-5 w-5' />
-      default: return <FileText className='h-5 w-5' />
+      case 'lease':
+        return <FileText className='h-5 w-5' />
+      case 'notice':
+        return <AlertTriangle className='h-5 w-5' />
+      case 'report':
+        return <BarChart3 className='h-5 w-5' />
+      case 'contract':
+        return <FileText className='h-5 w-5' />
+      case 'form':
+        return <FileText className='h-5 w-5' />
+      default:
+        return <FileText className='h-5 w-5' />
     }
   }
 
   const getTemplateTypeColor = (templateType: string) => {
     switch (templateType) {
-      case 'lease': return 'bg-blue-100 text-blue-800'
-      case 'notice': return 'bg-orange-100 text-orange-800'
-      case 'report': return 'bg-green-100 text-green-800'
-      case 'contract': return 'bg-purple-100 text-purple-800'
-      case 'form': return 'bg-gray-100 text-gray-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'lease':
+        return 'bg-blue-100 text-blue-800'
+      case 'notice':
+        return 'bg-orange-100 text-orange-800'
+      case 'report':
+        return 'bg-green-100 text-green-800'
+      case 'contract':
+        return 'bg-purple-100 text-purple-800'
+      case 'form':
+        return 'bg-gray-100 text-gray-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
@@ -96,7 +104,7 @@ const DocumentsPage: React.FC = () => {
           template_id: selectedTemplate.id,
           variables: templateVariables,
           title: documentTitle || selectedTemplate.display_name,
-        })
+        }),
       })
 
       const result = await response.json()
@@ -145,17 +153,20 @@ const DocumentsPage: React.FC = () => {
     }
   }
 
-  const filteredTemplates = templates.filter(template =>
-    template.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    template.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTemplates = templates.filter(
+    template =>
+      template.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      template.description.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
     <SidebarProvider
-      style={{
-        '--sidebar-width': '280px',
-        '--header-height': '60px',
-      } as React.CSSProperties}
+      style={
+        {
+          '--sidebar-width': '280px',
+          '--header-height': '60px',
+        } as React.CSSProperties
+      }
     >
       <AppSidebar variant='inset' />
       <SidebarInset>
@@ -227,7 +238,7 @@ const DocumentsPage: React.FC = () => {
                         <Input
                           placeholder='Enter document title'
                           value={documentTitle}
-                          onChange={(e) => setDocumentTitle(e.target.value)}
+                          onChange={e => setDocumentTitle(e.target.value)}
                         />
                       </div>
                     </div>
@@ -235,7 +246,7 @@ const DocumentsPage: React.FC = () => {
                     <div className='space-y-3'>
                       <h4 className='font-medium'>Template Variables</h4>
                       <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-                        {selectedTemplate.variables.map((variable) => (
+                        {selectedTemplate.variables.map(variable => (
                           <div key={variable}>
                             <label className='text-sm font-medium mb-1 block capitalize'>
                               {variable.replace('_', ' ')}
@@ -243,10 +254,12 @@ const DocumentsPage: React.FC = () => {
                             <Input
                               placeholder={`Enter ${variable.replace('_', ' ')}`}
                               value={templateVariables[variable] || ''}
-                              onChange={(e) => setTemplateVariables(prev => ({
-                                ...prev,
-                                [variable]: e.target.value
-                              }))}
+                              onChange={e =>
+                                setTemplateVariables(prev => ({
+                                  ...prev,
+                                  [variable]: e.target.value,
+                                }))
+                              }
                             />
                           </div>
                         ))}
@@ -288,7 +301,7 @@ const DocumentsPage: React.FC = () => {
                         <Input
                           placeholder='Search by name or description...'
                           value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
+                          onChange={e => setSearchTerm(e.target.value)}
                           className='pl-10'
                         />
                       </div>
@@ -298,7 +311,7 @@ const DocumentsPage: React.FC = () => {
                       <label className='text-sm font-medium mb-2 block'>Category</label>
                       <select
                         value={categoryFilter}
-                        onChange={(e) => setCategoryFilter(e.target.value)}
+                        onChange={e => setCategoryFilter(e.target.value)}
                         className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                       >
                         <option value=''>All Categories</option>
@@ -314,7 +327,7 @@ const DocumentsPage: React.FC = () => {
                       <label className='text-sm font-medium mb-2 block'>Type</label>
                       <select
                         value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value)}
+                        onChange={e => setTypeFilter(e.target.value)}
                         className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                       >
                         <option value=''>All Types</option>
@@ -336,7 +349,7 @@ const DocumentsPage: React.FC = () => {
                 </div>
               ) : (
                 <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-                  {filteredTemplates.map((template) => (
+                  {filteredTemplates.map(template => (
                     <Card
                       key={template.id}
                       className={`cursor-pointer transition-all hover:shadow-md ${
@@ -346,7 +359,9 @@ const DocumentsPage: React.FC = () => {
                     >
                       <CardHeader>
                         <div className='flex items-center gap-3'>
-                          <div className={`p-2 rounded-lg ${getTemplateTypeColor(template.template_type)}`}>
+                          <div
+                            className={`p-2 rounded-lg ${getTemplateTypeColor(template.template_type)}`}
+                          >
                             {getTemplateIcon(template.template_type)}
                           </div>
                           <div className='flex-1'>
@@ -375,7 +390,7 @@ const DocumentsPage: React.FC = () => {
                             variant='outline'
                             size='sm'
                             className='w-full'
-                            onClick={(e) => {
+                            onClick={e => {
                               e.stopPropagation()
                               setSelectedTemplate(template)
                             }}
@@ -400,12 +415,14 @@ const DocumentsPage: React.FC = () => {
                 </div>
               ) : documents.length > 0 ? (
                 <div className='space-y-4'>
-                  {documents.map((document) => (
+                  {documents.map(document => (
                     <Card key={document.id}>
                       <CardContent className='p-6'>
                         <div className='flex items-center justify-between'>
                           <div className='flex items-center gap-4'>
-                            <div className={`p-2 rounded-lg ${getTemplateTypeColor(document.template_type)}`}>
+                            <div
+                              className={`p-2 rounded-lg ${getTemplateTypeColor(document.template_type)}`}
+                            >
                               {getTemplateIcon(document.template_type)}
                             </div>
                             <div>
@@ -414,10 +431,16 @@ const DocumentsPage: React.FC = () => {
                                 <Badge variant='outline' className='text-xs'>
                                   {document.template_name}
                                 </Badge>
-                                <Badge variant={
-                                  document.status === 'generated' ? 'success' :
-                                  document.status === 'sent' ? 'default' : 'secondary'
-                                } className='text-xs'>
+                                <Badge
+                                  variant={
+                                    document.status === 'generated'
+                                      ? 'success'
+                                      : document.status === 'sent'
+                                        ? 'default'
+                                        : 'secondary'
+                                  }
+                                  className='text-xs'
+                                >
                                   {document.status}
                                 </Badge>
                                 <span className='text-xs text-muted-foreground'>

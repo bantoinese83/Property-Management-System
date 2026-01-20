@@ -127,7 +127,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onClose }) => {
             />
           </div>
 
-            <div className='space-y-2'>
+          <div className='space-y-2'>
             <label htmlFor='description'>Description</label>
             <textarea
               id='description'

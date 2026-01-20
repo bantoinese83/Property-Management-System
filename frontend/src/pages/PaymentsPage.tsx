@@ -13,7 +13,7 @@ import { Badge } from '../components/common/Badge'
 import { Input } from '../components/common/Input'
 import { LoadingSpinner, ErrorMessage } from '../components/common'
 import { DollarSign, CheckCircle, AlertTriangle, Clock, TrendingUp, Download } from 'lucide-react'
-import { exportToCSV, entityColumns } from '../utils/export'
+import { exportToCSV, entityColumns, type ExportColumn } from '../utils/export'
 
 interface PaymentsResponse {
   results: RentPayment[]
@@ -85,20 +85,20 @@ const PaymentsPage: React.FC = () => {
   const handleExportData = () => {
     if (payments.length === 0) {
       toast.error('No data to export', {
-        description: 'There are no payments to export.'
+        description: 'There are no payments to export.',
       })
       return
     }
 
     try {
-      exportToCSV(payments, entityColumns.payments, 'payments')
+      exportToCSV(payments as unknown as Record<string, unknown>[], entityColumns.payments as ExportColumn[], 'payments')
       toast.success('Export successful', {
-        description: 'Payments data has been exported to CSV.'
+        description: 'Payments data has been exported to CSV.',
       })
     } catch (error) {
       console.error('Export failed:', error)
       toast.error('Export failed', {
-        description: 'An error occurred while exporting data.'
+        description: 'An error occurred while exporting data.',
       })
     }
   }

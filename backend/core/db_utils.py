@@ -6,18 +6,24 @@ Provides query optimization, caching, and performance monitoring tools.
 
 from functools import wraps
 from typing import Any, Callable, Optional, TypeVar
+
 from django.core.cache import cache
 from django.db import connection, models
-from django.db.models import QuerySet, Prefetch
+from django.db.models import Prefetch, QuerySet
 from django.utils.decorators import method_decorator
-from core.logging import logger, log_database_query
 
-F = TypeVar('F', bound=Callable[..., Any])
+from core.logging import log_database_query, logger
+
+F = TypeVar("F", bound=Callable[..., Any])
 
 
-def optimize_queryset(queryset: QuerySet, select_related: Optional[list] = None,
-                     prefetch_related: Optional[list] = None,
-                     defer: Optional[list] = None, only: Optional[list] = None) -> QuerySet:
+def optimize_queryset(
+    queryset: QuerySet,
+    select_related: Optional[list] = None,
+    prefetch_related: Optional[list] = None,
+    defer: Optional[list] = None,
+    only: Optional[list] = None,
+) -> QuerySet:
     """
     Optimize a queryset with select_related, prefetch_related, defer, and only.
 
@@ -62,6 +68,7 @@ def cache_queryset(timeout: int = 300, key_prefix: str = ""):
         timeout: Cache timeout in seconds (default: 5 minutes)
         key_prefix: Prefix for cache keys to avoid conflicts
     """
+
     def decorator(func: F) -> F:
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -80,7 +87,9 @@ def cache_queryset(timeout: int = 300, key_prefix: str = ""):
             logger.debug(f"Cached result for {cache_key}")
 
             return result
+
         return wrapper
+
     return decorator
 
 
@@ -92,12 +101,12 @@ class QueryOptimizer:
         """Get a property with optimized related data loading."""
         return optimize_queryset(
             queryset=models.Property.objects.filter(id=property_id),
-            select_related=['owner'],
+            select_related=["owner"],
             prefetch_related=[
-                'leases__tenant',
-                'maintenance_requests',
-                Prefetch('documents', queryset=models.Document.objects.filter(is_active=True))
-            ]
+                "leases__tenant",
+                "maintenance_requests",
+                Prefetch("documents", queryset=models.Document.objects.filter(is_active=True)),
+            ],
         ).first()
 
     @staticmethod
@@ -106,10 +115,10 @@ class QueryOptimizer:
         return optimize_queryset(
             queryset=models.Tenant.objects.filter(id=tenant_id),
             prefetch_related=[
-                'leases__property',
-                'payments',
-                Prefetch('documents', queryset=models.Document.objects.filter(is_active=True))
-            ]
+                "leases__property",
+                "payments",
+                Prefetch("documents", queryset=models.Document.objects.filter(is_active=True)),
+            ],
         ).first()
 
     @staticmethod
@@ -117,23 +126,24 @@ class QueryOptimizer:
         """Get a lease with all related data optimized."""
         return optimize_queryset(
             queryset=models.Lease.objects.filter(id=lease_id),
-            select_related=['property', 'tenant'],
+            select_related=["property", "tenant"],
             prefetch_related=[
-                'payments',
-                'maintenance_requests',
-                Prefetch('property__documents', queryset=models.Document.objects.filter(is_active=True)),
-                Prefetch('tenant__documents', queryset=models.Document.objects.filter(is_active=True))
-            ]
+                "payments",
+                "maintenance_requests",
+                Prefetch("property__documents", queryset=models.Document.objects.filter(is_active=True)),
+                Prefetch("tenant__documents", queryset=models.Document.objects.filter(is_active=True)),
+            ],
         ).first()
 
     @staticmethod
     def get_dashboard_stats(user_id: Optional[int] = None) -> dict:
         """Get dashboard statistics with optimized queries."""
-        from django.db.models import Count, Sum, Q
-        from properties.models import Property
-        from tenants.models import Tenant
+        from django.db.models import Count, Q, Sum
+
         from leases.models import Lease
         from payments.models import RentPayment
+        from properties.models import Property
+        from tenants.models import Tenant
 
         # Use select_related and annotations to minimize queries
         stats = {}
@@ -143,59 +153,47 @@ class QueryOptimizer:
         if user_id:
             property_queryset = property_queryset.filter(owner_id=user_id)
 
-        stats['properties'] = {
-            'total': property_queryset.count(),
-            'occupied': property_queryset.filter(
-                leases__lease_end_date__gte=models.functions.Now()
-            ).distinct().count(),
+        stats["properties"] = {
+            "total": property_queryset.count(),
+            "occupied": property_queryset.filter(leases__lease_end_date__gte=models.functions.Now()).distinct().count(),
         }
 
         # Tenant stats
         tenant_queryset = Tenant.objects.all()
         if user_id:
-            tenant_queryset = tenant_queryset.filter(
-                leases__property__owner_id=user_id
-            ).distinct()
+            tenant_queryset = tenant_queryset.filter(leases__property__owner_id=user_id).distinct()
 
-        stats['tenants'] = {
-            'total': tenant_queryset.count(),
-            'active': tenant_queryset.filter(
-                leases__lease_end_date__gte=models.functions.Now()
-            ).distinct().count(),
+        stats["tenants"] = {
+            "total": tenant_queryset.count(),
+            "active": tenant_queryset.filter(leases__lease_end_date__gte=models.functions.Now()).distinct().count(),
         }
 
         # Financial stats (last 30 days)
         from django.utils import timezone
+
         thirty_days_ago = timezone.now() - timezone.timedelta(days=30)
 
-        payment_queryset = RentPayment.objects.filter(
-            created_at__gte=thirty_days_ago
-        )
+        payment_queryset = RentPayment.objects.filter(created_at__gte=thirty_days_ago)
 
         if user_id:
-            payment_queryset = payment_queryset.filter(
-                lease__property__owner_id=user_id
-            )
+            payment_queryset = payment_queryset.filter(lease__property__owner_id=user_id)
 
-        stats['payments'] = {
-            'total_amount': payment_queryset.aggregate(
-                total=Sum('amount')
-            )['total'] or 0,
-            'count': payment_queryset.count(),
+        stats["payments"] = {
+            "total_amount": payment_queryset.aggregate(total=Sum("amount"))["total"] or 0,
+            "count": payment_queryset.count(),
         }
 
         # Maintenance stats
         from maintenance.models import MaintenanceRequest
+
         maintenance_queryset = MaintenanceRequest.objects.all()
         if user_id:
-            maintenance_queryset = maintenance_queryset.filter(
-                property__owner_id=user_id
-            )
+            maintenance_queryset = maintenance_queryset.filter(property__owner_id=user_id)
 
-        stats['maintenance'] = {
-            'total': maintenance_queryset.count(),
-            'pending': maintenance_queryset.filter(status='pending').count(),
-            'in_progress': maintenance_queryset.filter(status='in_progress').count(),
+        stats["maintenance"] = {
+            "total": maintenance_queryset.count(),
+            "pending": maintenance_queryset.filter(status="pending").count(),
+            "in_progress": maintenance_queryset.filter(status="in_progress").count(),
         }
 
         return stats
@@ -210,6 +208,7 @@ def log_slow_queries(threshold_ms: float = 1000):
             # Your database operations here
             pass
     """
+
     class SlowQueryLogger:
         def __enter__(self):
             self.initial_queries = len(connection.queries)
@@ -217,27 +216,28 @@ def log_slow_queries(threshold_ms: float = 1000):
 
         def __exit__(self, exc_type, exc_val, exc_tb):
             final_queries = len(connection.queries)
-            new_queries = connection.queries[self.initial_queries:]
+            new_queries = connection.queries[self.initial_queries :]
 
             for query in new_queries:
-                duration = float(query.get('time', 0))
+                duration = float(query.get("time", 0))
                 if duration > threshold_ms:
                     logger.warning(
                         f"Slow query detected: {duration:.2f}ms",
                         extra={
-                            'extra_data': {
-                                'query': query.get('sql', ''),
-                                'duration_ms': duration,
-                                'params': query.get('params', []),
+                            "extra_data": {
+                                "query": query.get("sql", ""),
+                                "duration_ms": duration,
+                                "params": query.get("params", []),
                             }
-                        }
+                        },
                     )
 
     return SlowQueryLogger()
 
 
-def bulk_create_with_progress(queryset: QuerySet, batch_size: int = 1000,
-                             progress_callback: Optional[Callable] = None) -> int:
+def bulk_create_with_progress(
+    queryset: QuerySet, batch_size: int = 1000, progress_callback: Optional[Callable] = None
+) -> int:
     """
     Bulk create objects with progress tracking.
 
@@ -275,8 +275,9 @@ def bulk_create_with_progress(queryset: QuerySet, batch_size: int = 1000,
     return total_created
 
 
-def get_or_create_with_cache(model: type[models.Model], defaults: dict = None,
-                           timeout: int = 300, **kwargs) -> tuple[models.Model, bool]:
+def get_or_create_with_cache(
+    model: type[models.Model], defaults: dict = None, timeout: int = 300, **kwargs
+) -> tuple[models.Model, bool]:
     """
     Cached version of get_or_create to reduce database hits.
 
@@ -324,7 +325,7 @@ def create_composite_index(model: type[models.Model], fields: list[str], name: s
         name = f"idx_{model._meta.db_table}_{'_'.join(fields)}"
 
     table_name = model._meta.db_table
-    field_list = ', '.join(fields)
+    field_list = ", ".join(fields)
 
     sql = f"CREATE INDEX CONCURRENTLY {name} ON {table_name} ({field_list});"
     return sql
@@ -338,33 +339,32 @@ def analyze_table_performance(model: type[models.Model]) -> dict:
         Dictionary with performance analysis and recommendations
     """
     table_name = model._meta.db_table
-    analysis = {
-        'table_name': table_name,
-        'recommendations': [],
-        'metrics': {}
-    }
+    analysis = {"table_name": table_name, "recommendations": [], "metrics": {}}
 
     try:
         with connection.cursor() as cursor:
             # Get table statistics
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 SELECT
                     schemaname, tablename, seq_scan, seq_tup_read,
                     idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del
                 FROM pg_stat_user_tables
                 WHERE tablename = %s
-            """, [table_name])
+            """,
+                [table_name],
+            )
 
             stats = cursor.fetchone()
             if stats:
-                analysis['metrics'] = {
-                    'sequential_scans': stats[2],
-                    'sequential_tuples_read': stats[3],
-                    'index_scans': stats[4],
-                    'index_tuples_fetched': stats[5],
-                    'tuples_inserted': stats[6],
-                    'tuples_updated': stats[7],
-                    'tuples_deleted': stats[8],
+                analysis["metrics"] = {
+                    "sequential_scans": stats[2],
+                    "sequential_tuples_read": stats[3],
+                    "index_scans": stats[4],
+                    "index_tuples_fetched": stats[5],
+                    "tuples_inserted": stats[6],
+                    "tuples_updated": stats[7],
+                    "tuples_deleted": stats[8],
                 }
 
                 # Generate recommendations
@@ -372,17 +372,13 @@ def analyze_table_performance(model: type[models.Model]) -> dict:
                 idx_scans = stats[4] or 0
 
                 if seq_scans > idx_scans * 10:  # More sequential than index scans
-                    analysis['recommendations'].append(
-                        "Consider adding indexes on frequently queried columns"
-                    )
+                    analysis["recommendations"].append("Consider adding indexes on frequently queried columns")
 
                 if (stats[7] or 0) > (stats[6] or 0) * 5:  # High update rate
-                    analysis['recommendations'].append(
-                        "High update rate detected - consider fill factor optimization"
-                    )
+                    analysis["recommendations"].append("High update rate detected - consider fill factor optimization")
 
     except Exception as e:
         logger.error(f"Table performance analysis failed: {str(e)}")
-        analysis['error'] = str(e)
+        analysis["error"] = str(e)
 
     return analysis

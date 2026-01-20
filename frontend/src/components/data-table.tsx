@@ -96,6 +96,7 @@ import {
 } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const schema = z.object({
   id: z.number(),
   header: z.string(),
@@ -490,36 +491,36 @@ export function DataTable({
               id={sortableId}
             >
               <Table className='min-w-full'>
-              <TableHeader className='sticky top-0 z-10 bg-muted'>
-                {table.getHeaderGroups().map(headerGroup => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map(header => {
-                      return (
-                        <TableHead key={header.id} colSpan={header.colSpan}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody className='**:data-[slot=table-cell]:first:w-8'>
-                {table.getRowModel().rows?.length ? (
-                  <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
-                    {table.getRowModel().rows.map(row => (
-                      <DraggableRow key={row.id} row={row} />
-                    ))}
-                  </SortableContext>
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className='h-24 text-center'>
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
+                <TableHeader className='sticky top-0 z-10 bg-muted'>
+                  {table.getHeaderGroups().map(headerGroup => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map(header => {
+                        return (
+                          <TableHead key={header.id} colSpan={header.colSpan}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(header.column.columnDef.header, header.getContext())}
+                          </TableHead>
+                        )
+                      })}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody className='**:data-[slot=table-cell]:first:w-8'>
+                  {table.getRowModel().rows?.length ? (
+                    <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
+                      {table.getRowModel().rows.map(row => (
+                        <DraggableRow key={row.id} row={row} />
+                      ))}
+                    </SortableContext>
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={columns.length} className='h-24 text-center'>
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
               </Table>
             </DndContext>
           </div>

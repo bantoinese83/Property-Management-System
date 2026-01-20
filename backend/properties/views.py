@@ -5,7 +5,6 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-
 from .models import Property, PropertyImage
 from .serializers import PropertyImageSerializer, PropertyListSerializer, PropertySerializer
 
@@ -65,6 +64,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
         self.check_object_permissions(request, property_obj)
 
         from django.utils import timezone
+
         from leases.models import Lease
 
         today = timezone.now().date()
@@ -94,17 +94,16 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
         from datetime import timedelta
 
-        from accounting.models import FinancialTransaction
         from django.utils import timezone
+
+        from accounting.models import FinancialTransaction
         from payments.models import RentPayment
 
         today = timezone.now().date()
         last_30_days = today - timedelta(days=30)
 
         # Rent payments
-        payments = RentPayment.objects.filter(
-            lease__property=property_obj, payment_date__gte=last_30_days
-        )
+        payments = RentPayment.objects.filter(lease__property=property_obj, payment_date__gte=last_30_days)
 
         total_collected = sum(p.amount for p in payments if p.status == "paid")
         pending_payments = sum(p.amount for p in payments if p.status == "pending")
@@ -138,11 +137,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
         properties = self.get_queryset()
 
         total_units = sum(p.total_units for p in properties)
-        avg_occupancy = (
-            sum(p.get_occupancy_rate() for p in properties) / len(properties)
-            if properties.exists()
-            else 0
-        )
+        avg_occupancy = sum(p.get_occupancy_rate() for p in properties) / len(properties) if properties.exists() else 0
         total_monthly_income = sum(float(p.get_monthly_income()) for p in properties)
 
         return Response(
@@ -254,18 +249,16 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
             property_types[prop_type]["count"] += 1
             property_types[prop_type]["total_units"] += prop.total_units
-            property_types[prop_type]["occupied_units"] += (
-                prop.total_units * prop.get_occupancy_rate() / 100
-            )
+            property_types[prop_type]["occupied_units"] += prop.total_units * prop.get_occupancy_rate() / 100
             property_types[prop_type]["monthly_income"] += float(prop.get_monthly_income())
 
         # Recent activity (last 10 items)
         recent_activity = []
 
         # Recent payments
-        recent_payments_activity = RentPayment.objects.filter(
-            lease_obj__property_obj__in=properties
-        ).order_by("-created_at")[:5]
+        recent_payments_activity = RentPayment.objects.filter(lease_obj__property_obj__in=properties).order_by(
+            "-created_at"
+        )[:5]
 
         for payment in recent_payments_activity:
             recent_activity.append(
@@ -279,9 +272,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
             )
 
         # Recent maintenance
-        recent_maintenance = MaintenanceRequest.objects.filter(property_obj__in=properties).order_by(
-            "-created_at"
-        )[:5]
+        recent_maintenance = MaintenanceRequest.objects.filter(property_obj__in=properties).order_by("-created_at")[:5]
 
         for maintenance in recent_maintenance:
             recent_activity.append(
@@ -331,9 +322,7 @@ class PropertyImageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return PropertyImage.objects.filter(property__owner=self.request.user).select_related(
-            "property"
-        )
+        return PropertyImage.objects.filter(property__owner=self.request.user).select_related("property")
 
     def perform_create(self, serializer):
         property_id = self.request.data.get("property")

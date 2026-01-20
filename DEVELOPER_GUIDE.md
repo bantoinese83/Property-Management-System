@@ -135,19 +135,30 @@ frontend/
 git clone <repository-url>
 cd property-management-system
 
-# 2. Install development tools
-make setup  # Installs pre-commit hooks and dependencies
+# 2. Install development tools and pre-commit hooks
+make setup
 
-# 3. Start development environment
+# 3. Optional: Configure environment variables
+cp env.example .env
+# Edit .env with your preferred settings (database, email, etc.)
+
+# 4. Start development environment
 docker-compose up -d
 
-# 4. Access application
-# Frontend: http://localhost:5173
-# Backend: http://localhost:8000/api
-# Admin: http://localhost:8000/admin
+# 5. Wait for services to start (~30 seconds)
+# Check status: docker-compose ps
 
-# 5. Load demo data
+# 6. Load demo data
 docker-compose exec backend python manage.py create_demo_data
+
+# 7. Access application
+# 🌐 Frontend: http://localhost (React app with hot reload)
+# 🔧 Backend API: http://localhost/api (Django REST API)
+# 📚 API Docs: http://localhost/api/docs (Swagger/OpenAPI)
+# 👑 Admin Panel: http://localhost/admin (admin/admin123)
+
+# 8. Optional: Start Celery for background tasks
+docker-compose --profile celery up -d celery
 ```
 
 ### **Local Development Setup**
@@ -156,17 +167,40 @@ docker-compose exec backend python manage.py create_demo_data
 cd backend
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Setup environment
 cp .env.example .env
+# Edit .env: DATABASE_URL, SECRET_KEY, EMAIL settings
+
+# Database setup (choose one)
+# Option 1: Local PostgreSQL
+createdb property_mgmt
+# Option 2: Docker PostgreSQL
+docker run -d --name pms-postgres -p 5432:5432 \
+  -e POSTGRES_DB=property_mgmt \
+  -e POSTGRES_USER=property_user \
+  -e POSTGRES_PASSWORD=secure_password \
+  postgres:15-alpine
+
+# Run migrations and load data
 python manage.py migrate
 python manage.py create_demo_data
-python manage.py runserver
+
+# Optional: Start Celery worker (separate terminal)
+celery -A config worker --loglevel=info
+
+# Start Django server
+python manage.py runserver 0.0.0.0:8000
 
 # Frontend setup (separate terminal)
 cd frontend
 npm install
 cp .env.example .env
-npm run dev
+# Set VITE_API_URL=http://localhost:8000/api
+npm run dev  # Access at http://localhost:5173
 ```
 
 ### **Environment Configuration**

@@ -1,5 +1,5 @@
-from django.utils import timezone
 import django_filters
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -10,11 +10,11 @@ from .serializers import RentPaymentSerializer
 
 
 class RentPaymentFilter(django_filters.FilterSet):
-    property = django_filters.NumberFilter(field_name='lease_obj__property', lookup_expr='exact')
+    property = django_filters.NumberFilter(field_name="lease_obj__property", lookup_expr="exact")
 
     class Meta:
         model = RentPayment
-        fields = ['status', 'payment_method', 'property']
+        fields = ["status", "payment_method", "property"]
 
 
 class RentPaymentViewSet(viewsets.ModelViewSet):
@@ -61,9 +61,7 @@ class RentPaymentViewSet(viewsets.ModelViewSet):
     def overdue(self, request):
         """Get overdue payments"""
         today = timezone.now().date()
-        overdue_payments = self.get_queryset().filter(
-            due_date__lt=today, status__in=["pending", "overdue"]
-        )
+        overdue_payments = self.get_queryset().filter(due_date__lt=today, status__in=["pending", "overdue"])
         serializer = self.get_serializer(overdue_payments, many=True)
         return Response(serializer.data)
 
@@ -117,19 +115,11 @@ class RentPaymentViewSet(viewsets.ModelViewSet):
         month_start = today.replace(day=1)
 
         # Get payments for current month
-        payments = self.get_queryset().filter(
-            payment_date__gte=month_start, payment_date__lte=today
-        )
+        payments = self.get_queryset().filter(payment_date__gte=month_start, payment_date__lte=today)
 
-        total_collected = sum(
-            p.amount for p in payments if p.status == "paid"
-        )
-        total_pending = sum(
-            p.amount for p in payments if p.status == "pending"
-        )
-        total_overdue = sum(
-            p.amount for p in payments if p.status == "overdue"
-        )
+        total_collected = sum(p.amount for p in payments if p.status == "paid")
+        total_pending = sum(p.amount for p in payments if p.status == "pending")
+        total_overdue = sum(p.amount for p in payments if p.status == "overdue")
 
         return Response(
             {
@@ -162,10 +152,7 @@ class RentPaymentViewSet(viewsets.ModelViewSet):
             # frontend or settings. Using defaults for local development
             success_url = request.data.get(
                 "success_url",
-                (
-                    "http://localhost:5173/payments?success=true"
-                    "&session_id={CHECKOUT_SESSION_ID}"
-                ),
+                ("http://localhost:5173/payments?success=true" "&session_id={CHECKOUT_SESSION_ID}"),
             )
             cancel_url = request.data.get(
                 "cancel_url",
@@ -181,14 +168,9 @@ class RentPaymentViewSet(viewsets.ModelViewSet):
                             "currency": "usd",
                             "product_data": {
                                 "name": f"Rent Payment - {prop_name}",
-                                "description": (
-                                    f"Payment for "
-                                    f"{payment.due_date.strftime('%B %Y')}"
-                                ),
+                                "description": (f"Payment for " f"{payment.due_date.strftime('%B %Y')}"),
                             },
-                            "unit_amount": int(
-                                payment.total_amount * 100
-                            ),  # Amount in cents
+                            "unit_amount": int(payment.total_amount * 100),  # Amount in cents
                         },
                         "quantity": 1,
                     }

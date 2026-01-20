@@ -1,4 +1,5 @@
 from django.utils.deprecation import MiddlewareMixin
+
 from .signals import set_audit_context
 
 
@@ -7,7 +8,7 @@ class AuditMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         """Set audit context at the start of each request"""
-        user = getattr(request, 'user', None)
+        user = getattr(request, "user", None)
         if user and user.is_authenticated:
             set_audit_context(user=user, request=request)
         else:

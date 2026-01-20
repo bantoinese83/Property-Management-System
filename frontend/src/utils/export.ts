@@ -5,25 +5,27 @@
 export interface ExportColumn {
   key: string
   label: string
-  formatter?: (value: any) => string
+  formatter?: (value: unknown) => unknown
 }
 
-export const exportToCSV = (data: any[], columns: ExportColumn[], filename: string) => {
+export const exportToCSV = (data: Record<string, unknown>[], columns: ExportColumn[], filename: string) => {
   // Create CSV header
   const headers = columns.map(col => col.label).join(',')
 
   // Create CSV rows
   const rows = data.map(item =>
-    columns.map(col => {
-      const value = item[col.key]
-      const formatted = col.formatter ? col.formatter(value) : value
-      // Escape commas and quotes in CSV
-      const stringValue = String(formatted || '')
-      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
-        return `"${stringValue.replace(/"/g, '""')}"`
-      }
-      return stringValue
-    }).join(',')
+    columns
+      .map(col => {
+        const value = item[col.key]
+        const formatted = col.formatter ? col.formatter(value) : value
+        // Escape commas and quotes in CSV
+        const stringValue = String(formatted || '')
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+          return `"${stringValue.replace(/"/g, '""')}"`
+        }
+        return stringValue
+      })
+      .join(',')
   )
 
   // Combine header and rows
@@ -57,7 +59,7 @@ export const formatters = {
     }
   },
 
-  boolean: (value: boolean) => value ? 'Yes' : 'No',
+  boolean: (value: boolean) => (value ? 'Yes' : 'No'),
 
   capitalize: (value: string) => {
     if (!value) return ''
@@ -67,7 +69,7 @@ export const formatters = {
   replaceUnderscore: (value: string) => {
     if (!value) return ''
     return value.replace(/_/g, ' ')
-  }
+  },
 }
 
 // Predefined column configurations for different entities
@@ -80,10 +82,14 @@ export const entityColumns = {
     { key: 'zip_code', label: 'ZIP Code' },
     { key: 'property_type', label: 'Property Type', formatter: formatters.replaceUnderscore },
     { key: 'total_units', label: 'Total Units' },
-    { key: 'occupancy_rate', label: 'Occupancy Rate (%)', formatter: (value: number) => `${value}%` },
+    {
+      key: 'occupancy_rate',
+      label: 'Occupancy Rate (%)',
+      formatter: (value: number) => `${value}%`,
+    },
     { key: 'monthly_income', label: 'Monthly Income', formatter: formatters.currency },
     { key: 'is_active', label: 'Active', formatter: formatters.boolean },
-    { key: 'created_at', label: 'Created Date', formatter: formatters.date }
+    { key: 'created_at', label: 'Created Date', formatter: formatters.date },
   ],
 
   tenants: [
@@ -98,7 +104,7 @@ export const entityColumns = {
     { key: 'is_active', label: 'Active', formatter: formatters.boolean },
     { key: 'active_lease_count', label: 'Active Leases' },
     { key: 'monthly_rent_total', label: 'Monthly Rent', formatter: formatters.currency },
-    { key: 'created_at', label: 'Created Date', formatter: formatters.date }
+    { key: 'created_at', label: 'Created Date', formatter: formatters.date },
   ],
 
   leases: [
@@ -111,7 +117,7 @@ export const entityColumns = {
     { key: 'status', label: 'Status', formatter: formatters.capitalize },
     { key: 'is_ending_soon', label: 'Ending Soon', formatter: formatters.boolean },
     { key: 'days_remaining', label: 'Days Remaining' },
-    { key: 'created_at', label: 'Created Date', formatter: formatters.date }
+    { key: 'created_at', label: 'Created Date', formatter: formatters.date },
   ],
 
   maintenance: [
@@ -127,7 +133,7 @@ export const entityColumns = {
     { key: 'estimated_cost', label: 'Estimated Cost', formatter: formatters.currency },
     { key: 'actual_cost', label: 'Actual Cost', formatter: formatters.currency },
     { key: 'requested_date', label: 'Requested Date', formatter: formatters.date },
-    { key: 'completed_date', label: 'Completed Date', formatter: formatters.date }
+    { key: 'completed_date', label: 'Completed Date', formatter: formatters.date },
   ],
 
   payments: [
@@ -140,7 +146,7 @@ export const entityColumns = {
     { key: 'status', label: 'Status', formatter: formatters.capitalize },
     { key: 'total_amount', label: 'Total Amount', formatter: formatters.currency },
     { key: 'transaction_id', label: 'Transaction ID' },
-    { key: 'processed_at', label: 'Processed Date', formatter: formatters.date }
+    { key: 'processed_at', label: 'Processed Date', formatter: formatters.date },
   ],
 
   transactions: [
@@ -152,6 +158,6 @@ export const entityColumns = {
     { key: 'transaction_date', label: 'Date', formatter: formatters.date },
     { key: 'vendor_name', label: 'Vendor' },
     { key: 'recorded_by_name', label: 'Recorded By' },
-    { key: 'created_at', label: 'Created Date', formatter: formatters.date }
-  ]
+    { key: 'created_at', label: 'Created Date', formatter: formatters.date },
+  ],
 }

@@ -1,14 +1,16 @@
 import logging
 from datetime import timedelta
-from django.utils import timezone
-from django.conf import settings
-from celery import shared_task
 
-from .services import EmailService
-from users.models import Notification, NotificationPreference
-from payments.models import RentPayment
+from celery import shared_task
+from django.conf import settings
+from django.utils import timezone
+
 from leases.models import Lease
 from maintenance.models import MaintenanceRequest
+from payments.models import RentPayment
+from users.models import Notification, NotificationPreference
+
+from .services import EmailService
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +23,8 @@ def send_rent_due_reminders():
 
     # Get payments due in the notification window
     upcoming_payments = RentPayment.objects.filter(
-        due_date=reminder_date,
-        status__in=['pending', 'overdue']
-    ).select_related('lease_obj', 'lease_obj__tenant', 'lease_obj__property_obj')
+        due_date=reminder_date, status__in=["pending", "overdue"]
+    ).select_related("lease_obj", "lease_obj__tenant", "lease_obj__property_obj")
 
     sent_count = 0
     for payment in upcoming_payments:
@@ -46,8 +47,8 @@ def send_rent_due_reminders():
             tenant_name=tenant.full_name,
             property_name=payment.lease_obj.property_obj.property_name,
             amount=str(payment.total_amount),
-            due_date=payment.due_date.strftime('%B %d, %Y'),
-            lease_period=f"{payment.lease_obj.lease_start_date.strftime('%B %Y')} - {payment.lease_obj.lease_end_date.strftime('%B %Y')}"
+            due_date=payment.due_date.strftime("%B %d, %Y"),
+            lease_period=f"{payment.lease_obj.lease_start_date.strftime('%B %Y')} - {payment.lease_obj.lease_end_date.strftime('%B %Y')}",
         )
 
         if success:
@@ -56,15 +57,15 @@ def send_rent_due_reminders():
             # Create in-app notification
             Notification.objects.create(
                 user=tenant,
-                notification_type='payment',
-                title='Rent Payment Due Soon',
+                notification_type="payment",
+                title="Rent Payment Due Soon",
                 message=f'Your rent payment of ${payment.total_amount} for {payment.lease_obj.property_obj.property_name} is due on {payment.due_date.strftime("%B %d, %Y")}.',
-                related_model='payment',
+                related_model="payment",
                 related_id=payment.id,
-                action_url=f'/payments/{payment.id}'
+                action_url=f"/payments/{payment.id}",
             )
 
-    logger.info(f'Sent {sent_count} rent due reminders')
+    logger.info(f"Sent {sent_count} rent due reminders")
     return sent_count
 
 
@@ -74,13 +75,15 @@ def send_maintenance_updates():
     today = timezone.now().date()
 
     # Get maintenance requests that need updates
-    maintenance_requests = MaintenanceRequest.objects.filter(
-        tenant__isnull=False,
-        status__in=['assigned', 'in_progress', 'completed']
-    ).exclude(
-        # Don't send updates for requests updated in the last 24 hours
-        updated_at__gte=timezone.now() - timedelta(hours=24)
-    ).select_related('tenant', 'property_obj', 'assigned_to')
+    maintenance_requests = (
+        MaintenanceRequest.objects.filter(tenant__isnull=False, status__in=["assigned", "in_progress", "completed"])
+        .exclude(
+            # Don't send updates for requests updated in the last 24 hours
+            updated_at__gte=timezone.now()
+            - timedelta(hours=24)
+        )
+        .select_related("tenant", "property_obj", "assigned_to")
+    )
 
     sent_count = 0
     for request in maintenance_requests:
@@ -105,11 +108,11 @@ def send_maintenance_updates():
             request_description=request.description,
             priority=request.priority,
             status=request.status,
-            requested_date=request.requested_date.strftime('%B %d, %Y'),
-            scheduled_date=request.scheduled_date.strftime('%B %d, %Y') if request.scheduled_date else None,
+            requested_date=request.requested_date.strftime("%B %d, %Y"),
+            scheduled_date=request.scheduled_date.strftime("%B %d, %Y") if request.scheduled_date else None,
             estimated_cost=str(request.estimated_cost) if request.estimated_cost else None,
             actual_cost=str(request.actual_cost) if request.actual_cost else None,
-            notes=request.notes
+            notes=request.notes,
         )
 
         if success:
@@ -117,23 +120,23 @@ def send_maintenance_updates():
 
             # Create in-app notification
             status_messages = {
-                'assigned': f'Your maintenance request "{request.title}" has been assigned and scheduled.',
-                'in_progress': f'Work has begun on your maintenance request "{request.title}".',
-                'completed': f'Your maintenance request "{request.title}" has been completed.'
+                "assigned": f'Your maintenance request "{request.title}" has been assigned and scheduled.',
+                "in_progress": f'Work has begun on your maintenance request "{request.title}".',
+                "completed": f'Your maintenance request "{request.title}" has been completed.',
             }
 
             Notification.objects.create(
                 user=tenant,
-                notification_type='maintenance',
-                title='Maintenance Request Update',
+                notification_type="maintenance",
+                title="Maintenance Request Update",
                 message=status_messages.get(request.status, f'Update on maintenance request "{request.title}"'),
                 priority=request.priority,
-                related_model='maintenance',
+                related_model="maintenance",
                 related_id=request.id,
-                action_url=f'/maintenance/{request.id}'
+                action_url=f"/maintenance/{request.id}",
             )
 
-    logger.info(f'Sent {sent_count} maintenance updates')
+    logger.info(f"Sent {sent_count} maintenance updates")
     return sent_count
 
 
@@ -144,10 +147,9 @@ def send_lease_expiration_reminders():
     reminder_date = today + timedelta(days=settings.NOTIFICATION_DAYS_BEFORE_LEASE_END)
 
     # Get leases expiring in the notification window
-    expiring_leases = Lease.objects.filter(
-        lease_end_date=reminder_date,
-        status='active'
-    ).select_related('tenant', 'property_obj')
+    expiring_leases = Lease.objects.filter(lease_end_date=reminder_date, status="active").select_related(
+        "tenant", "property_obj"
+    )
 
     sent_count = 0
     for lease in expiring_leases:
@@ -170,11 +172,11 @@ def send_lease_expiration_reminders():
             tenant_email=tenant.email,
             tenant_name=tenant.full_name,
             property_name=lease.property_obj.property_name,
-            lease_start_date=lease.lease_start_date.strftime('%B %d, %Y'),
-            lease_end_date=lease.lease_end_date.strftime('%B %d, %Y'),
+            lease_start_date=lease.lease_start_date.strftime("%B %d, %Y"),
+            lease_end_date=lease.lease_end_date.strftime("%B %d, %Y"),
             monthly_rent=str(lease.monthly_rent),
             days_remaining=days_remaining,
-            auto_renew=lease.auto_renew
+            auto_renew=lease.auto_renew,
         )
 
         if success:
@@ -183,16 +185,16 @@ def send_lease_expiration_reminders():
             # Create in-app notification
             Notification.objects.create(
                 user=tenant,
-                notification_type='lease',
-                title='Lease Expiration Notice',
+                notification_type="lease",
+                title="Lease Expiration Notice",
                 message=f'Your lease for {lease.property_obj.property_name} expires in {days_remaining} days on {lease.lease_end_date.strftime("%B %d, %Y")}.',
-                priority='high' if days_remaining <= 30 else 'medium',
-                related_model='lease',
+                priority="high" if days_remaining <= 30 else "medium",
+                related_model="lease",
                 related_id=lease.id,
-                action_url=f'/leases/{lease.id}'
+                action_url=f"/leases/{lease.id}",
             )
 
-    logger.info(f'Sent {sent_count} lease expiration reminders')
+    logger.info(f"Sent {sent_count} lease expiration reminders")
     return sent_count
 
 
@@ -202,10 +204,9 @@ def send_overdue_payment_alerts():
     today = timezone.now().date()
 
     # Get overdue payments
-    overdue_payments = RentPayment.objects.filter(
-        due_date__lt=today,
-        status__in=['pending', 'overdue']
-    ).select_related('lease_obj', 'lease_obj__tenant', 'lease_obj__property_obj')
+    overdue_payments = RentPayment.objects.filter(due_date__lt=today, status__in=["pending", "overdue"]).select_related(
+        "lease_obj", "lease_obj__tenant", "lease_obj__property_obj"
+    )
 
     sent_count = 0
     for payment in overdue_payments:
@@ -216,9 +217,9 @@ def send_overdue_payment_alerts():
         # Only send if we haven't sent an alert in the last 7 days
         recent_alert = Notification.objects.filter(
             user=tenant,
-            notification_type='payment',
-            title__icontains='overdue',
-            created_at__gte=timezone.now() - timedelta(days=7)
+            notification_type="payment",
+            title__icontains="overdue",
+            created_at__gte=timezone.now() - timedelta(days=7),
         ).exists()
 
         if recent_alert:
@@ -238,8 +239,8 @@ def send_overdue_payment_alerts():
             tenant_name=tenant.full_name,
             property_name=payment.lease_obj.property_obj.property_name,
             amount=str(payment.total_amount),
-            due_date=payment.due_date.strftime('%B %d, %Y'),
-            lease_period=f"{payment.lease_obj.lease_start_date.strftime('%B %Y')} - {payment.lease_obj.lease_end_date.strftime('%B %Y')}"
+            due_date=payment.due_date.strftime("%B %d, %Y"),
+            lease_period=f"{payment.lease_obj.lease_start_date.strftime('%B %Y')} - {payment.lease_obj.lease_end_date.strftime('%B %Y')}",
         )
 
         if success:
@@ -249,16 +250,16 @@ def send_overdue_payment_alerts():
             days_overdue = (today - payment.due_date).days
             Notification.objects.create(
                 user=tenant,
-                notification_type='payment',
-                title='Payment Overdue',
+                notification_type="payment",
+                title="Payment Overdue",
                 message=f'Your rent payment of ${payment.total_amount} for {payment.lease_obj.property_obj.property_name} was due on {payment.due_date.strftime("%B %d, %Y")} and is {days_overdue} days overdue.',
-                priority='urgent',
-                related_model='payment',
+                priority="urgent",
+                related_model="payment",
                 related_id=payment.id,
-                action_url=f'/payments/{payment.id}'
+                action_url=f"/payments/{payment.id}",
             )
 
-    logger.info(f'Sent {sent_count} overdue payment alerts')
+    logger.info(f"Sent {sent_count} overdue payment alerts")
     return sent_count
 
 
@@ -269,49 +270,44 @@ def send_admin_summary_report():
     yesterday = today - timedelta(days=1)
 
     # Get admin users
-    admin_users = NotificationPreference.objects.filter(
-        user__user_type='admin',
-        email_enabled=True
-    ).select_related('user')
+    admin_users = NotificationPreference.objects.filter(user__user_type="admin", email_enabled=True).select_related(
+        "user"
+    )
 
     if not admin_users.exists():
         return 0
 
     # Collect summary data
     summary_data = {
-        'date': yesterday.strftime('%B %d, %Y'),
-        'total_properties': 0,
-        'active_leases': 0,
-        'pending_maintenance': 0,
-        'overdue_payments': 0,
-        'total_collections': 0,
-        'new_tenants': 0,
-        'expiring_leases': 0
+        "date": yesterday.strftime("%B %d, %Y"),
+        "total_properties": 0,
+        "active_leases": 0,
+        "pending_maintenance": 0,
+        "overdue_payments": 0,
+        "total_collections": 0,
+        "new_tenants": 0,
+        "expiring_leases": 0,
     }
 
     # Get summary stats (simplified version - would need proper aggregation)
-    from properties.models import Property
     from leases.models import Lease
     from maintenance.models import MaintenanceRequest
     from payments.models import RentPayment
+    from properties.models import Property
     from tenants.models import Tenant
 
-    summary_data['total_properties'] = Property.objects.count()
-    summary_data['active_leases'] = Lease.objects.filter(status='active').count()
-    summary_data['pending_maintenance'] = MaintenanceRequest.objects.filter(status__in=['open', 'assigned']).count()
-    summary_data['overdue_payments'] = RentPayment.objects.filter(status='overdue').count()
-    summary_data['new_tenants'] = Tenant.objects.filter(created_at__date=yesterday).count()
-    summary_data['expiring_leases'] = Lease.objects.filter(
-        lease_end_date__lte=today + timedelta(days=30),
-        status='active'
+    summary_data["total_properties"] = Property.objects.count()
+    summary_data["active_leases"] = Lease.objects.filter(status="active").count()
+    summary_data["pending_maintenance"] = MaintenanceRequest.objects.filter(status__in=["open", "assigned"]).count()
+    summary_data["overdue_payments"] = RentPayment.objects.filter(status="overdue").count()
+    summary_data["new_tenants"] = Tenant.objects.filter(created_at__date=yesterday).count()
+    summary_data["expiring_leases"] = Lease.objects.filter(
+        lease_end_date__lte=today + timedelta(days=30), status="active"
     ).count()
 
     # Get yesterday's collections
-    yesterday_payments = RentPayment.objects.filter(
-        payment_date=yesterday,
-        status='paid'
-    )
-    summary_data['total_collections'] = sum(float(p.amount) for p in yesterday_payments)
+    yesterday_payments = RentPayment.objects.filter(payment_date=yesterday, status="paid")
+    summary_data["total_collections"] = sum(float(p.amount) for p in yesterday_payments)
 
     # Send email to admins
     admin_emails = [admin.user.email for admin in admin_users]
@@ -336,14 +332,10 @@ Daily Property Management Summary - {yesterday.strftime('%B %d, %Y')}
 This report was generated automatically by the Property Management System.
 """
 
-    success = EmailService.send_system_notification(
-        recipient_emails=admin_emails,
-        subject=subject,
-        message=message
-    )
+    success = EmailService.send_system_notification(recipient_emails=admin_emails, subject=subject, message=message)
 
     if success:
-        logger.info(f'Daily summary report sent to {len(admin_emails)} administrators')
+        logger.info(f"Daily summary report sent to {len(admin_emails)} administrators")
         return len(admin_emails)
 
     return 0

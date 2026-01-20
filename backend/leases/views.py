@@ -1,22 +1,21 @@
-from django.utils import timezone
 import django_filters
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
 
 from .models import Lease
 from .serializers import LeaseSerializer
 
 
 class LeaseFilter(django_filters.FilterSet):
-    property = django_filters.NumberFilter(field_name='property_obj', lookup_expr='exact')
-    tenant_id = django_filters.NumberFilter(field_name='tenant', lookup_expr='exact')
+    property = django_filters.NumberFilter(field_name="property_obj", lookup_expr="exact")
+    tenant_id = django_filters.NumberFilter(field_name="tenant", lookup_expr="exact")
 
     class Meta:
         model = Lease
-        fields = ['status', 'property', 'tenant_id']
+        fields = ["status", "property", "tenant_id"]
 
 
 class LeaseViewSet(viewsets.ModelViewSet):

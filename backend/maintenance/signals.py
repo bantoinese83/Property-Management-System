@@ -1,7 +1,10 @@
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from .models import MaintenanceRequest
+
 from core.notifications import notify_maintenance_request, notify_maintenance_status_change
+
+from .models import MaintenanceRequest
+
 
 @receiver(post_save, sender=MaintenanceRequest)
 def maintenance_request_notification(sender, instance, created, **kwargs):
@@ -10,8 +13,9 @@ def maintenance_request_notification(sender, instance, created, **kwargs):
     """
     if created:
         notify_maintenance_request(instance)
-    elif hasattr(instance, '_previous_status') and instance.status != instance._previous_status:
+    elif hasattr(instance, "_previous_status") and instance.status != instance._previous_status:
         notify_maintenance_status_change(instance)
+
 
 @receiver(pre_save, sender=MaintenanceRequest)
 def track_maintenance_status(sender, instance, **kwargs):

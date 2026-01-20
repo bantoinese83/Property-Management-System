@@ -1,7 +1,10 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Lease
+
 from core.notifications import notify_lease_created
+
+from .models import Lease
+
 
 @receiver(post_save, sender=Lease)
 def lease_created_notification(sender, instance, created, **kwargs):

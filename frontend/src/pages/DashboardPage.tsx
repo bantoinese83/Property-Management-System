@@ -18,7 +18,7 @@ import {
   TrendingDown,
   Wrench,
   Users,
-  Activity
+  Activity,
 } from 'lucide-react'
 
 interface DashboardAnalytics {
@@ -80,13 +80,23 @@ const DashboardPage: React.FC = () => {
     }
   }>(`${API_ENDPOINTS.ACCOUNTING.TRANSACTIONS.LIST}summary/`)
 
-  const { data: overduePayments } = useApi<{ results: any[] }>(
-    `${API_ENDPOINTS.PAYMENTS.LIST}overdue/`
-  )
+  const { data: overduePayments } = useApi<{
+    results: Array<{
+      id: number
+      tenant_name: string
+      amount: string
+      days_overdue: number
+    }>
+  }>(`${API_ENDPOINTS.PAYMENTS.LIST}overdue/`)
 
-  const { data: pendingMaintenance } = useApi<{ results: any[] }>(
-    `${API_ENDPOINTS.MAINTENANCE.LIST}?status=open&priority=urgent`
-  )
+  const { data: pendingMaintenance } = useApi<{
+    results: Array<{
+      id: number
+      property_name: string
+      title: string
+      priority: string
+    }>
+  }>(`${API_ENDPOINTS.MAINTENANCE.LIST}?status=open&priority=urgent`)
 
   if (loading) {
     return (
@@ -192,7 +202,8 @@ const DashboardPage: React.FC = () => {
         <SiteHeader />
         <div className='flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6'>
           {/* Alerts Section */}
-          {((overduePayments?.results?.length ?? 0) > 0 || (pendingMaintenance?.results?.length ?? 0) > 0) && (
+          {((overduePayments?.results?.length ?? 0) > 0 ||
+            (pendingMaintenance?.results?.length ?? 0) > 0) && (
             <div className='rounded-lg border border-amber-200 bg-amber-50 p-4'>
               <div className='flex items-start gap-3'>
                 <AlertTriangle className='h-5 w-5 text-amber-600 mt-0.5' />
@@ -201,12 +212,14 @@ const DashboardPage: React.FC = () => {
                   <div className='mt-2 space-y-1'>
                     {(overduePayments?.results?.length ?? 0) > 0 && (
                       <p className='text-sm text-amber-700'>
-                        {overduePayments?.results?.length ?? 0} overdue payment{(overduePayments?.results?.length ?? 0) !== 1 ? 's' : ''}
+                        {overduePayments?.results?.length ?? 0} overdue payment
+                        {(overduePayments?.results?.length ?? 0) !== 1 ? 's' : ''}
                       </p>
                     )}
                     {(pendingMaintenance?.results?.length ?? 0) > 0 && (
                       <p className='text-sm text-amber-700'>
-                        {pendingMaintenance?.results?.length ?? 0} urgent maintenance request{(pendingMaintenance?.results?.length ?? 0) !== 1 ? 's' : ''}
+                        {pendingMaintenance?.results?.length ?? 0} urgent maintenance request
+                        {(pendingMaintenance?.results?.length ?? 0) !== 1 ? 's' : ''}
                       </p>
                     )}
                   </div>
@@ -221,12 +234,17 @@ const DashboardPage: React.FC = () => {
             <div className='rounded-lg border bg-card p-4 sm:p-6 shadow-sm'>
               <div className='flex items-center justify-between'>
                 <div className='flex-1 min-w-0'>
-                  <p className='text-sm font-medium text-muted-foreground truncate'>Total Properties</p>
+                  <p className='text-sm font-medium text-muted-foreground truncate'>
+                    Total Properties
+                  </p>
                   <p className='text-2xl sm:text-3xl font-bold tabular-nums mt-1'>
                     {summary.total_properties}
                   </p>
                   <div className='mt-2 flex items-center gap-1'>
-                    <Badge variant={summary.total_properties > 0 ? 'success' : 'default'} className='text-xs'>
+                    <Badge
+                      variant={summary.total_properties > 0 ? 'success' : 'default'}
+                      className='text-xs'
+                    >
                       {summary.total_properties > 0 ? 'Active' : 'No Properties'}
                     </Badge>
                   </div>
@@ -241,7 +259,9 @@ const DashboardPage: React.FC = () => {
             <div className='rounded-lg border bg-card p-4 sm:p-6 shadow-sm'>
               <div className='flex items-center justify-between'>
                 <div className='flex-1 min-w-0'>
-                  <p className='text-sm font-medium text-muted-foreground truncate'>Occupancy Rate</p>
+                  <p className='text-sm font-medium text-muted-foreground truncate'>
+                    Occupancy Rate
+                  </p>
                   <p className='text-2xl sm:text-3xl font-bold tabular-nums mt-1'>
                     {formatPercent(summary.average_occupancy)}
                   </p>
@@ -254,8 +274,11 @@ const DashboardPage: React.FC = () => {
                       <TrendingDown className='h-3 w-3 text-red-600' />
                     )}
                     <span className='text-xs text-muted-foreground'>
-                      {summary.average_occupancy >= 90 ? 'Excellent' :
-                       summary.average_occupancy >= 70 ? 'Good' : 'Needs Attention'}
+                      {summary.average_occupancy >= 90
+                        ? 'Excellent'
+                        : summary.average_occupancy >= 70
+                          ? 'Good'
+                          : 'Needs Attention'}
                     </span>
                   </div>
                 </div>
@@ -269,7 +292,9 @@ const DashboardPage: React.FC = () => {
             <div className='rounded-lg border bg-card p-4 sm:p-6 shadow-sm'>
               <div className='flex items-center justify-between'>
                 <div className='flex-1 min-w-0'>
-                  <p className='text-sm font-medium text-muted-foreground truncate'>Monthly Revenue</p>
+                  <p className='text-sm font-medium text-muted-foreground truncate'>
+                    Monthly Revenue
+                  </p>
                   <p className='text-xl sm:text-2xl lg:text-3xl font-bold tabular-nums mt-1'>
                     {formatCurrency(summary.total_monthly_income)}
                   </p>
@@ -289,7 +314,9 @@ const DashboardPage: React.FC = () => {
             <div className='rounded-lg border bg-card p-4 sm:p-6 shadow-sm'>
               <div className='flex items-center justify-between'>
                 <div className='flex-1 min-w-0'>
-                  <p className='text-sm font-medium text-muted-foreground truncate'>Active Leases</p>
+                  <p className='text-sm font-medium text-muted-foreground truncate'>
+                    Active Leases
+                  </p>
                   <p className='text-2xl sm:text-3xl font-bold tabular-nums mt-1'>
                     {summary.active_leases}
                   </p>
@@ -317,13 +344,19 @@ const DashboardPage: React.FC = () => {
             <div className='rounded-lg border bg-card p-3 sm:p-6 shadow-sm'>
               <div className='flex items-center justify-between'>
                 <div className='flex-1 min-w-0'>
-                  <p className='text-xs sm:text-sm font-medium text-muted-foreground truncate'>Total Units</p>
+                  <p className='text-xs sm:text-sm font-medium text-muted-foreground truncate'>
+                    Total Units
+                  </p>
                   <p className='text-lg sm:text-xl font-bold tabular-nums mt-1'>
                     {summary.total_units}
                   </p>
                   <div className='mt-1 text-xs text-muted-foreground'>
-                    <span className='hidden sm:inline'>{summary.occupied_units} occupied • {summary.vacant_units} vacant</span>
-                    <span className='sm:hidden'>{summary.occupied_units}/{summary.vacant_units}</span>
+                    <span className='hidden sm:inline'>
+                      {summary.occupied_units} occupied • {summary.vacant_units} vacant
+                    </span>
+                    <span className='sm:hidden'>
+                      {summary.occupied_units}/{summary.vacant_units}
+                    </span>
                   </div>
                 </div>
                 <div className='flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-blue-100 ml-2 flex-shrink-0'>
@@ -336,7 +369,9 @@ const DashboardPage: React.FC = () => {
             <div className='rounded-lg border bg-card p-3 sm:p-6 shadow-sm'>
               <div className='flex items-center justify-between'>
                 <div className='flex-1 min-w-0'>
-                  <p className='text-xs sm:text-sm font-medium text-muted-foreground truncate'>Outstanding</p>
+                  <p className='text-xs sm:text-sm font-medium text-muted-foreground truncate'>
+                    Outstanding
+                  </p>
                   <p className='text-base sm:text-lg font-bold tabular-nums mt-1'>
                     {formatCurrency(summary.total_outstanding)}
                   </p>
@@ -361,7 +396,9 @@ const DashboardPage: React.FC = () => {
             <div className='rounded-lg border bg-card p-3 sm:p-6 shadow-sm'>
               <div className='flex items-center justify-between'>
                 <div className='flex-1 min-w-0'>
-                  <p className='text-xs sm:text-sm font-medium text-muted-foreground truncate'>Maintenance</p>
+                  <p className='text-xs sm:text-sm font-medium text-muted-foreground truncate'>
+                    Maintenance
+                  </p>
                   <p className='text-lg sm:text-xl font-bold tabular-nums mt-1'>
                     {summary.open_maintenance}
                   </p>
@@ -386,23 +423,29 @@ const DashboardPage: React.FC = () => {
             <div className='rounded-lg border bg-card p-3 sm:p-6 shadow-sm'>
               <div className='flex items-center justify-between'>
                 <div className='flex-1 min-w-0'>
-                  <p className='text-xs sm:text-sm font-medium text-muted-foreground truncate'>Net Profit</p>
-                  <p className={`text-base sm:text-lg font-bold tabular-nums mt-1 ${
-                    accountingSummary && parseFloat(accountingSummary.summary.net_income) >= 0
-                      ? 'text-green-600'
-                      : 'text-red-600'
-                  }`}>
-                    {accountingSummary ? formatCurrency(accountingSummary.summary.net_income) : '$0.00'}
+                  <p className='text-xs sm:text-sm font-medium text-muted-foreground truncate'>
+                    Net Profit
                   </p>
-                  <div className='mt-1 text-xs text-muted-foreground truncate'>
-                    This month
-                  </div>
+                  <p
+                    className={`text-base sm:text-lg font-bold tabular-nums mt-1 ${
+                      accountingSummary && parseFloat(accountingSummary.summary.net_income) >= 0
+                        ? 'text-green-600'
+                        : 'text-red-600'
+                    }`}
+                  >
+                    {accountingSummary
+                      ? formatCurrency(accountingSummary.summary.net_income)
+                      : '$0.00'}
+                  </p>
+                  <div className='mt-1 text-xs text-muted-foreground truncate'>This month</div>
                 </div>
-                <div className={`flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg ml-2 flex-shrink-0 ${
-                  accountingSummary && parseFloat(accountingSummary.summary.net_income) >= 0
-                    ? 'bg-green-100'
-                    : 'bg-red-100'
-                }`}>
+                <div
+                  className={`flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg ml-2 flex-shrink-0 ${
+                    accountingSummary && parseFloat(accountingSummary.summary.net_income) >= 0
+                      ? 'bg-green-100'
+                      : 'bg-red-100'
+                  }`}
+                >
                   {accountingSummary && parseFloat(accountingSummary.summary.net_income) >= 0 ? (
                     <TrendingUp className='h-3 w-3 sm:h-4 sm:w-4 text-green-600' />
                   ) : (
@@ -447,7 +490,9 @@ const DashboardPage: React.FC = () => {
                   <div>
                     <p className='text-sm font-medium text-muted-foreground'>Total Income</p>
                     <p className='text-lg font-semibold text-green-600'>
-                      {accountingSummary ? formatCurrency(accountingSummary.summary.total_income) : '$0.00'}
+                      {accountingSummary
+                        ? formatCurrency(accountingSummary.summary.total_income)
+                        : '$0.00'}
                     </p>
                   </div>
                   <TrendingUp className='h-5 w-5 text-green-600' />
@@ -457,7 +502,9 @@ const DashboardPage: React.FC = () => {
                   <div>
                     <p className='text-sm font-medium text-muted-foreground'>Total Expenses</p>
                     <p className='text-lg font-semibold text-red-600'>
-                      {accountingSummary ? formatCurrency(accountingSummary.summary.total_expenses) : '$0.00'}
+                      {accountingSummary
+                        ? formatCurrency(accountingSummary.summary.total_expenses)
+                        : '$0.00'}
                     </p>
                   </div>
                   <TrendingDown className='h-5 w-5 text-red-600' />
@@ -466,12 +513,16 @@ const DashboardPage: React.FC = () => {
                 <div className='pt-2 border-t'>
                   <div className='flex items-center justify-between'>
                     <p className='text-sm font-medium'>Net Profit</p>
-                    <p className={`text-lg font-bold ${
-                      accountingSummary && parseFloat(accountingSummary.summary.net_income) >= 0
-                        ? 'text-green-600'
-                        : 'text-red-600'
-                    }`}>
-                      {accountingSummary ? formatCurrency(accountingSummary.summary.net_income) : '$0.00'}
+                    <p
+                      className={`text-lg font-bold ${
+                        accountingSummary && parseFloat(accountingSummary.summary.net_income) >= 0
+                          ? 'text-green-600'
+                          : 'text-red-600'
+                      }`}
+                    >
+                      {accountingSummary
+                        ? formatCurrency(accountingSummary.summary.net_income)
+                        : '$0.00'}
                     </p>
                   </div>
                 </div>
@@ -495,9 +546,11 @@ const DashboardPage: React.FC = () => {
               <div className='space-y-3'>
                 {data.recent_activity.slice(0, 5).map((activity, index) => (
                   <div key={index} className='flex items-start gap-3 p-3 rounded-lg bg-muted/50'>
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                      activity.type === 'payment' ? 'bg-green-100' : 'bg-orange-100'
-                    }`}>
+                    <div
+                      className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                        activity.type === 'payment' ? 'bg-green-100' : 'bg-orange-100'
+                      }`}
+                    >
                       {activity.type === 'payment' ? (
                         <DollarSign className='h-4 w-4 text-green-600' />
                       ) : (
@@ -516,10 +569,16 @@ const DashboardPage: React.FC = () => {
                           </span>
                         )}
                         {activity.priority && (
-                          <Badge variant={
-                            activity.priority === 'urgent' ? 'danger' :
-                            activity.priority === 'high' ? 'warning' : 'default'
-                          } className='text-xs'>
+                          <Badge
+                            variant={
+                              activity.priority === 'urgent'
+                                ? 'danger'
+                                : activity.priority === 'high'
+                                  ? 'warning'
+                                  : 'default'
+                            }
+                            className='text-xs'
+                          >
                             {activity.priority}
                           </Badge>
                         )}
@@ -543,9 +602,13 @@ const DashboardPage: React.FC = () => {
               </div>
               <div className='space-y-4'>
                 {Object.entries(charts.property_types).map(([type, data]) => {
-                  const occupancyRate = data.total_units > 0 ? (data.occupied_units / data.total_units) * 100 : 0
+                  const occupancyRate =
+                    data.total_units > 0 ? (data.occupied_units / data.total_units) * 100 : 0
                   return (
-                    <div key={type} className='flex items-center justify-between p-4 rounded-lg border'>
+                    <div
+                      key={type}
+                      className='flex items-center justify-between p-4 rounded-lg border'
+                    >
                       <div className='flex-1'>
                         <div className='flex items-center gap-3'>
                           <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
@@ -554,7 +617,8 @@ const DashboardPage: React.FC = () => {
                           <div>
                             <p className='font-medium'>{type}</p>
                             <p className='text-sm text-muted-foreground'>
-                              {data.count} propert{data.count !== 1 ? 'ies' : 'y'} • {data.total_units} units
+                              {data.count} propert{data.count !== 1 ? 'ies' : 'y'} •{' '}
+                              {data.total_units} units
                             </p>
                           </div>
                         </div>
@@ -575,9 +639,7 @@ const DashboardPage: React.FC = () => {
             <div className='rounded-lg border bg-card p-6 shadow-sm'>
               <div className='mb-4'>
                 <h3 className='text-lg font-semibold'>Quick Actions</h3>
-                <p className='text-sm text-muted-foreground'>
-                  Common tasks and shortcuts
-                </p>
+                <p className='text-sm text-muted-foreground'>Common tasks and shortcuts</p>
               </div>
               <div className='space-y-3'>
                 <a
@@ -650,9 +712,11 @@ const DashboardPage: React.FC = () => {
                 </div>
                 <p className='text-sm text-muted-foreground'>Average Occupancy Rate</p>
                 <div className='mt-2 text-xs'>
-                  {summary.average_occupancy >= 90 ? '🏆 Excellent performance' :
-                   summary.average_occupancy >= 80 ? '✅ Good performance' :
-                   '⚠️ Needs improvement'}
+                  {summary.average_occupancy >= 90
+                    ? '🏆 Excellent performance'
+                    : summary.average_occupancy >= 80
+                      ? '✅ Good performance'
+                      : '⚠️ Needs improvement'}
                 </div>
               </div>
 
@@ -662,9 +726,9 @@ const DashboardPage: React.FC = () => {
                 </div>
                 <p className='text-sm text-muted-foreground'>Active Leases</p>
                 <div className='mt-2 text-xs'>
-                  {summary.expiring_leases > 0 ?
-                    `⚠️ ${summary.expiring_leases} expiring soon` :
-                    '✅ All leases current'}
+                  {summary.expiring_leases > 0
+                    ? `⚠️ ${summary.expiring_leases} expiring soon`
+                    : '✅ All leases current'}
                 </div>
               </div>
 
@@ -674,9 +738,11 @@ const DashboardPage: React.FC = () => {
                 </div>
                 <p className='text-sm text-muted-foreground'>Properties Managed</p>
                 <div className='mt-2 text-xs'>
-                  {summary.total_properties > 5 ? '🏢 Large portfolio' :
-                   summary.total_properties > 2 ? '🏠 Growing portfolio' :
-                   '🌱 Starting out'}
+                  {summary.total_properties > 5
+                    ? '🏢 Large portfolio'
+                    : summary.total_properties > 2
+                      ? '🏠 Growing portfolio'
+                      : '🌱 Starting out'}
                 </div>
               </div>
             </div>

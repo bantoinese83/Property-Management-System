@@ -50,9 +50,7 @@ class UserProfile(models.Model):
     bio = models.TextField(blank=True)
     company_name = models.CharField(max_length=255, blank=True)
     website = models.URLField(blank=True, validators=[URLValidator()])
-    notification_preferences = models.JSONField(
-        default=dict, help_text="User's notification preferences"
-    )
+    notification_preferences = models.JSONField(default=dict, help_text="User's notification preferences")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -65,26 +63,26 @@ class Notification(models.Model):
     """User notifications"""
 
     NOTIFICATION_TYPES = (
-        ('system', 'System Notification'),
-        ('payment', 'Payment Notification'),
-        ('maintenance', 'Maintenance Notification'),
-        ('lease', 'Lease Notification'),
-        ('property', 'Property Notification'),
-        ('tenant', 'Tenant Notification'),
+        ("system", "System Notification"),
+        ("payment", "Payment Notification"),
+        ("maintenance", "Maintenance Notification"),
+        ("lease", "Lease Notification"),
+        ("property", "Property Notification"),
+        ("tenant", "Tenant Notification"),
     )
 
     PRIORITY_CHOICES = (
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
-        ('urgent', 'Urgent'),
+        ("low", "Low"),
+        ("medium", "Medium"),
+        ("high", "High"),
+        ("urgent", "Urgent"),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
     notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
     title = models.CharField(max_length=255)
     message = models.TextField()
-    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default="medium")
 
     # Related objects (optional)
     related_model = models.CharField(max_length=100, blank=True)  # e.g., 'property', 'lease', 'maintenance'
@@ -103,11 +101,11 @@ class Notification(models.Model):
     sent_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=['user', 'is_read']),
-            models.Index(fields=['user', 'notification_type']),
-            models.Index(fields=['created_at']),
+            models.Index(fields=["user", "is_read"]),
+            models.Index(fields=["user", "notification_type"]),
+            models.Index(fields=["created_at"]),
         ]
 
     def __str__(self):
@@ -116,18 +114,18 @@ class Notification(models.Model):
     def mark_as_read(self):
         """Mark notification as read"""
         self.is_read = True
-        self.save(update_fields=['is_read', 'updated_at'])
+        self.save(update_fields=["is_read", "updated_at"])
 
     def archive(self):
         """Archive notification"""
         self.is_archived = True
-        self.save(update_fields=['is_archived', 'updated_at'])
+        self.save(update_fields=["is_archived", "updated_at"])
 
 
 class NotificationPreference(models.Model):
     """User notification preferences"""
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='notification_preferences')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="notification_preferences")
 
     # Email preferences
     email_enabled = models.BooleanField(default=True)
@@ -151,12 +149,16 @@ class NotificationPreference(models.Model):
     push_system_updates = models.BooleanField(default=False)
 
     # Frequency settings
-    digest_frequency = models.CharField(max_length=20, choices=[
-        ('immediate', 'Immediate'),
-        ('daily', 'Daily'),
-        ('weekly', 'Weekly'),
-        ('never', 'Never'),
-    ], default='immediate')
+    digest_frequency = models.CharField(
+        max_length=20,
+        choices=[
+            ("immediate", "Immediate"),
+            ("daily", "Daily"),
+            ("weekly", "Weekly"),
+            ("never", "Never"),
+        ],
+        default="immediate",
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -20,9 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv(
-    "SECRET_KEY", "django-insecure-(ku!)b93j&cy&hm)%b6ssom8_1afnh^y+nyk8$17r&38zz+c0m"
-)
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-(ku!)b93j&cy&hm)%b6ssom8_1afnh^y+nyk8$17r&38zz+c0m")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
@@ -215,15 +213,15 @@ EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@property-mgmt.com")
 
 # Notification settings
-NOTIFICATION_DAYS_BEFORE_DUE = int(os.getenv('NOTIFICATION_DAYS_BEFORE_DUE', 7))
-NOTIFICATION_DAYS_BEFORE_MAINTENANCE = int(os.getenv('NOTIFICATION_DAYS_BEFORE_MAINTENANCE', 3))
-NOTIFICATION_DAYS_BEFORE_LEASE_END = int(os.getenv('NOTIFICATION_DAYS_BEFORE_LEASE_END', 30))
+NOTIFICATION_DAYS_BEFORE_DUE = int(os.getenv("NOTIFICATION_DAYS_BEFORE_DUE", 7))
+NOTIFICATION_DAYS_BEFORE_MAINTENANCE = int(os.getenv("NOTIFICATION_DAYS_BEFORE_MAINTENANCE", 3))
+NOTIFICATION_DAYS_BEFORE_LEASE_END = int(os.getenv("NOTIFICATION_DAYS_BEFORE_LEASE_END", 30))
 
 # Email templates directory
-EMAIL_TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates', 'emails')
+EMAIL_TEMPLATES_DIR = os.path.join(BASE_DIR, "templates", "emails")
 
 # Backup settings
-BACKUP_DIR = os.path.join(BASE_DIR, '..', 'backups')
+BACKUP_DIR = os.path.join(BASE_DIR, "..", "backups")
 BACKUP_MAX_RETRIES = 3
 
 # Celery Configuration

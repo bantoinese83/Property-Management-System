@@ -12,7 +12,7 @@ import { Modal } from '../components/common/Modal'
 import { LoadingSpinner, ErrorMessage } from '../components/common'
 import { Input } from '../components/common/Input'
 import { FileText, Calendar, DollarSign, Plus, Download } from 'lucide-react'
-import { exportToCSV, entityColumns } from '../utils/export'
+import { exportToCSV, entityColumns, type ExportColumn } from '../utils/export'
 import LeaseForm from '../components/leases/LeaseForm'
 
 interface LeasesResponse {
@@ -59,20 +59,20 @@ const LeasesPage: React.FC = () => {
   const handleExportData = () => {
     if (leases.length === 0) {
       toast.error('No data to export', {
-        description: 'There are no leases to export.'
+        description: 'There are no leases to export.',
       })
       return
     }
 
     try {
-      exportToCSV(leases, entityColumns.leases, 'leases')
+      exportToCSV(leases as unknown as Record<string, unknown>[], entityColumns.leases as ExportColumn[], 'leases')
       toast.success('Export successful', {
-        description: 'Leases data has been exported to CSV.'
+        description: 'Leases data has been exported to CSV.',
       })
     } catch (error) {
       console.error('Export failed:', error)
       toast.error('Export failed', {
-        description: 'An error occurred while exporting data.'
+        description: 'An error occurred while exporting data.',
       })
     }
   }

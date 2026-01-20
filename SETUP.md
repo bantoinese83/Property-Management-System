@@ -38,13 +38,22 @@ docker-compose exec backend python manage.py create_demo_data
 ```
 
 ### **4. Access Application**
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:8000/api
-- **Admin Panel**: http://localhost:8000/admin
+- **Frontend**: http://localhost (React app with hot reload)
+- **Backend API**: http://localhost/api (Django REST API)
+- **API Documentation**: http://localhost/api/docs (Swagger/OpenAPI)
+- **Admin Panel**: http://localhost/admin (Django admin interface)
 
 ### **5. Demo Credentials**
-- **Admin**: `admin` / `admin123`
-- **Owner**: `owner` / `owner123`
+- **Admin User**: `admin` / `admin123` (full system access)
+- **Property Owner**: `owner` / `owner123` (property management access)
+
+### **6. Demo Data**
+The demo data includes:
+- **1 Property**: "Downtown Apartment" with sample details
+- **1 Tenant**: "John Doe" with contact information
+- **1 Active Lease**: Current lease agreement with terms
+- **Document Templates**: Pre-built lease and contract templates
+- **Audit Logs**: Sample activity tracking entries
 
 ---
 
@@ -63,17 +72,27 @@ pip install -r requirements.txt
 
 # Setup environment
 cp .env.example .env
-# Edit .env with your database settings
+# Edit .env with your database settings (DATABASE_URL, SECRET_KEY, etc.)
 
-# Setup database
-createdb property_mgmt  # Or use Docker: docker-compose up -d db
+# Setup database (choose one option)
+# Option 1: Local PostgreSQL
+createdb property_mgmt
+# Option 2: Docker PostgreSQL
+docker run -d --name pms-postgres -p 5432:5432 \
+  -e POSTGRES_DB=property_mgmt \
+  -e POSTGRES_USER=property_user \
+  -e POSTGRES_PASSWORD=secure_password \
+  postgres:15-alpine
 
 # Run migrations
 python manage.py migrate
 python manage.py create_demo_data
 
+# Optional: Start Celery worker in another terminal
+celery -A config worker --loglevel=info
+
 # Start development server
-python manage.py runserver
+python manage.py runserver 0.0.0.0:8000
 ```
 
 ### **Frontend Setup**
@@ -87,8 +106,13 @@ npm install
 cp .env.example .env
 # Edit .env with API URL: VITE_API_URL=http://localhost:8000/api
 
-# Start development server
+# Optional: Install additional dev tools
+npm install -g @types/node typescript
+
+# Start development server (with hot reload)
 npm run dev
+
+# Access at: http://localhost:5173
 ```
 
 ---
@@ -120,24 +144,103 @@ git push
 
 ---
 
-## 🐳 **DOCKER COMMANDS**
+## 🐳 **COMPREHENSIVE DOCKER GUIDE**
 
+### **Development Environment**
 ```bash
-# Start development environment
+# Start all services (recommended for development)
 docker-compose up -d
 
-# View logs
-docker-compose logs -f [service-name]
+# Start with Celery background tasks
+docker-compose --profile celery up -d
+
+# View all service logs
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+docker-compose logs -f db
+```
+
+### **Container Management**
+```bash
+# Check service status
+docker-compose ps
+
+# Restart specific service
+docker-compose restart backend
+docker-compose restart frontend
 
 # Rebuild after code changes
+docker-compose up -d --build backend
+docker-compose up -d --build frontend
+
+# Rebuild all services
 docker-compose up -d --build
+```
 
-# Stop all services
-docker-compose down
+### **Database Operations**
+```bash
+# Access database shell
+docker-compose exec db psql -U property_user -d property_mgmt
 
-# Reset database (WARNING: destroys data)
+# Run Django migrations
+docker-compose exec backend python manage.py migrate
+
+# Create/load demo data
+docker-compose exec backend python manage.py create_demo_data
+
+# Reset database (WARNING: destroys all data)
 docker-compose down -v
 docker-compose up -d db
+```
+
+### **Development Workflow**
+```bash
+# Run backend commands
+docker-compose exec backend python manage.py shell
+docker-compose exec backend python manage.py dbshell
+
+# Run frontend commands
+docker-compose exec frontend npm run build
+docker-compose exec frontend npm run lint
+
+# Check system health
+curl http://localhost/health/
+curl http://localhost/api/
+```
+
+### **Production Deployment**
+```bash
+# Build production images
+docker-compose -f docker-compose.prod.yml build
+
+# Deploy to production
+docker-compose -f docker-compose.prod.yml up -d
+
+# Setup SSL certificates
+sudo certbot --nginx -d yourdomain.com
+
+# View production logs
+docker-compose -f docker-compose.prod.yml logs -f
+```
+
+### **Troubleshooting Docker**
+```bash
+# Clear Docker cache and rebuild
+docker system prune -a
+docker-compose build --no-cache
+
+# Fix permission issues
+sudo chown -R $USER:$USER .
+sudo usermod -aG docker $USER
+
+# Check resource usage
+docker stats
+
+# View container resource limits
+docker-compose exec backend python manage.py check
 ```
 
 ---

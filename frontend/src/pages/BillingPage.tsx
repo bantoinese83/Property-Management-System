@@ -156,7 +156,9 @@ const BillingPage: React.FC = () => {
             {tabs.map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as 'overview' | 'plans' | 'payment-methods' | 'invoices')}
+                onClick={() =>
+                  setActiveTab(tab.id as 'overview' | 'plans' | 'payment-methods' | 'invoices')
+                }
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                   activeTab === tab.id
                     ? 'bg-background text-foreground shadow-sm'
@@ -331,69 +333,71 @@ const BillingPage: React.FC = () => {
                   <LoadingSpinner size='lg' />
                 </div>
               ) : (
-                (Array.isArray(plansData) ? plansData : plansData?.results || [])?.map((plan: SubscriptionPlan) => (
-                  <Card
-                    key={plan.id}
-                    className={`relative ${currentSubscription?.plan === plan.id ? 'ring-2 ring-primary' : ''}`}
-                  >
-                    {currentSubscription?.plan === plan.id && (
-                      <div className='absolute -top-3 left-1/2 transform -translate-x-1/2'>
-                        <Badge className='bg-primary text-primary-foreground'>Current Plan</Badge>
-                      </div>
-                    )}
+                (Array.isArray(plansData) ? plansData : plansData?.results || [])?.map(
+                  (plan: SubscriptionPlan) => (
+                    <Card
+                      key={plan.id}
+                      className={`relative ${currentSubscription?.plan === plan.id ? 'ring-2 ring-primary' : ''}`}
+                    >
+                      {currentSubscription?.plan === plan.id && (
+                        <div className='absolute -top-3 left-1/2 transform -translate-x-1/2'>
+                          <Badge className='bg-primary text-primary-foreground'>Current Plan</Badge>
+                        </div>
+                      )}
 
-                    <CardHeader>
-                      <CardTitle>{plan.name}</CardTitle>
-                      <CardDescription>{plan.description}</CardDescription>
-                      <div className='flex items-baseline gap-1'>
-                        <span className='text-3xl font-bold'>{formatCurrency(plan.price)}</span>
-                        <span className='text-sm text-muted-foreground'>/{plan.interval}</span>
-                      </div>
-                    </CardHeader>
+                      <CardHeader>
+                        <CardTitle>{plan.name}</CardTitle>
+                        <CardDescription>{plan.description}</CardDescription>
+                        <div className='flex items-baseline gap-1'>
+                          <span className='text-3xl font-bold'>{formatCurrency(plan.price)}</span>
+                          <span className='text-sm text-muted-foreground'>/{plan.interval}</span>
+                        </div>
+                      </CardHeader>
 
-                    <CardContent className='space-y-4'>
-                      <div className='space-y-2'>
-                        <div className='flex justify-between text-sm'>
-                          <span>Properties</span>
-                          <span>
-                            {plan.max_properties === -1 ? 'Unlimited' : plan.max_properties}
-                          </span>
+                      <CardContent className='space-y-4'>
+                        <div className='space-y-2'>
+                          <div className='flex justify-between text-sm'>
+                            <span>Properties</span>
+                            <span>
+                              {plan.max_properties === -1 ? 'Unlimited' : plan.max_properties}
+                            </span>
+                          </div>
+                          <div className='flex justify-between text-sm'>
+                            <span>Tenants</span>
+                            <span>{plan.max_tenants === -1 ? 'Unlimited' : plan.max_tenants}</span>
+                          </div>
+                          <div className='flex justify-between text-sm'>
+                            <span>Users</span>
+                            <span>{plan.max_users === -1 ? 'Unlimited' : plan.max_users}</span>
+                          </div>
+                          <div className='flex justify-between text-sm'>
+                            <span>Storage</span>
+                            <span>{plan.storage_limit_mb}MB</span>
+                          </div>
                         </div>
-                        <div className='flex justify-between text-sm'>
-                          <span>Tenants</span>
-                          <span>{plan.max_tenants === -1 ? 'Unlimited' : plan.max_tenants}</span>
-                        </div>
-                        <div className='flex justify-between text-sm'>
-                          <span>Users</span>
-                          <span>{plan.max_users === -1 ? 'Unlimited' : plan.max_users}</span>
-                        </div>
-                        <div className='flex justify-between text-sm'>
-                          <span>Storage</span>
-                          <span>{plan.storage_limit_mb}MB</span>
-                        </div>
-                      </div>
 
-                      <Button
-                        className='w-full'
-                        variant={currentSubscription?.plan === plan.id ? 'outline' : 'default'}
-                        disabled={currentSubscription?.plan === plan.id}
-                        onClick={() => {
-                          if (currentSubscription?.plan === plan.id) {
-                            toast.info('This is your current plan', {
-                              description: "You're already subscribed to this plan.",
-                            })
-                          } else {
-                            toast.info('Plan selection coming soon!', {
-                              description: `You will be able to subscribe to the ${plan.name} plan.`,
-                            })
-                          }
-                        }}
-                      >
-                        {currentSubscription?.plan === plan.id ? 'Current Plan' : 'Select Plan'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )) || (
+                        <Button
+                          className='w-full'
+                          variant={currentSubscription?.plan === plan.id ? 'outline' : 'default'}
+                          disabled={currentSubscription?.plan === plan.id}
+                          onClick={() => {
+                            if (currentSubscription?.plan === plan.id) {
+                              toast.info('This is your current plan', {
+                                description: "You're already subscribed to this plan.",
+                              })
+                            } else {
+                              toast.info('Plan selection coming soon!', {
+                                description: `You will be able to subscribe to the ${plan.name} plan.`,
+                              })
+                            }
+                          }}
+                        >
+                          {currentSubscription?.plan === plan.id ? 'Current Plan' : 'Select Plan'}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )
+                ) || (
                   <div className='col-span-full text-center py-8'>
                     <p className='text-muted-foreground'>No plans available at the moment.</p>
                   </div>

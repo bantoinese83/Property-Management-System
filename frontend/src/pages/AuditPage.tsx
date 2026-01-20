@@ -17,7 +17,7 @@ import {
   AlertTriangle,
   Eye,
   EyeOff,
-  Calendar
+  Calendar,
 } from 'lucide-react'
 
 interface AuditLog {
@@ -55,23 +55,35 @@ const AuditPage: React.FC = () => {
 
   const getActionColor = (action: string) => {
     switch (action) {
-      case 'create': return 'bg-green-100 text-green-800'
-      case 'update': return 'bg-blue-100 text-blue-800'
-      case 'delete': return 'bg-red-100 text-red-800'
-      case 'login': return 'bg-purple-100 text-purple-800'
-      case 'logout': return 'bg-gray-100 text-gray-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'create':
+        return 'bg-green-100 text-green-800'
+      case 'update':
+        return 'bg-blue-100 text-blue-800'
+      case 'delete':
+        return 'bg-red-100 text-red-800'
+      case 'login':
+        return 'bg-purple-100 text-purple-800'
+      case 'logout':
+        return 'bg-gray-100 text-gray-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
   const getActionIcon = (action: string) => {
     switch (action) {
-      case 'create': return <Activity className='h-4 w-4' />
-      case 'update': return <Activity className='h-4 w-4' />
-      case 'delete': return <AlertTriangle className='h-4 w-4' />
-      case 'login': return <User className='h-4 w-4' />
-      case 'logout': return <User className='h-4 w-4' />
-      default: return <Activity className='h-4 w-4' />
+      case 'create':
+        return <Activity className='h-4 w-4' />
+      case 'update':
+        return <Activity className='h-4 w-4' />
+      case 'delete':
+        return <AlertTriangle className='h-4 w-4' />
+      case 'login':
+        return <User className='h-4 w-4' />
+      case 'logout':
+        return <User className='h-4 w-4' />
+      default:
+        return <Activity className='h-4 w-4' />
     }
   }
 
@@ -85,10 +97,12 @@ const AuditPage: React.FC = () => {
   if (loading && !logs.length) {
     return (
       <SidebarProvider
-        style={{
-          '--sidebar-width': '280px',
-          '--header-height': '60px',
-        } as React.CSSProperties}
+        style={
+          {
+            '--sidebar-width': '280px',
+            '--header-height': '60px',
+          } as React.CSSProperties
+        }
       >
         <AppSidebar variant='inset' />
         <SidebarInset>
@@ -104,10 +118,12 @@ const AuditPage: React.FC = () => {
   if (error) {
     return (
       <SidebarProvider
-        style={{
-          '--sidebar-width': '280px',
-          '--header-height': '60px',
-        } as React.CSSProperties}
+        style={
+          {
+            '--sidebar-width': '280px',
+            '--header-height': '60px',
+          } as React.CSSProperties
+        }
       >
         <AppSidebar variant='inset' />
         <SidebarInset>
@@ -122,10 +138,12 @@ const AuditPage: React.FC = () => {
 
   return (
     <SidebarProvider
-      style={{
-        '--sidebar-width': '280px',
-        '--header-height': '60px',
-      } as React.CSSProperties}
+      style={
+        {
+          '--sidebar-width': '280px',
+          '--header-height': '60px',
+        } as React.CSSProperties
+      }
     >
       <AppSidebar variant='inset' />
       <SidebarInset>
@@ -140,11 +158,12 @@ const AuditPage: React.FC = () => {
               </p>
             </div>
             <div className='flex gap-2'>
-              <Button
-                variant='outline'
-                onClick={() => setShowSensitive(!showSensitive)}
-              >
-                {showSensitive ? <EyeOff className='h-4 w-4 mr-2' /> : <Eye className='h-4 w-4 mr-2' />}
+              <Button variant='outline' onClick={() => setShowSensitive(!showSensitive)}>
+                {showSensitive ? (
+                  <EyeOff className='h-4 w-4 mr-2' />
+                ) : (
+                  <Eye className='h-4 w-4 mr-2' />
+                )}
                 {showSensitive ? 'Hide Sensitive' : 'Show Sensitive'}
               </Button>
               <Button variant='outline'>
@@ -165,7 +184,7 @@ const AuditPage: React.FC = () => {
                     <Input
                       placeholder='Search by username, action, or description...'
                       value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onChange={e => setSearchTerm(e.target.value)}
                       className='pl-10'
                     />
                   </div>
@@ -175,7 +194,7 @@ const AuditPage: React.FC = () => {
                   <label className='text-sm font-medium mb-2 block'>Action</label>
                   <select
                     value={actionFilter}
-                    onChange={(e) => setActionFilter(e.target.value)}
+                    onChange={e => setActionFilter(e.target.value)}
                     className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                   >
                     <option value=''>All Actions</option>
@@ -192,7 +211,7 @@ const AuditPage: React.FC = () => {
                   <Input
                     type='date'
                     value={dateFilter}
-                    onChange={(e) => setDateFilter(e.target.value)}
+                    onChange={e => setDateFilter(e.target.value)}
                   />
                 </div>
               </div>
@@ -219,9 +238,12 @@ const AuditPage: React.FC = () => {
                   <div>
                     <p className='text-sm font-medium text-muted-foreground'>Today</p>
                     <p className='text-2xl font-bold'>
-                      {filteredLogs.filter(log =>
-                        new Date(log.timestamp).toDateString() === new Date().toDateString()
-                      ).length}
+                      {
+                        filteredLogs.filter(
+                          log =>
+                            new Date(log.timestamp).toDateString() === new Date().toDateString()
+                        ).length
+                      }
                     </p>
                   </div>
                   <Calendar className='h-8 w-8 text-muted-foreground' />
@@ -269,7 +291,7 @@ const AuditPage: React.FC = () => {
             <CardContent>
               {filteredLogs.length > 0 ? (
                 <div className='space-y-4'>
-                  {filteredLogs.map((log) => (
+                  {filteredLogs.map(log => (
                     <div
                       key={log.id}
                       className={`flex items-start gap-4 p-4 rounded-lg border ${
@@ -299,7 +321,9 @@ const AuditPage: React.FC = () => {
 
                         <div className='flex items-center gap-4 text-xs text-muted-foreground'>
                           <span>{formatTimestamp(log.timestamp)}</span>
-                          <span>{log.app_label}.{log.model_name}</span>
+                          <span>
+                            {log.app_label}.{log.model_name}
+                          </span>
                           {log.ip_address && <span>IP: {log.ip_address}</span>}
                           {log.changed_fields.length > 0 && (
                             <span>Changed: {log.changed_fields.join(', ')}</span>
@@ -314,7 +338,9 @@ const AuditPage: React.FC = () => {
                   <Shield className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
                   <h3 className='text-lg font-medium mb-2'>No audit logs found</h3>
                   <p className='text-sm text-muted-foreground'>
-                    {showSensitive ? 'No logs match your current filters.' : 'No logs available or sensitive logs are hidden.'}
+                    {showSensitive
+                      ? 'No logs match your current filters.'
+                      : 'No logs available or sensitive logs are hidden.'}
                   </p>
                 </div>
               )}

@@ -4,24 +4,25 @@ URL configuration for Property Management System.
 The `urlpatterns` list routes URLs to views.
 """
 
-from accounting.views import AccountingPeriodViewSet, FinancialTransactionViewSet
-from billing.views import SubscriptionPlanViewSet, SubscriptionViewSet, PaymentMethodViewSet, InvoiceViewSet
-from core.views import health_check, readiness_check, metrics
-from documents.views import DocumentViewSet
 from django.contrib import admin
 from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+from accounting.views import AccountingPeriodViewSet, FinancialTransactionViewSet
+from audit.views import AuditLogViewSet
+from billing.views import InvoiceViewSet, PaymentMethodViewSet, SubscriptionPlanViewSet, SubscriptionViewSet
+from core.views import health_check, metrics, readiness_check
+from documents.views import DocumentViewSet
 from leases.views import LeaseViewSet
 from maintenance.views import MaintenanceRequestViewSet
 from payments.views import RentPaymentViewSet
-from properties.views import PropertyImageViewSet, PropertyViewSet
-from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from tenants.views import TenantViewSet
 from payments.webhooks import stripe_webhook
-from users.views import NotificationViewSet, NotificationPreferenceViewSet
-from reports.views import generate_report, list_reports, get_report_templates, delete_report
-from audit.views import AuditLogViewSet
-from documents.views import DocumentViewSet
+from properties.views import PropertyImageViewSet, PropertyViewSet
+from reports.views import delete_report, generate_report, get_report_templates, list_reports
+from tenants.views import TenantViewSet
+from users.views import NotificationPreferenceViewSet, NotificationViewSet
+
 # API Documentation will use Django REST framework's browsable API
 
 # Global error handlers

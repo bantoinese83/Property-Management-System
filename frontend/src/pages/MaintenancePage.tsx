@@ -12,7 +12,7 @@ import { Modal } from '../components/common/Modal'
 import { LoadingSpinner, ErrorMessage } from '../components/common'
 import { Input } from '../components/common/Input'
 import { Wrench, AlertTriangle, Clock, CheckCircle, Plus, User, Download } from 'lucide-react'
-import { exportToCSV, entityColumns } from '../utils/export'
+import { exportToCSV, entityColumns, type ExportColumn } from '../utils/export'
 import MaintenanceRequestForm from '../components/maintenance/MaintenanceRequestForm'
 
 interface MaintenanceResponse {
@@ -76,20 +76,20 @@ const MaintenancePage: React.FC = () => {
   const handleExportData = () => {
     if (requests.length === 0) {
       toast.error('No data to export', {
-        description: 'There are no maintenance requests to export.'
+        description: 'There are no maintenance requests to export.',
       })
       return
     }
 
     try {
-      exportToCSV(requests, entityColumns.maintenance, 'maintenance_requests')
+      exportToCSV(requests as unknown as Record<string, unknown>[], entityColumns.maintenance as ExportColumn[], 'maintenance_requests')
       toast.success('Export successful', {
-        description: 'Maintenance requests data has been exported to CSV.'
+        description: 'Maintenance requests data has been exported to CSV.',
       })
     } catch (error) {
       console.error('Export failed:', error)
       toast.error('Export failed', {
-        description: 'An error occurred while exporting data.'
+        description: 'An error occurred while exporting data.',
       })
     }
   }

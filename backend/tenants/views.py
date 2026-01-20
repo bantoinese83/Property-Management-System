@@ -1,9 +1,9 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from leases.serializers import LeaseSerializer
 from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from leases.serializers import LeaseSerializer
 
 from .models import Tenant
 from .serializers import TenantSerializer
@@ -47,6 +47,7 @@ class TenantViewSet(viewsets.ModelViewSet):
         tenant = self.get_object()
 
         from django.utils import timezone
+
         from leases.models import Lease
 
         today = timezone.now().date()

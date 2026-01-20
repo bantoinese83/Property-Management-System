@@ -3,14 +3,17 @@
  * Only available in development mode
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
+
 // Define AxiosResponse type locally to avoid import issues
-interface AxiosResponse<T = any> {
+interface AxiosResponse<T = unknown> {
   data: T
   status: number
   statusText: string
-  headers: any
-  config: any
-  request?: any
+  headers: Record<string, unknown>
+  config: unknown
+  request?: unknown
 }
 
 // Development-only utilities

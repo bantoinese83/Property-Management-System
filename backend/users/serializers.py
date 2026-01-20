@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from .models import User, UserProfile, Notification, NotificationPreference
+from .models import Notification, NotificationPreference, User, UserProfile
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -119,13 +119,22 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = [
-            'id', 'notification_type', 'title', 'message', 'priority',
-            'is_read', 'is_archived', 'action_url', 'created_at', 'time_ago'
+            "id",
+            "notification_type",
+            "title",
+            "message",
+            "priority",
+            "is_read",
+            "is_archived",
+            "action_url",
+            "created_at",
+            "time_ago",
         ]
-        read_only_fields = ['id', 'created_at', 'time_ago']
+        read_only_fields = ["id", "created_at", "time_ago"]
 
     def get_time_ago(self, obj):
         from django.utils import timezone
+
         delta = timezone.now() - obj.created_at
 
         if delta.days > 0:
@@ -144,10 +153,20 @@ class NotificationPreferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationPreference
         fields = [
-            'email_enabled', 'email_payment_reminders', 'email_maintenance_updates',
-            'email_lease_updates', 'email_system_updates', 'in_app_enabled',
-            'in_app_payment_reminders', 'in_app_maintenance_updates', 'in_app_lease_updates',
-            'in_app_system_updates', 'push_enabled', 'push_payment_reminders',
-            'push_maintenance_updates', 'push_lease_updates', 'push_system_updates',
-            'digest_frequency'
+            "email_enabled",
+            "email_payment_reminders",
+            "email_maintenance_updates",
+            "email_lease_updates",
+            "email_system_updates",
+            "in_app_enabled",
+            "in_app_payment_reminders",
+            "in_app_maintenance_updates",
+            "in_app_lease_updates",
+            "in_app_system_updates",
+            "push_enabled",
+            "push_payment_reminders",
+            "push_maintenance_updates",
+            "push_lease_updates",
+            "push_system_updates",
+            "digest_frequency",
         ]

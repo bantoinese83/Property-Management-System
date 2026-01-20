@@ -39,9 +39,7 @@ class Property(models.Model):
     # Financial
     purchase_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     purchase_date = models.DateField(null=True, blank=True)
-    annual_property_tax = models.DecimalField(
-        max_digits=12, decimal_places=2, null=True, blank=True
-    )
+    annual_property_tax = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     insurance_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     # Status

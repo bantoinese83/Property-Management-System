@@ -15,7 +15,7 @@ import { DocumentUpload } from '../components/common/DocumentUpload'
 import { DocumentList } from '../components/common/DocumentList'
 import { Input } from '../components/common/Input'
 import { Home, Building2, FileText, BarChart3, Download } from 'lucide-react'
-import { exportToCSV, entityColumns } from '../utils/export'
+import { exportToCSV, entityColumns, type ExportColumn } from '../utils/export'
 
 interface PropertiesResponse {
   results: Property[]
@@ -64,20 +64,20 @@ const PropertiesPage: React.FC = () => {
   const handleExportData = () => {
     if (properties.length === 0) {
       toast.error('No data to export', {
-        description: 'There are no properties to export.'
+        description: 'There are no properties to export.',
       })
       return
     }
 
     try {
-      exportToCSV(properties, entityColumns.properties, 'properties')
+      exportToCSV(properties as unknown as Record<string, unknown>[], entityColumns.properties as ExportColumn[], 'properties')
       toast.success('Export successful', {
-        description: 'Properties data has been exported to CSV.'
+        description: 'Properties data has been exported to CSV.',
       })
     } catch (error) {
       console.error('Export failed:', error)
       toast.error('Export failed', {
-        description: 'An error occurred while exporting data.'
+        description: 'An error occurred while exporting data.',
       })
     }
   }

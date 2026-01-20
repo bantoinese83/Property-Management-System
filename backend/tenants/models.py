@@ -54,6 +54,7 @@ class Tenant(models.Model):
     def get_active_leases(self):
         """Get all active leases for this tenant"""
         from django.utils import timezone
+
         from leases.models import Lease
 
         today = timezone.now().date()

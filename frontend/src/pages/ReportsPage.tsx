@@ -9,15 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Input } from '../components/common/Input'
 import { LoadingSpinner } from '../components/common'
 import { Badge } from '../components/common/Badge'
-import {
-  FileText,
-  BarChart3,
-  Download,
-  Building2,
-  Users,
-  Wrench,
-  DollarSign
-} from 'lucide-react'
+import { FileText, BarChart3, Download, Building2, Users, Wrench, DollarSign } from 'lucide-react'
 
 interface ReportTemplate {
   id: number
@@ -26,7 +18,7 @@ interface ReportTemplate {
   description: string
   report_type: string
   category: string
-  default_parameters: Record<string, any>
+  default_parameters: Record<string, unknown>
 }
 
 interface GeneratedReport {
@@ -47,17 +39,19 @@ const ReportsPage: React.FC = () => {
   const [reportParams, setReportParams] = useState({
     start_date: '',
     end_date: '',
-    title: ''
+    title: '',
   })
   const [generatingReport, setGeneratingReport] = useState(false)
 
-  const { data: templatesData, loading: templatesLoading } = useApi<{ templates: ReportTemplate[] }>(
-    API_ENDPOINTS.REPORTS.TEMPLATES
-  )
+  const { data: templatesData, loading: templatesLoading } = useApi<{
+    templates: ReportTemplate[]
+  }>(API_ENDPOINTS.REPORTS.TEMPLATES)
 
-  const { data: reportsData, loading: reportsLoading, refetch: refetchReports } = useApi<{ reports: GeneratedReport[] }>(
-    API_ENDPOINTS.REPORTS.LIST
-  )
+  const {
+    data: reportsData,
+    loading: reportsLoading,
+    refetch: refetchReports,
+  } = useApi<{ reports: GeneratedReport[] }>(API_ENDPOINTS.REPORTS.LIST)
 
   const templates = templatesData?.templates || []
   const reports = reportsData?.reports || []
@@ -65,12 +59,12 @@ const ReportsPage: React.FC = () => {
   // Set default date range (last 30 days)
   useEffect(() => {
     const today = new Date()
-    const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000))
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
 
     setReportParams(prev => ({
       ...prev,
       start_date: thirtyDaysAgo.toISOString().split('T')[0],
-      end_date: today.toISOString().split('T')[0]
+      end_date: today.toISOString().split('T')[0],
     }))
   }, [])
 
@@ -120,8 +114,8 @@ const ReportsPage: React.FC = () => {
           start_date: reportParams.start_date,
           end_date: reportParams.end_date,
           title: reportParams.title || selectedTemplate.display_name,
-          ...selectedTemplate.default_parameters
-        })
+          ...selectedTemplate.default_parameters,
+        }),
       })
 
       const result = await response.json()
@@ -148,10 +142,12 @@ const ReportsPage: React.FC = () => {
 
   return (
     <SidebarProvider
-      style={{
-        '--sidebar-width': '280px',
-        '--header-height': '60px',
-      } as React.CSSProperties}
+      style={
+        {
+          '--sidebar-width': '280px',
+          '--header-height': '60px',
+        } as React.CSSProperties
+      }
     >
       <AppSidebar variant='inset' />
       <SidebarInset>
@@ -218,7 +214,9 @@ const ReportsPage: React.FC = () => {
                         <Input
                           type='date'
                           value={reportParams.start_date}
-                          onChange={(e) => setReportParams(prev => ({ ...prev, start_date: e.target.value }))}
+                          onChange={e =>
+                            setReportParams(prev => ({ ...prev, start_date: e.target.value }))
+                          }
                         />
                       </div>
                       <div>
@@ -226,7 +224,9 @@ const ReportsPage: React.FC = () => {
                         <Input
                           type='date'
                           value={reportParams.end_date}
-                          onChange={(e) => setReportParams(prev => ({ ...prev, end_date: e.target.value }))}
+                          onChange={e =>
+                            setReportParams(prev => ({ ...prev, end_date: e.target.value }))
+                          }
                         />
                       </div>
                       <div>
@@ -234,7 +234,9 @@ const ReportsPage: React.FC = () => {
                         <Input
                           placeholder='Custom report title'
                           value={reportParams.title}
-                          onChange={(e) => setReportParams(prev => ({ ...prev, title: e.target.value }))}
+                          onChange={e =>
+                            setReportParams(prev => ({ ...prev, title: e.target.value }))
+                          }
                         />
                       </div>
                     </div>
@@ -247,10 +249,7 @@ const ReportsPage: React.FC = () => {
                         <Download className='h-4 w-4' />
                         Generate Report
                       </Button>
-                      <Button
-                        variant='outline'
-                        onClick={() => setSelectedTemplate(null)}
-                      >
+                      <Button variant='outline' onClick={() => setSelectedTemplate(null)}>
                         Cancel
                       </Button>
                     </div>
@@ -265,7 +264,7 @@ const ReportsPage: React.FC = () => {
                 </div>
               ) : (
                 <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-                  {templates.map((template) => (
+                  {templates.map(template => (
                     <Card
                       key={template.id}
                       className={`cursor-pointer transition-all hover:shadow-md ${
@@ -275,7 +274,9 @@ const ReportsPage: React.FC = () => {
                     >
                       <CardHeader>
                         <div className='flex items-center gap-3'>
-                          <div className={`p-2 rounded-lg ${getReportTypeColor(template.report_type)}`}>
+                          <div
+                            className={`p-2 rounded-lg ${getReportTypeColor(template.report_type)}`}
+                          >
                             {getReportTypeIcon(template.report_type)}
                           </div>
                           <div className='flex-1'>
@@ -295,7 +296,7 @@ const ReportsPage: React.FC = () => {
                             variant='outline'
                             size='sm'
                             className='w-full'
-                            onClick={(e) => {
+                            onClick={e => {
                               e.stopPropagation()
                               setSelectedTemplate(template)
                             }}
@@ -320,12 +321,14 @@ const ReportsPage: React.FC = () => {
                 </div>
               ) : reports.length > 0 ? (
                 <div className='space-y-4'>
-                  {reports.map((report) => (
+                  {reports.map(report => (
                     <Card key={report.id}>
                       <CardContent className='p-6'>
                         <div className='flex items-center justify-between'>
                           <div className='flex items-center gap-4'>
-                            <div className={`p-2 rounded-lg ${getReportTypeColor(report.report_type)}`}>
+                            <div
+                              className={`p-2 rounded-lg ${getReportTypeColor(report.report_type)}`}
+                            >
                               {getReportTypeIcon(report.report_type)}
                             </div>
                             <div>
@@ -339,7 +342,8 @@ const ReportsPage: React.FC = () => {
                                 </span>
                                 {report.start_date && report.end_date && (
                                   <span className='text-sm text-muted-foreground'>
-                                    • {formatDate(report.start_date)} - {formatDate(report.end_date)}
+                                    • {formatDate(report.start_date)} -{' '}
+                                    {formatDate(report.end_date)}
                                   </span>
                                 )}
                               </div>
@@ -353,7 +357,9 @@ const ReportsPage: React.FC = () => {
                               <Button
                                 variant='outline'
                                 size='sm'
-                                onClick={() => window.open(`/api/reports/${report.id}/download/`, '_blank')}
+                                onClick={() =>
+                                  window.open(`/api/reports/${report.id}/download/`, '_blank')
+                                }
                               >
                                 <Download className='h-4 w-4 mr-2' />
                                 Download

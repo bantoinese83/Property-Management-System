@@ -32,33 +32,38 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onClose 
 
   const { values, errors, loading, handleChange, handleSubmit, setValue } =
     useForm<TransactionFormValues>({
-      initialValues: transaction ? {
-        property_obj: transaction.property,
-        transaction_type: transaction.transaction_type,
-        category: transaction.category,
-        amount: typeof transaction.amount === 'string' ? parseFloat(transaction.amount) : transaction.amount,
-        description: transaction.description,
-        transaction_date: transaction.transaction_date,
-        lease: transaction.lease,
-        maintenance_request: transaction.maintenance_request,
-        vendor_name: transaction.vendor_name || '',
-        vendor_invoice_number: transaction.vendor_invoice_number || '',
-        is_recurring: false,
-        recurring_frequency: '',
-      } : {
-        property_obj: undefined,
-        transaction_type: 'expense',
-        category: '',
-        amount: undefined,
-        description: '',
-        transaction_date: '',
-        lease: undefined,
-        maintenance_request: undefined,
-        vendor_name: '',
-        vendor_invoice_number: '',
-        is_recurring: false,
-        recurring_frequency: '',
-      },
+      initialValues: transaction
+        ? {
+            property_obj: transaction.property,
+            transaction_type: transaction.transaction_type,
+            category: transaction.category,
+            amount:
+              typeof transaction.amount === 'string'
+                ? parseFloat(transaction.amount)
+                : transaction.amount,
+            description: transaction.description,
+            transaction_date: transaction.transaction_date,
+            lease: transaction.lease,
+            maintenance_request: transaction.maintenance_request,
+            vendor_name: transaction.vendor_name || '',
+            vendor_invoice_number: transaction.vendor_invoice_number || '',
+            is_recurring: false,
+            recurring_frequency: '',
+          }
+        : {
+            property_obj: undefined,
+            transaction_type: 'expense',
+            category: '',
+            amount: undefined,
+            description: '',
+            transaction_date: '',
+            lease: undefined,
+            maintenance_request: undefined,
+            vendor_name: '',
+            vendor_invoice_number: '',
+            is_recurring: false,
+            recurring_frequency: '',
+          },
       onSubmit: async formData => {
         try {
           const url = isEditing

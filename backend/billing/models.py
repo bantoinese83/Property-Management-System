@@ -1,28 +1,33 @@
-from django.db import models
-from django.conf import settings
-from django.utils import timezone
 import uuid
+
+from django.conf import settings
+from django.db import models
+from django.utils import timezone
 
 
 class SubscriptionPlan(models.Model):
     """Subscription plans for the property management system"""
 
     PLAN_TYPES = (
-        ('free', 'Free'),
-        ('basic', 'Basic'),
-        ('professional', 'Professional'),
-        ('enterprise', 'Enterprise'),
+        ("free", "Free"),
+        ("basic", "Basic"),
+        ("professional", "Professional"),
+        ("enterprise", "Enterprise"),
     )
 
     name = models.CharField(max_length=100)
     plan_type = models.CharField(max_length=20, choices=PLAN_TYPES, unique=True)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=3, default='USD')
-    interval = models.CharField(max_length=20, choices=[
-        ('month', 'Monthly'),
-        ('year', 'Yearly'),
-    ], default='month')
+    currency = models.CharField(max_length=3, default="USD")
+    interval = models.CharField(
+        max_length=20,
+        choices=[
+            ("month", "Monthly"),
+            ("year", "Yearly"),
+        ],
+        default="month",
+    )
 
     # Feature limits (use -1 for unlimited)
     max_properties = models.IntegerField(default=1, help_text="Use -1 for unlimited")
@@ -40,7 +45,7 @@ class SubscriptionPlan(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['price']
+        ordering = ["price"]
 
     def __str__(self):
         return f"{self.name} (${self.price}/{self.interval})"
@@ -50,18 +55,18 @@ class Subscription(models.Model):
     """User subscriptions"""
 
     STATUS_CHOICES = (
-        ('active', 'Active'),
-        ('past_due', 'Past Due'),
-        ('canceled', 'Canceled'),
-        ('unpaid', 'Unpaid'),
-        ('trialing', 'Trialing'),
+        ("active", "Active"),
+        ("past_due", "Past Due"),
+        ("canceled", "Canceled"),
+        ("unpaid", "Unpaid"),
+        ("trialing", "Trialing"),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     plan = models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE)
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='trialing')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="trialing")
     current_period_start = models.DateTimeField()
     current_period_end = models.DateTimeField()
     cancel_at_period_end = models.BooleanField(default=False)
@@ -74,22 +79,22 @@ class Subscription(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.user.username} - {self.plan.name}"
 
     @property
     def is_active(self):
-        return self.status == 'active' and not self.cancel_at_period_end
+        return self.status == "active" and not self.cancel_at_period_end
 
 
 class PaymentMethod(models.Model):
     """User payment methods"""
 
     METHOD_TYPES = (
-        ('card', 'Credit/Debit Card'),
-        ('bank_account', 'Bank Account'),
+        ("card", "Credit/Debit Card"),
+        ("bank_account", "Bank Account"),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -113,10 +118,10 @@ class PaymentMethod(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-is_default', '-created_at']
+        ordering = ["-is_default", "-created_at"]
 
     def __str__(self):
-        if self.method_type == 'card':
+        if self.method_type == "card":
             return f"{self.brand.title()} ****{self.last4}"
         else:
             return f"{self.bank_name} ****{self.account_last4}"
@@ -126,11 +131,11 @@ class Invoice(models.Model):
     """Invoices for billing"""
 
     STATUS_CHOICES = (
-        ('draft', 'Draft'),
-        ('open', 'Open'),
-        ('paid', 'Paid'),
-        ('void', 'Void'),
-        ('uncollectible', 'Uncollectible'),
+        ("draft", "Draft"),
+        ("open", "Open"),
+        ("paid", "Paid"),
+        ("void", "Void"),
+        ("uncollectible", "Uncollectible"),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -138,8 +143,8 @@ class Invoice(models.Model):
     subscription = models.ForeignKey(Subscription, on_delete=models.SET_NULL, null=True, blank=True)
 
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=3, default='USD')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    currency = models.CharField(max_length=3, default="USD")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
 
     # Dates
     invoice_date = models.DateTimeField(default=timezone.now)
@@ -158,7 +163,7 @@ class Invoice(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"Invoice {self.id} - {self.user.username} - ${self.amount}"

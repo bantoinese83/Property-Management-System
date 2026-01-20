@@ -11,8 +11,16 @@ import { Modal } from '../components/common/Modal'
 import { Input } from '../components/common/Input'
 import { LoadingSpinner, ErrorMessage } from '../components/common'
 import { Badge } from '../components/common/Badge'
-import { Plus, TrendingUp, TrendingDown, DollarSign, Calculator, FileText, Download } from 'lucide-react'
-import { exportToCSV, entityColumns } from '../utils/export'
+import {
+  Plus,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Calculator,
+  FileText,
+  Download,
+} from 'lucide-react'
+import { exportToCSV, entityColumns, type ExportColumn } from '../utils/export'
 import { toast } from 'sonner'
 import TransactionForm from '../components/accounting/TransactionForm'
 
@@ -52,20 +60,20 @@ const AccountingPage: React.FC = () => {
   const handleExportData = () => {
     if (transactions.length === 0) {
       toast.error('No data to export', {
-        description: 'There are no transactions to export.'
+        description: 'There are no transactions to export.',
       })
       return
     }
 
     try {
-      exportToCSV(transactions, entityColumns.transactions, 'accounting_transactions')
+      exportToCSV(transactions as unknown as Record<string, unknown>[], entityColumns.transactions as ExportColumn[], 'accounting_transactions')
       toast.success('Export successful', {
-        description: 'Accounting transactions data has been exported to CSV.'
+        description: 'Accounting transactions data has been exported to CSV.',
       })
     } catch (error) {
       console.error('Export failed:', error)
       toast.error('Export failed', {
-        description: 'An error occurred while exporting data.'
+        description: 'An error occurred while exporting data.',
       })
     }
   }

@@ -1,8 +1,8 @@
-from rest_framework import viewsets, status
+from django.contrib.contenttypes.models import ContentType
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.contrib.contenttypes.models import ContentType
 
 from .models import Document
 from .serializers import DocumentSerializer
@@ -19,16 +19,14 @@ class DocumentViewSet(viewsets.ModelViewSet):
         queryset = Document.objects.filter(uploaded_by=self.request.user)
 
         # Filter by model type
-        model_name = self.request.query_params.get('model_name')
+        model_name = self.request.query_params.get("model_name")
         if model_name:
             try:
                 content_type = ContentType.objects.get(
-                    app_label='properties',  # Adjust based on your app structure
-                    model=model_name
+                    app_label="properties", model=model_name  # Adjust based on your app structure
                 )
                 queryset = queryset.filter(
-                    content_type=content_type,
-                    object_id=self.request.query_params.get('object_id')
+                    content_type=content_type, object_id=self.request.query_params.get("object_id")
                 )
             except ContentType.DoesNotExist:
                 queryset = queryset.none()
@@ -39,7 +37,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         """Set the uploaded_by field when creating a document"""
         serializer.save(uploaded_by=self.request.user)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def download(self, request, pk=None):
         """Download a document file"""
         try:
@@ -47,30 +45,19 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
             # Check if user has permission to access this document
             if document.uploaded_by != request.user:
-                return Response(
-                    {'error': 'Permission denied'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
+                return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
             if not document.file:
-                return Response(
-                    {'error': 'File not found'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
 
             # Return file response
             from django.http import FileResponse
-            response = FileResponse(document.file.open('rb'))
-            response['Content-Disposition'] = f'attachment; filename="{document.file.name.split("/")[-1]}"'
+
+            response = FileResponse(document.file.open("rb"))
+            response["Content-Disposition"] = f'attachment; filename="{document.file.name.split("/")[-1]}"'
             return response
 
         except Document.DoesNotExist:
-            return Response(
-                {'error': 'Document not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Document not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response(
-                {'error': f'Download failed: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({"error": f"Download failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
