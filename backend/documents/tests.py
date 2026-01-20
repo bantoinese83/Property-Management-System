@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
+import tempfile
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -24,6 +25,7 @@ class DocumentTests(TestCase):
 
         self.test_file = SimpleUploadedFile("test_doc.txt", b"test content", content_type="text/plain")
 
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     def test_upload_document_with_model_name(self):
         url = "/api/documents/"
         data = {
@@ -44,6 +46,7 @@ class DocumentTests(TestCase):
         # Use in instead of endswith to be safer with storage backends
         self.assertIn("test_doc", doc.file.name)
 
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     def test_list_documents_by_model_name(self):
         # Create a document first
         Document.objects.create(
@@ -61,6 +64,7 @@ class DocumentTests(TestCase):
         self.assertEqual(len(response.data["results"]), 1)
         self.assertEqual(response.data["results"][0]["title"], "Existing Doc")
 
+    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
     def test_upload_invalid_model_name(self):
         url = "/api/documents/"
         data = {"title": "Invalid Document", "model_name": "non_existent_model", "object_id": 1, "file": self.test_file}

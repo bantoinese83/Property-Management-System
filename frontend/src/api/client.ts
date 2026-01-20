@@ -1,10 +1,18 @@
-import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import axios, { type AxiosInstance, AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import { getUserFriendlyError } from '../utils/errorMessages'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
 interface TokenResponse {
   access: string
   refresh: string
+}
+
+declare module 'axios' {
+  interface AxiosError {
+    userFriendlyMessage?: string
+    originalError?: AxiosError
+  }
 }
 
 class APIClient {
@@ -41,6 +49,7 @@ class APIClient {
       async (error: AxiosError) => {
         const originalRequest = error.config
 
+        // Handle token refresh for 401 errors
         if (error.response?.status === 401 && originalRequest && !this.isRetry(originalRequest)) {
           if (!this.refreshTokenPromise) {
             this.refreshTokenPromise = this.performTokenRefresh()
@@ -59,6 +68,12 @@ class APIClient {
             window.location.href = '/login'
             return Promise.reject(error)
           }
+        }
+
+        // Transform error messages to be user-friendly
+        if (error.response?.data) {
+          const transformedError = this.transformError(error)
+          return Promise.reject(transformedError)
         }
 
         return Promise.reject(error)
@@ -92,6 +107,25 @@ class APIClient {
   private logout() {
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
+  }
+
+  private transformError(error: AxiosError): AxiosError {
+    // Create a new error with user-friendly message
+    const userFriendlyMessage = getUserFriendlyError(error)
+
+    const transformedError = new AxiosError(
+      userFriendlyMessage,
+      error.code,
+      error.config,
+      error.request,
+      error.response
+    )
+
+    // Preserve original error details for debugging
+    transformedError.userFriendlyMessage = userFriendlyMessage
+    transformedError.originalError = error
+
+    return transformedError
   }
 
   public getClient(): AxiosInstance {

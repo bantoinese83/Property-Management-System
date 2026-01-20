@@ -1,7 +1,10 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import URLValidator
+from django.core.validators import URLValidator, RegexValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
+from datetime import date
 
 
 class User(AbstractUser):
@@ -15,13 +18,29 @@ class User(AbstractUser):
     )
 
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default="owner")
-    phone_number = models.CharField(max_length=20, blank=True)
+    phone_number = models.CharField(
+        max_length=20,
+        blank=True,
+        validators=[RegexValidator(
+            regex=r'^\+?1?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$',
+            message='Enter a valid phone number.',
+            code='invalid_phone_number'
+        )]
+    )
     profile_picture = models.ImageField(upload_to="profiles/", blank=True, null=True)
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.TextField(blank=True)
     city = models.CharField(max_length=100, blank=True)
     state = models.CharField(max_length=50, blank=True)
-    zip_code = models.CharField(max_length=10, blank=True)
+    zip_code = models.CharField(
+        max_length=10,
+        blank=True,
+        validators=[RegexValidator(
+            regex=r'^\d{5}(-\d{4})?$',
+            message='Enter a valid ZIP code.',
+            code='invalid_zip_code'
+        )]
+    )
     is_verified = models.BooleanField(default=False)
     is_email_verified = models.BooleanField(default=False)
     two_factor_enabled = models.BooleanField(default=False)
@@ -41,6 +60,21 @@ class User(AbstractUser):
 
     def get_user_type_display(self):
         return dict(self.USER_TYPE_CHOICES).get(self.user_type)
+
+    def clean(self):
+        """Validate user data"""
+        from django.core.exceptions import ValidationError
+
+        # Validate date of birth is not in the future and not too old
+        if self.date_of_birth:
+            today = date.today()
+            if self.date_of_birth > today:
+                raise ValidationError({'date_of_birth': 'Date of birth cannot be in the future.'})
+            # Check if user is not unreasonably old (over 150 years)
+            if (today - self.date_of_birth).days > (150 * 365):
+                raise ValidationError({'date_of_birth': 'Invalid date of birth.'})
+
+        super().clean()
 
 
 class UserProfile(models.Model):
@@ -165,3 +199,11 @@ class NotificationPreference(models.Model):
 
     def __str__(self):
         return f"Notification preferences for {self.user.username}"
+
+
+# Signals
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    """Create UserProfile automatically when User is created"""
+    if created:
+        UserProfile.objects.create(user=instance)

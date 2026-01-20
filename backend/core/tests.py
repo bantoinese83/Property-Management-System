@@ -157,7 +157,7 @@ class IntegrationTestCase(PropertyTestMixin, APITestCase, TransactionTestCase):
             "city": "Test City",
             "state": "TC",
             "zip_code": "67890",
-            "property_type": "house",
+            "property_type": "single_family",
             "total_units": 1,
         }
 

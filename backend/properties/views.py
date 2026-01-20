@@ -163,9 +163,7 @@ class PropertyViewSet(BaseViewSet):
     def dashboard_analytics(self, request):
         """Get comprehensive dashboard analytics"""
         from datetime import timedelta
-
         from django.utils import timezone
-
         from leases.models import Lease
         from maintenance.models import MaintenanceRequest
         from payments.models import RentPayment

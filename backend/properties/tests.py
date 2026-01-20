@@ -52,11 +52,13 @@ class PropertyModelTest(TestCase):
 
         tenant = Tenant.objects.create(first_name="John", last_name="Doe", email="john@example.com")
 
+        from datetime import date, timedelta
+        today = date.today()
         lease = Lease.objects.create(
             property_obj=self.property,
             tenant=tenant,
-            lease_start_date="2024-01-01",
-            lease_end_date="2025-01-01",
+            lease_start_date=today - timedelta(days=30),  # Started 30 days ago
+            lease_end_date=today + timedelta(days=335),   # Ends in about a year
             monthly_rent=Decimal("2000.00"),
             status="active",
         )
@@ -70,12 +72,16 @@ class PropertyModelTest(TestCase):
 
 class PropertyAPITestCase(APITestCase):
     def setUp(self):
+        # Use unique usernames to avoid conflicts between test runs
+        import uuid
+        unique_id = str(uuid.uuid4())[:8]
+
         self.owner = User.objects.create_user(
-            username="owner", email="owner@example.com", password="owner123", user_type="owner"
+            username=f"owner_{unique_id}", email=f"owner_{unique_id}@example.com", password="owner123", user_type="owner"
         )
 
         self.other_user = User.objects.create_user(
-            username="other", email="other@example.com", password="other123", user_type="owner"
+            username=f"other_{unique_id}", email=f"other_{unique_id}@example.com", password="other123", user_type="owner"
         )
 
         self.property = Property.objects.create(
@@ -99,7 +105,7 @@ class PropertyAPITestCase(APITestCase):
             "city": "New City",
             "state": "NS",
             "zip_code": "67890",
-            "property_type": "house",
+            "property_type": "single_family",
             "total_units": 1,
         }
         response = self.client.post(url, data, format="json")
@@ -124,7 +130,7 @@ class PropertyAPITestCase(APITestCase):
             city="Other City",
             state="OS",
             zip_code="98765",
-            property_type="house",
+            property_type="single_family",
             total_units=1,
         )
 

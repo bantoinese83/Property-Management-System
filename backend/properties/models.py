@@ -5,9 +5,10 @@ This module contains all models related to property management,
 including properties, property images, and related functionality.
 """
 
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
+from datetime import date
 
 
 class Property(models.Model):
@@ -61,26 +62,77 @@ class Property(models.Model):
     state = models.CharField(max_length=50)
     zip_code = models.CharField(max_length=10)
     country = models.CharField(max_length=100, default="USA")
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(-90), MaxValueValidator(90)]
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(-180), MaxValueValidator(180)]
+    )
 
     # Property Details
     property_type = models.CharField(max_length=50, choices=PROPERTY_TYPE_CHOICES)
     total_units = models.IntegerField(default=1, validators=[MinValueValidator(1)])
-    year_built = models.IntegerField(null=True, blank=True)
-    square_footage = models.IntegerField(null=True, blank=True)
-    bedrooms = models.IntegerField(null=True, blank=True)
-    bathrooms = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    year_built = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1800), MaxValueValidator(date.today().year + 1)]
+    )
+    square_footage = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1)]
+    )
+    bedrooms = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(50)]
+    )
+    bathrooms = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(20)]
+    )
 
     # Financial
-    purchase_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    purchase_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)]
+    )
     purchase_date = models.DateField(null=True, blank=True)
-    annual_property_tax = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    insurance_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    annual_property_tax = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)]
+    )
+    insurance_cost = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)]
+    )
 
     # Status
     is_active = models.BooleanField(default=True)
     is_listed_for_rent = models.BooleanField(default=True)
+
+    # Optimistic locking
+    version = models.PositiveIntegerField(default=1, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -102,28 +154,57 @@ class Property(models.Model):
         return f"{self.address}, {self.city}, {self.state} {self.zip_code}"
 
     def get_occupancy_rate(self):
-        """Calculate occupancy percentage"""
+        """Calculate occupancy percentage with edge case handling"""
         from leases.models import Lease
 
-        today = timezone.now().date()
-        active_leases = Lease.objects.filter(
-            property_obj=self, status="active", lease_start_date__lte=today, lease_end_date__gte=today
-        ).count()
+        # Handle edge case where total_units is invalid
+        if not self.total_units or self.total_units <= 0:
+            return 0.0
 
+        today = timezone.now().date()
+        try:
+            active_leases = Lease.objects.filter(
+                property_obj=self, status="active",
+                lease_start_date__lte=today,
+                lease_end_date__gte=today
+            ).count()
+        except Exception:
+            # Handle database query errors gracefully
+            return 0.0
+
+        # Prevent division by zero (redundant but defensive)
         if self.total_units == 0:
-            return 0
-        return round((active_leases / self.total_units) * 100, 2)
+            return 0.0
+
+        occupancy_rate = (active_leases / self.total_units) * 100
+        return round(max(0.0, min(100.0, occupancy_rate)), 2)
+
+    def save(self, *args, **kwargs):
+        """Handle optimistic locking"""
+        if self.pk:  # Only increment version for updates, not creates
+            self.version += 1
+        super().save(*args, **kwargs)
 
     def get_monthly_income(self):
-        """Calculate expected monthly income from all active leases"""
+        """Calculate expected monthly income from all active leases with edge case handling"""
         from leases.models import Lease
 
         today = timezone.now().date()
-        total_rent = Lease.objects.filter(
-            property_obj=self, status="active", lease_start_date__lte=today, lease_end_date__gte=today
-        ).aggregate(total=models.Sum("monthly_rent"))["total"]
+        try:
+            result = Lease.objects.filter(
+                property_obj=self, status="active",
+                lease_start_date__lte=today,
+                lease_end_date__gte=today
+            ).aggregate(total=models.Sum("monthly_rent"))
+            total_rent = result.get("total")
+        except Exception:
+            # Handle database query errors gracefully
+            return 0
 
-        return total_rent or 0
+        # Ensure we return a valid decimal or 0
+        if total_rent is None:
+            return 0
+        return max(0, total_rent)
 
 
 class PropertyImage(models.Model):

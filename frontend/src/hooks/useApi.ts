@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { type AxiosError } from 'axios'
 import client from '../api/client'
+import { useToast } from '../components/common/ToastContainer'
+import { isRetryableError } from '../utils/errorMessages'
 
 interface UseApiOptions<T = unknown> {
   skip?: boolean
@@ -9,6 +11,8 @@ interface UseApiOptions<T = unknown> {
   onSuccess?: (data: T) => void
   onError?: (error: Error) => void
   enableBackgroundRefetch?: boolean
+  showErrorToast?: boolean
+  errorMessage?: string
 }
 
 interface UseApiResponse<T> {
@@ -32,6 +36,7 @@ export function useApi<T = unknown>(
   const [error, setError] = useState<Error | null>(null)
   const [isRefetching, setIsRefetching] = useState(false)
   const retryCount = useRef(0)
+  const { showError } = useToast()
 
   // Memoize options to prevent unnecessary re-renders
   const memoizedOptions = useMemo(
@@ -62,19 +67,23 @@ export function useApi<T = unknown>(
         const error = err instanceof Error ? err : new Error('Unknown error occurred')
         setError(error)
 
+        // Show error toast if enabled (default: true for most cases)
+        const showToast = options.showErrorToast !== false
+        if (showToast && !isRetry) {
+          const errorMessage = options.errorMessage || error.message || 'Something went wrong'
+          showError('Error', errorMessage)
+        }
+
         // Call error callback
         if (memoizedOptions.onError) {
           memoizedOptions.onError(error)
         }
 
-        // Auto-retry logic for server errors (but not rate limits)
+        // Auto-retry logic for retryable errors
         if (
           memoizedOptions.retryOnError &&
           retryCount.current < memoizedOptions.retryOnError &&
-          axiosError.response &&
-          typeof axiosError.response.status === 'number' &&
-          axiosError.response.status >= 500 &&
-          axiosError.response.status !== 429 // Don't retry rate limits
+          isRetryableError(axiosError)
         ) {
           retryCount.current++
           setTimeout(() => fetchData(true), 1000 * Math.pow(2, retryCount.current))

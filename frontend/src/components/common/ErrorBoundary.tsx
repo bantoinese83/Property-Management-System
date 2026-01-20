@@ -101,10 +101,14 @@ class ErrorBoundary extends Component<Props, State> {
               <AlertCircle className='w-8 h-8 text-red-600' />
             </div>
 
-            <h1 className='mb-4 text-2xl font-bold text-gray-900'>Something went wrong</h1>
+            <h1 className='mb-4 text-2xl font-bold text-gray-900'>Oops! Something went wrong</h1>
 
             <p className='mb-6 text-gray-600 leading-relaxed'>
-              {error?.message || 'An unexpected error occurred. Please try again.'}
+              We're sorry, but we encountered an unexpected issue. Our team has been notified and is working to fix it.
+            </p>
+
+            <p className='mb-6 text-sm text-gray-500'>
+              In the meantime, try refreshing the page or contact support if the problem persists.
             </p>
 
             {retryCount > 0 && (
