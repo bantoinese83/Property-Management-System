@@ -13,6 +13,11 @@ router.register(r'results', views.AIProcessingResultViewSet)
 router.register(r'lease-analysis', views.LeaseAnalysisViewSet)
 router.register(r'application-analysis', views.TenantApplicationAnalysisViewSet)
 router.register(r'maintenance-analysis', views.MaintenanceAnalysisViewSet)
+router.register(r'inspection-analysis', views.PropertyInspectionViewSet)
+router.register(r'work-completion-analysis', views.WorkCompletionAnalysisViewSet)
+router.register(r'financial-analysis', views.FinancialAnalysisViewSet)
+router.register(r'voice-interactions', views.VoiceInteractionViewSet)
+router.register(r'voice-reports', views.VoiceReportViewSet)
 router.register(r'service', views.AIServiceViewSet, basename='ai-service')
 
 urlpatterns = [

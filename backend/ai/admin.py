@@ -8,7 +8,12 @@ from .models import (
     AIProcessingResult,
     LeaseAnalysis,
     TenantApplicationAnalysis,
-    MaintenanceAnalysis
+    MaintenanceAnalysis,
+    PropertyInspection,
+    WorkCompletionAnalysis,
+    FinancialAnalysis,
+    VoiceInteraction,
+    VoiceReport
 )
 
 
@@ -128,6 +133,170 @@ class MaintenanceAnalysisAdmin(admin.ModelAdmin):
         ('Recommendations', {
             'fields': ('approach_recommendation', 'timeline_estimate',
                       'vendor_needed', 'follow_up_required'),
+            'classes': ('collapse',)
+        }),
+        ('AI Analysis', {
+            'fields': ('ai_result',),
+        }),
+    )
+
+
+@admin.register(PropertyInspection)
+class PropertyInspectionAdmin(admin.ModelAdmin):
+    """Admin for property inspection analysis results."""
+
+    list_display = [
+        'id', 'inspection_type', 'room_area', 'overall_condition',
+        'urgency_level', 'estimated_repair_cost', 'ai_result'
+    ]
+    list_filter = ['inspection_type', 'overall_condition', 'urgency_level']
+    search_fields = ['room_area', 'damage_description', 'safety_concerns']
+    readonly_fields = ['id']
+
+    fieldsets = (
+        ('Inspection Details', {
+            'fields': ('inspection_type', 'room_area')
+        }),
+        ('Assessment Results', {
+            'fields': ('overall_condition', 'damage_description', 'maintenance_items',
+                      'safety_concerns', 'estimated_repair_cost', 'urgency_level'),
+            'classes': ('collapse',)
+        }),
+        ('Recommendations', {
+            'fields': ('recommendations', 'compliance_notes'),
+            'classes': ('collapse',)
+        }),
+        ('Media', {
+            'fields': ('photo_urls', 'ai_result'),
+        }),
+    )
+
+
+@admin.register(WorkCompletionAnalysis)
+class WorkCompletionAnalysisAdmin(admin.ModelAdmin):
+    """Admin for work completion analysis results."""
+
+    list_display = [
+        'id', 'completion_quality', 'compliance_check',
+        'monitoring_needed', 'ai_result'
+    ]
+    list_filter = ['completion_quality', 'compliance_check', 'monitoring_needed']
+    search_fields = ['workmanship_quality', 'follow_up_work']
+    readonly_fields = ['id']
+
+    fieldsets = (
+        ('Work Assessment', {
+            'fields': ('completion_quality', 'issues_resolved', 'remaining_issues'),
+            'classes': ('collapse',)
+        }),
+        ('Quality & Compliance', {
+            'fields': ('workmanship_quality', 'compliance_check'),
+            'classes': ('collapse',)
+        }),
+        ('Follow-up', {
+            'fields': ('follow_up_work', 'monitoring_needed'),
+            'classes': ('collapse',)
+        }),
+        ('Media & Links', {
+            'fields': ('before_photo_urls', 'after_photo_urls', 'maintenance_request', 'ai_result'),
+        }),
+    )
+
+
+@admin.register(FinancialAnalysis)
+class FinancialAnalysisAdmin(admin.ModelAdmin):
+    """Admin for financial analysis results."""
+
+    list_display = [
+        'id', 'analysis_period', 'report_type', 'profitability_rating',
+        'investment_rating', 'ai_result'
+    ]
+    list_filter = ['analysis_period', 'report_type', 'profitability_rating', 'investment_rating']
+    search_fields = ['benchmarking_insights', 'recommendations']
+    readonly_fields = ['id']
+
+    fieldsets = (
+        ('Analysis Details', {
+            'fields': ('analysis_period', 'report_type', 'profitability_rating')
+        }),
+        ('Financial Metrics', {
+            'fields': ('financial_ratios', 'trend_analysis', 'forecasts'),
+            'classes': ('collapse',)
+        }),
+        ('Risk & Investment', {
+            'fields': ('risk_assessment', 'investment_rating', 'expected_returns'),
+            'classes': ('collapse',)
+        }),
+        ('Market Analysis', {
+            'fields': ('market_analysis', 'benchmarking_insights'),
+            'classes': ('collapse',)
+        }),
+        ('Recommendations', {
+            'fields': ('recommendations', 'generated_report'),
+            'classes': ('collapse',)
+        }),
+        ('AI Analysis', {
+            'fields': ('ai_result',),
+        }),
+    )
+
+
+@admin.register(VoiceInteraction)
+class VoiceInteractionAdmin(admin.ModelAdmin):
+    """Admin for voice interactions."""
+
+    list_display = [
+        'id', 'interaction_type', 'detected_intent', 'intent_confidence',
+        'needs_clarification', 'action_taken', 'ai_result'
+    ]
+    list_filter = ['interaction_type', 'detected_intent', 'needs_clarification']
+    search_fields = ['audio_transcript', 'response_text', 'detected_intent']
+    readonly_fields = ['id']
+
+    fieldsets = (
+        ('Interaction Details', {
+            'fields': ('interaction_type', 'audio_transcript', 'audio_duration_seconds')
+        }),
+        ('AI Processing', {
+            'fields': ('detected_intent', 'intent_confidence', 'extracted_parameters'),
+            'classes': ('collapse',)
+        }),
+        ('Response', {
+            'fields': ('response_text', 'response_audio_url'),
+            'classes': ('collapse',)
+        }),
+        ('Actions', {
+            'fields': ('action_taken', 'action_result', 'needs_clarification', 'clarification_question'),
+            'classes': ('collapse',)
+        }),
+        ('Follow-up', {
+            'fields': ('suggested_follow_ups', 'ai_result'),
+        }),
+    )
+
+
+@admin.register(VoiceReport)
+class VoiceReportAdmin(admin.ModelAdmin):
+    """Admin for voice reports."""
+
+    list_display = [
+        'id', 'report_type', 'property_obj', 'audio_duration_seconds',
+        'ai_result'
+    ]
+    list_filter = ['report_type']
+    search_fields = ['report_text']
+    readonly_fields = ['id']
+
+    fieldsets = (
+        ('Report Details', {
+            'fields': ('report_type', 'property_obj', 'report_text')
+        }),
+        ('Audio', {
+            'fields': ('report_audio_url', 'audio_duration_seconds'),
+            'classes': ('collapse',)
+        }),
+        ('Content Analysis', {
+            'fields': ('key_highlights', 'urgent_items', 'recommended_actions'),
             'classes': ('collapse',)
         }),
         ('AI Analysis', {

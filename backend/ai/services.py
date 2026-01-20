@@ -4,6 +4,7 @@ Integrates Google Gemini API for document processing, text generation, and intel
 """
 
 import os
+import json
 import logging
 from typing import Dict, List, Optional, Any, Union
 from pathlib import Path
@@ -272,6 +273,498 @@ class CommunicationService(GeminiAIService):
         )
 
 
+class PropertyInspectionService(GeminiAIService):
+    """Service for analyzing property inspection photos and assessing damage."""
+
+    def analyze_property_image(self, image_description: str, inspection_context: str = "") -> Optional[Dict[str, Any]]:
+        """
+        Analyze a property inspection image and provide assessment.
+
+        Args:
+            image_description: Description of what's in the image
+            inspection_context: Additional context about the inspection
+
+        Returns:
+            Dictionary with image analysis results
+        """
+        prompt = f"""
+        Analyze this property inspection image and provide a detailed assessment in JSON format:
+
+        {{
+            "overall_condition": "excellent/good/fair/poor/critical",
+            "damage_assessment": "Description of any visible damage or issues",
+            "maintenance_needed": "List of maintenance items identified",
+            "safety_concerns": "Any safety issues or hazards detected",
+            "estimated_costs": "Rough cost estimates for any repairs needed",
+            "urgency_level": "low/medium/high/emergency",
+            "recommendations": "Specific recommendations for property manager",
+            "compliance_notes": "Any code compliance or regulatory concerns",
+            "confidence_score": "Confidence in assessment (0.0 to 1.0)"
+        }}
+
+        Image Description: {image_description}
+        Inspection Context: {inspection_context}
+
+        Focus on structural integrity, habitability, safety, and maintenance needs.
+        Be specific about locations, severity, and recommended actions.
+        Return only valid JSON.
+        """
+
+        response = self.generate_content(
+            prompt=prompt,
+            model="gemini-2.5-pro",
+            temperature=0.2,
+            max_tokens=1000
+        )
+
+        if not response:
+            return None
+
+        try:
+            import json
+            json_start = response.find('{')
+            json_end = response.rfind('}') + 1
+            if json_start >= 0 and json_end > json_start:
+                json_str = response[json_start:json_end]
+                return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse property inspection analysis: {e}")
+            return None
+
+    def compare_before_after_images(self, before_description: str, after_description: str, work_description: str) -> Optional[Dict[str, Any]]:
+        """
+        Compare before and after images of property work.
+
+        Args:
+            before_description: Description of the before image
+            after_description: Description of the after image
+            work_description: Description of the work performed
+
+        Returns:
+            Comparison analysis results
+        """
+        prompt = f"""
+        Compare before and after images of property maintenance/repair work and provide assessment in JSON format:
+
+        {{
+            "work_completion_quality": "excellent/good/satisfactory/poor/incomplete",
+            "issues_resolved": "List of issues that appear to be fixed",
+            "remaining_issues": "Any remaining problems or incomplete work",
+            "quality_assessment": "Assessment of workmanship quality",
+            "compliance_check": "Whether work appears to meet standards",
+            "recommendations": "Any follow-up work or monitoring needed",
+            "cost_accuracy": "Assessment of whether work matches described scope",
+            "safety_improvement": "Safety improvements achieved",
+            "confidence_score": "Confidence in assessment (0.0 to 1.0)"
+        }}
+
+        Before Image: {before_description}
+        After Image: {after_description}
+        Work Description: {work_description}
+
+        Be thorough and objective in your assessment.
+        Return only valid JSON.
+        """
+
+        response = self.generate_content(
+            prompt=prompt,
+            model="gemini-2.5-pro",
+            temperature=0.2,
+            max_tokens=800
+        )
+
+        if not response:
+            return None
+
+        try:
+            import json
+            json_start = response.find('{')
+            json_end = response.rfind('}') + 1
+            if json_start >= 0 and json_end > json_start:
+                json_str = response[json_start:json_end]
+                return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse before/after comparison: {e}")
+            return None
+
+
+class VoiceAssistantService(GeminiAIService):
+    """Service for voice-powered property management assistant using Live API."""
+
+    def __init__(self):
+        super().__init__()
+        # Note: Live API would require websockets and real-time audio processing
+        # This is a placeholder for future implementation with Live API
+        self.live_api_available = False
+
+    def process_voice_command(self, audio_transcript: str, user_context: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        Process voice commands for property management tasks.
+
+        Args:
+            audio_transcript: Transcribed voice input
+            user_context: User context (properties managed, recent activities, etc.)
+
+        Returns:
+            Response with action to take and voice response
+        """
+        prompt = f"""
+        You are TenantBase Assistant, an AI voice assistant for property managers.
+        Process this voice command and determine the appropriate action.
+
+        User Context:
+        - Managed Properties: {user_context.get('properties', [])}
+        - Recent Activities: {user_context.get('recent_activities', [])}
+        - Current Time: {user_context.get('current_time', 'Unknown')}
+
+        Voice Command: "{audio_transcript}"
+
+        Analyze the command and provide:
+        1. The intent/action the user wants to perform
+        2. Required parameters or data needed
+        3. A natural voice response to confirm/ask for clarification
+        4. Any follow-up actions or questions
+
+        Available Actions:
+        - property_info: Get information about a specific property
+        - tenant_info: Get information about a tenant
+        - maintenance_status: Check maintenance request status
+        - financial_summary: Get financial summary
+        - schedule_inspection: Schedule a property inspection
+        - create_task: Create a new task or reminder
+        - occupancy_report: Get occupancy report
+        - rent_due: Check upcoming rent payments
+
+        Return in JSON format:
+        {{
+            "intent": "detected_action",
+            "confidence": 0.0-1.0,
+            "parameters": {{"key": "value"}},
+            "response_text": "Natural voice response",
+            "needs_clarification": false,
+            "clarification_question": "if needed",
+            "suggested_actions": ["follow_up_actions"]
+        }}
+        """
+
+        response = self.generate_content(
+            prompt=prompt,
+            model="gemini-2.5-pro",
+            temperature=0.3,
+            max_tokens=1000
+        )
+
+        if not response:
+            return None
+
+        try:
+            import json
+            json_start = response.find('{')
+            json_end = response.rfind('}') + 1
+            if json_start >= 0 and json_end > json_start:
+                json_str = response[json_start:json_end]
+                result = json.loads(json_str)
+
+                # Add voice response audio generation (placeholder for now)
+                result['audio_response_url'] = self._generate_audio_response(result.get('response_text', ''))
+
+                return result
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse voice command analysis: {e}")
+            return None
+
+    def generate_property_report_voice(self, property_id: int, user_context: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        Generate a voice property report for hands-free consumption.
+
+        Args:
+            property_id: ID of the property
+            user_context: User context information
+
+        Returns:
+            Voice report data with audio URL
+        """
+        prompt = f"""
+        Generate a concise voice property report for property manager. Keep it under 200 words.
+
+        Property ID: {property_id}
+        User Context: {user_context}
+
+        Cover:
+        1. Current occupancy status
+        2. Financial highlights (rent collected, expenses)
+        3. Active maintenance requests
+        4. Upcoming events (lease renewals, inspections)
+        5. Any urgent issues requiring attention
+
+        Make it conversational and actionable, suitable for voice playback.
+        Focus on key metrics and actionable insights.
+        """
+
+        report_text = self.generate_content(
+            prompt=prompt,
+            model="gemini-2.5-flash",
+            temperature=0.4,
+            max_tokens=400
+        )
+
+        if report_text:
+            return {
+                'report_text': report_text,
+                'audio_url': self._generate_audio_response(report_text),
+                'generated_at': 'now',
+                'property_id': property_id
+            }
+
+        return None
+
+    def _generate_audio_response(self, text: str) -> Optional[str]:
+        """
+        Generate audio response from text (placeholder for future TTS integration).
+
+        In a full implementation, this would use Google's Text-to-Speech API
+        or another TTS service to convert the response text to audio.
+
+        Returns:
+            URL to generated audio file or None
+        """
+        # Placeholder - would integrate with Google Cloud Text-to-Speech
+        # or similar service in production
+        if not text:
+            return None
+
+        # For now, return a placeholder URL
+        # In production, this would generate and store actual audio
+        return f"/api/audio/generated/{hash(text)}.mp3"
+
+
+class FinancialAnalysisService(GeminiAIService):
+    """Service for financial analysis and forecasting using AI."""
+
+    def analyze_property_financials(self, financial_data: Dict[str, Any], analysis_period: str = "12_months") -> Optional[Dict[str, Any]]:
+        """
+        Analyze property financial performance and provide insights.
+
+        Args:
+            financial_data: Dictionary containing financial metrics
+            analysis_period: Period for analysis (3_months, 6_months, 12_months, etc.)
+
+        Returns:
+            Dictionary with financial analysis and recommendations
+        """
+        prompt = f"""
+        Analyze this property's financial performance and provide insights in JSON format:
+
+        {{
+            "profitability_assessment": "excellent/good/fair/poor",
+            "key_financial_ratios": {{
+                "occupancy_rate": "Current occupancy percentage",
+                "noi_margin": "Net Operating Income margin",
+                "cap_rate": "Capitalization rate if available",
+                "cash_flow_stability": "Assessment of cash flow consistency"
+            }},
+            "trend_analysis": {{
+                "revenue_trend": "increasing/stable/declining",
+                "expense_trend": "increasing/stable/declining",
+                "profit_trend": "increasing/stable/declining",
+                "concerning_trends": "List of concerning financial trends"
+            }},
+            "forecast_12_months": {{
+                "expected_revenue": "Projected annual revenue",
+                "expected_expenses": "Projected annual expenses",
+                "expected_profit": "Projected annual profit",
+                "confidence_level": "high/medium/low"
+            }},
+            "recommendations": [
+                "Specific recommendations for improving financial performance"
+            ],
+            "risk_assessment": {{
+                "financial_risks": "Identified financial risks",
+                "mitigation_strategies": "Strategies to address risks",
+                "opportunity_areas": "Areas for financial improvement"
+            }},
+            "benchmarking_insights": "How this property compares to market averages",
+            "confidence_score": "Confidence in analysis (0.0 to 1.0)"
+        }}
+
+        Financial Data for {analysis_period}:
+        {json.dumps(financial_data, indent=2)}
+
+        Provide data-driven insights based on standard real estate financial analysis principles.
+        Return only valid JSON.
+        """
+
+        response = self.generate_content(
+            prompt=prompt,
+            model="gemini-2.5-pro",
+            temperature=0.2,
+            max_tokens=1500
+        )
+
+        if not response:
+            return None
+
+        try:
+            import json
+            json_start = response.find('{')
+            json_end = response.rfind('}') + 1
+            if json_start >= 0 and json_end > json_start:
+                json_str = response[json_start:json_end]
+                return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse financial analysis: {e}")
+            return None
+
+    def generate_financial_report(self, property_data: Dict[str, Any], report_type: str = "monthly") -> Optional[str]:
+        """
+        Generate a comprehensive financial report using AI.
+
+        Args:
+            property_data: Property and financial data
+            report_type: Type of report (monthly, quarterly, annual)
+
+        Returns:
+            Formatted financial report
+        """
+        prompt = f"""
+        Generate a comprehensive {report_type} financial report for this property. Include:
+
+        1. EXECUTIVE SUMMARY
+           - Overall financial performance
+           - Key highlights and concerns
+           - Recommendations for action
+
+        2. REVENUE ANALYSIS
+           - Rental income breakdown
+           - Occupancy trends
+           - Revenue projections
+
+        3. EXPENSE ANALYSIS
+           - Major expense categories
+           - Cost trends and variances
+           - Budget vs actual performance
+
+        4. PROFITABILITY METRICS
+           - Net Operating Income (NOI)
+           - Cash flow analysis
+           - Return on investment metrics
+
+        5. KEY PERFORMANCE INDICATORS
+           - Occupancy rates
+           - Collection rates
+           - Expense ratios
+           - Cash-on-cash returns
+
+        6. FORECASTS AND PROJECTIONS
+           - Short-term financial outlook
+           - Market condition impact
+           - Recommended adjustments
+
+        7. RISK ASSESSMENT
+           - Financial vulnerabilities
+           - Market risks
+           - Mitigation strategies
+
+        8. RECOMMENDATIONS
+           - Immediate actions needed
+           - Long-term strategic improvements
+           - Operational efficiencies
+
+        Format as a professional financial report with clear sections and actionable insights.
+
+        Property Data:
+        {json.dumps(property_data, indent=2)}
+        """
+
+        return self.generate_content(
+            prompt=prompt,
+            model="gemini-2.5-pro",
+            temperature=0.3,
+            max_tokens=2500
+        )
+
+    def analyze_investment_opportunity(self, property_data: Dict[str, Any], market_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        Analyze a property as an investment opportunity.
+
+        Args:
+            property_data: Property financial and operational data
+            market_data: Local market conditions and comparables
+
+        Returns:
+            Investment analysis and recommendations
+        """
+        prompt = f"""
+        Perform a comprehensive investment analysis for this property in JSON format:
+
+        {{
+            "investment_rating": "excellent/good/fair/poor/high_risk",
+            "financial_projections": {{
+                "year_1_noi": "Projected Net Operating Income",
+                "year_3_noi": "3-year NOI projection",
+                "cap_rate": "Current capitalization rate",
+                "irr": "Internal Rate of Return estimate",
+                "cash_on_cash": "Cash-on-cash return percentage"
+            }},
+            "market_analysis": {{
+                "location_rating": "excellent/good/fair/poor",
+                "market_trends": "Current market conditions and trends",
+                "competitive_position": "How this property compares to competition",
+                "growth_potential": "Future appreciation potential"
+            }},
+            "risk_assessment": {{
+                "overall_risk": "low/medium/high",
+                "specific_risks": ["List of specific investment risks"],
+                "risk_mitigation": ["Strategies to mitigate identified risks"]
+            }},
+            "acquisition_strategy": {{
+                "recommended_price_range": "Suggested acquisition price range",
+                "negotiation_points": ["Key negotiation points"],
+                "due_diligence_priorities": ["Critical due diligence items"]
+            }},
+            "value_add_opportunities": [
+                "Potential improvements to increase property value"
+            ],
+            "exit_strategy": {{
+                "hold_period": "Recommended holding period",
+                "exit_options": ["Potential exit strategies"],
+                "expected_returns": "Projected returns at exit"
+            }},
+            "confidence_score": "Confidence in analysis (0.0 to 1.0)"
+        }}
+
+        Property Data:
+        {json.dumps(property_data, indent=2)}
+
+        Market Data:
+        {json.dumps(market_data, indent=2)}
+
+        Base analysis on real estate investment principles and current market conditions.
+        Return only valid JSON.
+        """
+
+        response = self.generate_content(
+            prompt=prompt,
+            model="gemini-2.5-pro",
+            temperature=0.2,
+            max_tokens=2000
+        )
+
+        if not response:
+            return None
+
+        try:
+            import json
+            json_start = response.find('{')
+            json_end = response.rfind('}') + 1
+            if json_start >= 0 and json_end > json_start:
+                json_str = response[json_start:json_end]
+                return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse investment analysis: {e}")
+            return None
+
+
 class MaintenanceAnalysisService(GeminiAIService):
     """Service for analyzing maintenance requests and prioritizing work."""
 
@@ -334,3 +827,6 @@ class MaintenanceAnalysisService(GeminiAIService):
 document_service = DocumentProcessingService()
 communication_service = CommunicationService()
 maintenance_service = MaintenanceAnalysisService()
+inspection_service = PropertyInspectionService()
+financial_service = FinancialAnalysisService()
+voice_service = VoiceAssistantService()
