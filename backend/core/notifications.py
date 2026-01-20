@@ -108,7 +108,7 @@ def notify_lease_created(lease_obj):
               f"Start Date: {lease_obj.lease_start_date}\n" \
               f"End Date: {lease_obj.lease_end_date}\n" \
               f"Monthly Rent: {lease_obj.monthly_rent}\n" \
-              f"Security Deposit: {lease_obj.security_deposit}\n\n" \
+              f"Security Deposit: {lease_obj.deposit_amount or 'N/A'}\n\n" \
               f"Please log in to the portal to view the full details and sign the agreement."
 
     recipients = []

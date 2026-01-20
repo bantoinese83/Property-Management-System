@@ -41,7 +41,11 @@ services:
     environment:
       DEBUG: ${DEBUG:-True}
       SECRET_KEY: ${SECRET_KEY:-your-secret-key}
-      DATABASE_URL: postgresql://property_user:secure_password@db:5432/property_mgmt
+      DB_NAME: property_mgmt
+      DB_USER: property_user
+      DB_PASSWORD: secure_password
+      DB_HOST: db
+      DB_PORT: 5432
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
       REDIS_URL: redis://redis:6379/0
       # Email settings
@@ -80,7 +84,11 @@ services:
     environment:
       DEBUG: ${DEBUG:-True}
       SECRET_KEY: ${SECRET_KEY:-your-secret-key}
-      DATABASE_URL: postgresql://property_user:secure_password@db:5432/property_mgmt
+      DB_NAME: property_mgmt
+      DB_USER: property_user
+      DB_PASSWORD: secure_password
+      DB_HOST: db
+      DB_PORT: 5432
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173}
       REDIS_URL: redis://redis:6379/0
@@ -115,12 +123,12 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: development
     container_name: pms-frontend
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api}
     volumes:
       - ./frontend:/app
-      - /app/node_modules
     ports:
       - "5173:5173"
     depends_on:

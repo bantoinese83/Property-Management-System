@@ -1,4 +1,27 @@
-# Build stage
+# Multi-stage Dockerfile for both development and production
+
+# Development stage
+FROM node:18-alpine as development
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Expose port for development
+EXPOSE 5173
+
+# Start development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+# Production build stage
 FROM node:18-alpine as builder
 
 # Set working directory
@@ -7,8 +30,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (production only)
+RUN npm ci --only=production
 
 # Copy source code
 COPY . .
@@ -17,7 +40,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine
+FROM node:18-alpine as production
 
 # Install serve for serving static files
 RUN npm install -g serve
